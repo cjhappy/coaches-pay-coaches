@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Coaches Pay Coaches – The Marketplace for Youth Sports Coaches</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy: #0b1622;
+  --navy-mid: #101e2d;
+  --navy-card: #111f30;
+  --navy-light: #172840;
+  --green: #2ecc71;
+  --green-dark: #25a85c;
+  --green-dim: rgba(46,204,113,0.10);
+  --green-border: rgba(46,204,113,0.25);
+  --white: #ffffff;
+  --off: #dce8f2;
+  --muted: #7a95ae;
+  --border: rgba(255,255,255,0.07);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden}
+
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.5}
+
+/* ─── NAV ─── */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(11,22,34,0.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);transition:background .3s}
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none;cursor:pointer}
+.logo-badge{width:44px;height:44px;border-radius:10px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:15px;color:var(--navy);letter-spacing:.5px;flex-shrink:0}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;letter-spacing:.8px;color:var(--white);line-height:1.15}
+.logo-text em{color:var(--green);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s;cursor:pointer}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+.nav-cta{background:var(--green)!important;color:var(--navy)!important;padding:9px 22px;border-radius:7px;font-weight:700!important;font-size:13px!important;letter-spacing:.5px}
+.nav-cta:hover{background:var(--green-dark)!important}
+
+.page{display:none;padding-top:66px}
+.page.active{display:block}
+
+/* ─── HERO ─── */
+.hero{min-height:calc(100vh - 66px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 5% 60px;position:relative;overflow:hidden}
+.hero-glow{position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(46,204,113,0.07) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.hero-rings{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(46,204,113,0.06);top:50%;left:50%;transform:translate(-50%,-50%);animation:pulse 7s ease-in-out infinite}
+.ring:nth-child(1){width:360px;height:360px;animation-delay:0s}
+.ring:nth-child(2){width:580px;height:580px;animation-delay:1.2s}
+.ring:nth-child(3){width:800px;height:800px;animation-delay:2.4s}
+.ring:nth-child(4){width:1020px;height:1020px;animation-delay:3.6s}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:.9}}
+
+.sports-orbit{position:absolute;width:600px;height:600px;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;animation:spinOrbit 30s linear infinite}
+.orbit-sport{position:absolute;font-size:22px;opacity:.15}
+.orbit-sport:nth-child(1){top:0;left:50%;transform:translateX(-50%)}
+.orbit-sport:nth-child(2){top:15%;right:0}
+.orbit-sport:nth-child(3){top:50%;right:0;transform:translateY(-50%)}
+.orbit-sport:nth-child(4){bottom:15%;right:0}
+.orbit-sport:nth-child(5){bottom:0;left:50%;transform:translateX(-50%)}
+.orbit-sport:nth-child(6){bottom:15%;left:0}
+.orbit-sport:nth-child(7){top:50%;left:0;transform:translateY(-50%)}
+.orbit-sport:nth-child(8){top:15%;left:0}
+@keyframes spinOrbit{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:7px 18px;border-radius:100px;margin-bottom:28px;position:relative;z-index:2;animation:fadeUp .7s ease both}
+.blink{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.hero-mark{position:relative;z-index:2;margin-bottom:32px;animation:fadeUp .7s ease .05s both}
+.cpc-mark{width:110px;height:110px;border-radius:22px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:38px;color:var(--navy);letter-spacing:1px;margin:0 auto;box-shadow:0 0 60px rgba(46,204,113,0.25);animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+.hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(56px,9vw,108px);line-height:.92;letter-spacing:-1px;text-transform:uppercase;position:relative;z-index:2;animation:fadeUp .7s ease .15s both;margin-bottom:4px}
+.hero h1 em{color:var(--green);font-style:normal}
+.hero-sub{font-size:clamp(15px,1.8vw,18px);color:var(--muted);max-width:560px;margin:22px auto 40px;line-height:1.7;position:relative;z-index:2;animation:fadeUp .7s ease .25s both}
+.hero-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2;animation:fadeUp .7s ease .35s both}
+
+.sport-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:40px;position:relative;z-index:2;animation:fadeUp .7s ease .45s both}
+.sport-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--off);font-size:13px;font-weight:600;padding:7px 15px;border-radius:100px;transition:all .25s;cursor:default}
+.sport-pill:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.sport-pill span{font-size:16px}
+
+.btn{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;letter-spacing:1px;text-transform:uppercase;padding:15px 34px;border-radius:8px;text-decoration:none;border:none;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:8px}
+.btn-green{background:var(--green);color:var(--navy)}
+.btn-green:hover{background:var(--green-dark);transform:translateY(-2px);box-shadow:0 10px 32px rgba(46,204,113,0.28)}
+.btn-ghost{background:transparent;color:var(--white);border:1.5px solid var(--border)}
+.btn-ghost:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── MARQUEE ─── */
+.marquee-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--navy-mid);padding:13px 0;overflow:hidden}
+.marquee-track{display:flex;animation:marquee 32s linear infinite;white-space:nowrap}
+.m-item{display:inline-flex;align-items:center;gap:14px;padding:0 28px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted)}
+.m-dot{color:var(--green);font-size:16px}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ─── PROBLEM ─── */
+.problem-strip{padding:70px 5%;background:var(--navy-mid);border-bottom:1px solid var(--border)}
+.problem-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.problem-tag{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.problem-tag::before{content:'';width:22px;height:2px;background:var(--green)}
+.problem-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(32px,4vw,52px);line-height:.97;text-transform:uppercase;letter-spacing:-.5px;margin-bottom:20px}
+.problem-title em{color:var(--green);font-style:normal}
+.problem-list{list-style:none;display:flex;flex-direction:column;gap:14px}
+.problem-list li{display:flex;align-items:flex-start;gap:12px;font-size:15px;color:var(--off);line-height:1.55}
+.prob-x{width:22px;height:22px;border-radius:6px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.25);display:flex;align-items:center;justify-content:center;font-size:11px;color:#e74c3c;flex-shrink:0;margin-top:1px}
+.solution-cards{display:flex;flex-direction:column;gap:14px}
+.sol-card{background:var(--navy-card);border:1px solid var(--border);border-radius:12px;padding:20px 22px;display:flex;align-items:flex-start;gap:14px;transition:border-color .3s}
+.sol-card:hover{border-color:var(--green-border)}
+.sol-icon{width:40px;height:40px;border-radius:9px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sol-card h4{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;text-transform:uppercase;margin-bottom:4px}
+.sol-card p{font-size:13px;color:var(--muted);line-height:1.55}
+
+/* ─── SECTION ─── */
+.section{padding:90px 5%;position:relative;z-index:1}
+.section-label{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:14px}
+.section-label::before{content:'';width:22px;height:2px;background:var(--green)}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(34px,5vw,60px);line-height:.97;text-transform:uppercase;letter-spacing:-.5px;margin-bottom:14px}
+.section-title em{color:var(--green);font-style:normal}
+.section-desc{color:var(--muted);font-size:16px;max-width:500px;line-height:1.7}
+
+/* ─── HOW ─── */
+.how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2px;margin-top:52px;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.how-card{background:var(--navy-card);padding:38px 30px;position:relative;transition:background .3s}
+.how-card:hover{background:var(--navy-light)}
+.how-num{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:72px;line-height:1;color:rgba(46,204,113,0.08);position:absolute;top:16px;right:20px}
+.how-icon{width:50px;height:50px;border-radius:11px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
+.how-card h3{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:21px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:10px}
+.how-card p{color:var(--muted);font-size:14px;line-height:1.65}
+
+/* ─── SPORTS GRID ─── */
+.sports-wrap{background:var(--navy-mid);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.sports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin-top:48px}
+.sport-card{background:var(--navy-card);border:1px solid var(--border);border-radius:12px;padding:26px 16px;text-align:center;cursor:pointer;transition:all .25s;color:var(--white);display:block}
+.sport-card:hover{border-color:var(--green);background:var(--green-dim);transform:translateY(-4px)}
+.sport-emoji{font-size:30px;margin-bottom:10px;display:block}
+.sport-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.3px}
+.sport-sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ─── CATEGORIES ─── */
+.cats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-top:48px}
+.cat-card{background:var(--navy-card);border:1px solid var(--border);border-radius:12px;padding:26px 16px;text-align:center;cursor:pointer;transition:all .25s;color:var(--white);display:block}
+.cat-card:hover{border-color:var(--green);background:var(--green-dim);transform:translateY(-4px)}
+.cat-icon{font-size:28px;margin-bottom:10px;display:block}
+.cat-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.3px}
+.cat-sub{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* ─── PRODUCTS ─── */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px;margin-top:48px}
+.product-card{background:var(--navy-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .3s;cursor:pointer}
+.product-card:hover{transform:translateY(-5px);border-color:var(--green-border);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.product-thumb{height:148px;display:flex;align-items:center;justify-content:center;font-size:42px;position:relative}
+.pt1{background:linear-gradient(135deg,#0a1e33,#143050)}
+.pt2{background:linear-gradient(135deg,#0a2418,#174d30)}
+.pt3{background:linear-gradient(135deg,#1e1a0a,#42390f)}
+.pt4{background:linear-gradient(135deg,#1a0a2e,#321558)}
+.pt5{background:linear-gradient(135deg,#1a0e0a,#4a2010)}
+.pt6{background:linear-gradient(135deg,#0a1a1e,#103a44)}
+.p-badge{position:absolute;top:10px;left:10px;background:var(--green);color:var(--navy);font-size:9px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:4px}
+.p-sport-tag{position:absolute;top:10px;right:10px;background:rgba(11,22,34,0.8);color:var(--off);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:4px;border:1px solid var(--border)}
+.product-info{padding:18px}
+.p-seller{font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:6px}
+.p-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;text-transform:uppercase;line-height:1.1;margin-bottom:6px}
+.p-type{font-size:12px;color:var(--muted)}
+.p-meta{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.p-price{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:var(--green)}
+.p-btn{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;padding:7px 16px;border-radius:6px;cursor:pointer;transition:all .2s}
+.p-btn:hover{background:var(--green);color:var(--navy)}
+
+/* ─── WHO ─── */
+.who-wrap{background:var(--navy-mid);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.who-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-top:48px}
+.who-card{background:var(--navy-card);border:1px solid var(--border);border-radius:14px;padding:30px 24px;transition:all .3s}
+.who-card:hover{border-color:var(--green-border);transform:translateY(-3px)}
+.who-emoji{font-size:32px;margin-bottom:14px;display:block}
+.who-card h3{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:21px;text-transform:uppercase;margin-bottom:8px}
+.who-card p{font-size:14px;color:var(--muted);line-height:1.65}
+
+/* ─── SELLER ─── */
+.seller-strip{background:var(--navy-mid);border-top:1px solid var(--border)}
+.seller-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.earn-list{list-style:none;margin:26px 0 34px;display:flex;flex-direction:column;gap:13px}
+.earn-list li{display:flex;align-items:flex-start;gap:11px;font-size:15px;color:var(--off);line-height:1.5}
+.chk{width:22px;height:22px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--green);flex-shrink:0;margin-top:1px}
+.seller-visual{display:flex;align-items:center;justify-content:center;position:relative}
+.cpc-big{width:200px;height:200px;border-radius:36px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:72px;color:var(--navy);letter-spacing:2px;box-shadow:0 0 80px rgba(46,204,113,0.2);animation:float 5s ease-in-out infinite}
+.seller-float{position:absolute}
+.sf{background:var(--navy-card);border:1px solid var(--border);border-radius:10px;padding:13px 18px;position:absolute;white-space:nowrap;animation:floatStat 4s ease-in-out infinite}
+.sf:nth-child(1){top:-24px;right:-70px;animation-delay:0s}
+.sf:nth-child(2){bottom:4px;left:-80px;animation-delay:2s}
+@keyframes floatStat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.sf-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:26px;color:var(--green);line-height:1}
+.sf-lbl{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ─── COMMISSION ─── */
+.comm-box{max-width:760px;margin:48px auto 0;background:var(--navy-card);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.comm-top{padding:48px;text-align:center;border-bottom:1px solid var(--border)}
+.comm-pct{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:110px;line-height:1;color:var(--green);text-shadow:0 0 50px rgba(46,204,113,0.25)}
+.comm-sub{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;text-transform:uppercase;letter-spacing:3px;color:var(--muted);margin-top:-6px}
+.comm-desc{font-size:15px;color:var(--muted);max-width:400px;margin:14px auto 0;line-height:1.65}
+.comm-rows{display:grid;grid-template-columns:1fr 1fr 1fr}
+.cr{padding:26px;text-align:center;border-right:1px solid var(--border)}
+.cr:last-child{border-right:none}
+.cr-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:30px}
+.cr-lbl{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:1px}
+
+/* ─── FOOTER ─── */
+footer{background:#07101a;border-top:1px solid var(--border);padding:56px 5% 36px}
+.footer-inner{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px}
+.footer-brand-logo{display:flex;align-items:center;gap:10px;margin-bottom:14px;text-decoration:none;cursor:pointer}
+.fbadge{width:38px;height:38px;border-radius:8px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:13px;color:var(--navy)}
+.ftext{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;color:var(--white);line-height:1.2}
+.ftext em{color:var(--green);font-style:normal}
+.footer-tagline{font-size:13px;color:var(--muted);line-height:1.65;max-width:240px}
+.footer-col h4{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;text-transform:uppercase;letter-spacing:2px;color:var(--white);margin-bottom:18px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.footer-col a{color:var(--muted);text-decoration:none;font-size:13px;transition:color .2s;cursor:pointer}
+.footer-col a:hover{color:var(--green)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:26px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.footer-copy{font-size:12px;color:var(--muted)}
+.footer-copy em{color:var(--green);font-style:normal}
+.socials{display:flex;gap:10px}
+.soc{width:34px;height:34px;border-radius:7px;background:var(--navy-card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);cursor:pointer;transition:all .2s}
+.soc:hover{border-color:var(--green);color:var(--green)}
+
+/* ─── COACHES PAGE ─── */
+.coaches-hero{padding:80px 5% 50px;position:relative;overflow:hidden;border-bottom:1px solid var(--border)}
+.coaches-hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 60% 50%,rgba(46,204,113,0.06) 0%,transparent 65%);pointer-events:none}
+.coaches-hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(44px,7vw,84px);line-height:.93;text-transform:uppercase;letter-spacing:-1px;position:relative;z-index:1;animation:fadeUp .7s ease both}
+.coaches-hero h1 em{color:var(--green);font-style:normal}
+.coaches-hero p{font-size:17px;color:var(--muted);max-width:520px;margin-top:18px;line-height:1.7;position:relative;z-index:1;animation:fadeUp .7s ease .1s both}
+
+.filter-bar{display:flex;align-items:center;gap:10px;padding:24px 5%;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--navy-mid)}
+.filter-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;padding:8px 18px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .2s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+
+.featured-coach{padding:60px 5%;border-bottom:1px solid var(--border);background:var(--navy-mid)}
+.fc-inner{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:start;max-width:900px}
+.fc-avatar{width:100px;height:100px;border-radius:20px;background:linear-gradient(135deg,#143050,#2ecc71);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:36px;flex-shrink:0;border:2px solid var(--green);box-shadow:0 0 30px rgba(46,204,113,0.2)}
+.fc-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green);color:var(--navy);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:4px;margin-bottom:12px}
+.fc-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:34px;text-transform:uppercase;letter-spacing:-.3px;line-height:1}
+.fc-role{font-size:13px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:1.5px;margin:6px 0 14px}
+.fc-bio{font-size:15px;color:var(--muted);line-height:1.7;max-width:560px;margin-bottom:20px}
+.fc-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
+.tag{background:var(--navy-card);border:1px solid var(--border);color:var(--off);font-size:12px;font-weight:600;padding:5px 12px;border-radius:6px}
+.fc-stats{display:flex;gap:28px;flex-wrap:wrap}
+.fcs-val{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:24px;color:var(--white)}
+.fcs-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+
+.coaches-section{padding:60px 5%}
+.coaches-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;margin-top:36px}
+.coach-card{background:var(--navy-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .3s;cursor:pointer}
+.coach-card:hover{transform:translateY(-5px);border-color:var(--green-border);box-shadow:0 18px 50px rgba(0,0,0,.45)}
+.coach-card-top{padding:24px 24px 18px;display:flex;align-items:flex-start;gap:16px;border-bottom:1px solid var(--border)}
+.coach-av{width:64px;height:64px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:22px;flex-shrink:0}
+.av-a{background:linear-gradient(135deg,#0f2d44,#1a5c8a)}
+.av-b{background:linear-gradient(135deg,#0f3320,#1a6640)}
+.av-c{background:linear-gradient(135deg,#2a1a0f,#5c3a1a)}
+.av-d{background:linear-gradient(135deg,#1f0f2e,#4a1a6e)}
+.av-e{background:linear-gradient(135deg,#0f1f2e,#1a4060)}
+.av-f{background:linear-gradient(135deg,#2e1a1a,#6e2a2a)}
+.av-g{background:linear-gradient(135deg,#1a2e1a,#2a6e2a)}
+.av-h{background:linear-gradient(135deg,#2e2a1a,#6e5a1a)}
+.coach-info{flex:1;min-width:0}
+.coach-name{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:20px;text-transform:uppercase;line-height:1.1;margin-bottom:4px}
+.coach-title{font-size:12px;color:var(--green);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.coach-specialty{font-size:13px;color:var(--muted);line-height:1.5}
+.coach-card-bottom{padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+.coach-tags-small{display:flex;gap:6px;flex-wrap:wrap}
+.tag-sm{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);font-size:10px;font-weight:600;padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px}
+.sport-tag-sm{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:10px;font-weight:700;padding:3px 9px;border-radius:5px;text-transform:uppercase;letter-spacing:.5px}
+.view-btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;padding:7px 15px;border-radius:6px;border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);cursor:pointer;transition:all .2s;white-space:nowrap}
+.view-btn:hover{background:var(--green);color:var(--navy)}
+
+.become-cta{padding:80px 5%;background:var(--navy-mid);border-top:1px solid var(--border);text-align:center}
+.become-cta .cpc-mark{margin:0 auto 32px;width:90px;height:90px;font-size:30px;border-radius:18px}
+.become-cta h2{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:clamp(36px,5vw,62px);text-transform:uppercase;letter-spacing:-.5px;margin-bottom:16px}
+.become-cta h2 em{color:var(--green);font-style:normal}
+.become-cta p{font-size:17px;color:var(--muted);max-width:500px;margin:0 auto 36px;line-height:1.7}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  .seller-inner{grid-template-columns:1fr}.seller-visual{display:none}
+  .footer-inner{grid-template-columns:1fr 1fr}
+  .comm-rows{grid-template-columns:1fr}.cr{border-right:none;border-bottom:1px solid var(--border)}.cr:last-child{border-bottom:none}
+  .fc-inner{grid-template-columns:1fr}
+  .problem-inner{grid-template-columns:1fr}
+  nav .nav-links li:not(:last-child){display:none}
+}
+@media(max-width:600px){.footer-inner{grid-template-columns:1fr}.hero h1{font-size:52px}}
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <a class="logo" onclick="showPage('home')">
+    <div class="logo-badge">CPC</div>
+    <div class="logo-text">COACHES <em>PAY</em> COACHES</div>
+  </a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')" id="nav-home" class="active">Home</a></li>
+    <li><a onclick="showPage('home');scrollTo('#sports')">Sports</a></li>
+    <li><a onclick="showPage('coaches')" id="nav-coaches">Coaches</a></li>
+    <li><a onclick="showPage('home');scrollTo('#sell')">Sell</a></li>
+    <li><a class="nav-cta">Get Started →</a></li>
+  </ul>
+</nav>
+
+<!-- ══ HOME ══ -->
+<div id="page-home" class="page active">
+
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+    <div class="sports-orbit">
+      <span class="orbit-sport">🏀</span><span class="orbit-sport">⚽</span><span class="orbit-sport">🏈</span><span class="orbit-sport">⚾</span>
+      <span class="orbit-sport">🏒</span><span class="orbit-sport">🎾</span><span class="orbit-sport">🏐</span><span class="orbit-sport">🥍</span>
+    </div>
+    <div class="hero-mark"><div class="cpc-mark">CPC</div></div>
+    <div class="hero-eyebrow"><span class="blink"></span>The Marketplace for Youth Sports Coaches</div>
+    <h1>Coaches <em>Pay</em><br/>Coaches</h1>
+    <p class="hero-sub">A peer-driven digital marketplace where youth sports coaches buy and sell high-quality coaching materials — playbooks, drills, practice plans, scouting reports, film breakdowns, and more. Every sport. Every level.</p>
+    <div class="hero-btns">
+      <button class="btn btn-green" onclick="showPage('home');scrollTo('#sports')">Browse by Sport →</button>
+      <button class="btn btn-ghost" onclick="showPage('home');scrollTo('#sell')">Start Selling</button>
+    </div>
+    <div class="sport-pills">
+      <div class="sport-pill"><span>🏀</span> Basketball</div>
+      <div class="sport-pill"><span>⚽</span> Soccer</div>
+      <div class="sport-pill"><span>🏈</span> Football</div>
+      <div class="sport-pill"><span>⚾</span> Baseball</div>
+      <div class="sport-pill"><span>🏒</span> Hockey</div>
+      <div class="sport-pill"><span>🏐</span> Volleyball</div>
+      <div class="sport-pill"><span>🥍</span> Lacrosse</div>
+      <div class="sport-pill"><span>+</span> More</div>
+    </div>
+  </section>
+
+  <div class="marquee-bar">
+    <div class="marquee-track">
+      <span class="m-item">Playbooks <span class="m-dot">●</span></span>
+      <span class="m-item">Practice Plans <span class="m-dot">●</span></span>
+      <span class="m-item">Scouting Reports <span class="m-dot">●</span></span>
+      <span class="m-item">Film Breakdowns <span class="m-dot">●</span></span>
+      <span class="m-item">Skill Workouts <span class="m-dot">●</span></span>
+      <span class="m-item">Defensive Schemes <span class="m-dot">●</span></span>
+      <span class="m-item">Strength & Conditioning <span class="m-dot">●</span></span>
+      <span class="m-item">Video Clinics <span class="m-dot">●</span></span>
+      <span class="m-item">All Sports <span class="m-dot">●</span></span>
+      <span class="m-item">All Levels <span class="m-dot">●</span></span>
+      <span class="m-item">Playbooks <span class="m-dot">●</span></span>
+      <span class="m-item">Practice Plans <span class="m-dot">●</span></span>
+      <span class="m-item">Scouting Reports <span class="m-dot">●</span></span>
+      <span class="m-item">Film Breakdowns <span class="m-dot">●</span></span>
+      <span class="m-item">Skill Workouts <span class="m-dot">●</span></span>
+      <span class="m-item">Defensive Schemes <span class="m-dot">●</span></span>
+      <span class="m-item">Strength & Conditioning <span class="m-dot">●</span></span>
+      <span class="m-item">Video Clinics <span class="m-dot">●</span></span>
+      <span class="m-item">All Sports <span class="m-dot">●</span></span>
+      <span class="m-item">All Levels <span class="m-dot">●</span></span>
+    </div>
+  </div>
+
+  <!-- PROBLEM / SOLUTION -->
+  <section class="problem-strip">
+    <div class="problem-inner">
+      <div class="reveal">
+        <div class="problem-tag">The Problem</div>
+        <h2 class="problem-title">Youth Coaches<br/>Deserve <em>Better</em><br/>Resources</h2>
+        <ul class="problem-list">
+          <li><div class="prob-x">✕</div>Most youth coaches are parents — not always versed in practice planning, drills, or skill development</li>
+          <li><div class="prob-x">✕</div>No centralized, trusted platform exists to buy or sell sport-specific coaching content</li>
+          <li><div class="prob-x">✕</div>Quality resources are scattered, inconsistent, and often overpriced</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="problem-tag">Our Solution</div>
+        <div class="solution-cards">
+          <div class="sol-card"><div class="sol-icon">🤝</div><div><h4>Peer-Driven Marketplace</h4><p>Coaches upload, sell, and purchase materials quickly and securely — all in one place, across every sport.</p></div></div>
+          <div class="sol-card"><div class="sol-icon">⭐</div><div><h4>Curated & Reviewed</h4><p>Quality content from real coaches. User ratings, product reviews, and top-seller recognition built in.</p></div></div>
+          <div class="sol-card"><div class="sol-icon">🔒</div><div><h4>Secure & Protected</h4><p>Safe file delivery, watermarked downloads, and encrypted payments — built for coaches, not tech experts.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPORTS -->
+  <section class="section sports-wrap" id="sports">
+    <div class="section-label">Every Sport</div>
+    <h2 class="section-title">Browse <em>By Sport</em></h2>
+    <p class="section-desc">From the hardwood to the pitch to the ice — resources for every youth sports coach, at every level.</p>
+    <div class="sports-grid reveal">
+      <a class="sport-card"><span class="sport-emoji">🏀</span><div class="sport-name">Basketball</div><div class="sport-sub">Youth · AAU · HS · College</div></a>
+      <a class="sport-card"><span class="sport-emoji">⚽</span><div class="sport-name">Soccer</div><div class="sport-sub">Club · Rec · Travel</div></a>
+      <a class="sport-card"><span class="sport-emoji">🏈</span><div class="sport-name">Football</div><div class="sport-sub">Pop Warner · HS · Flag</div></a>
+      <a class="sport-card"><span class="sport-emoji">⚾</span><div class="sport-name">Baseball</div><div class="sport-sub">Little League · Travel Ball</div></a>
+      <a class="sport-card"><span class="sport-emoji">🥎</span><div class="sport-name">Softball</div><div class="sport-sub">Rec · Travel · HS</div></a>
+      <a class="sport-card"><span class="sport-emoji">🏒</span><div class="sport-name">Hockey</div><div class="sport-sub">Mites · Squirts · Bantam</div></a>
+      <a class="sport-card"><span class="sport-emoji">🏐</span><div class="sport-name">Volleyball</div><div class="sport-sub">Club · Rec · HS</div></a>
+      <a class="sport-card"><span class="sport-emoji">🥍</span><div class="sport-name">Lacrosse</div><div class="sport-sub">Youth · HS · Club</div></a>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section">
+    <div class="section-label">Browse By Type</div>
+    <h2 class="section-title">Find What You <em>Need</em></h2>
+    <p class="section-desc">Every format a coach needs — downloadable, game-ready, and built by coaches who've been there.</p>
+    <div class="cats-grid reveal">
+      <a class="cat-card"><span class="cat-icon">📒</span><div class="cat-name">Playbooks</div><div class="cat-sub">Offensive & Defensive Sets</div></a>
+      <a class="cat-card"><span class="cat-icon">📅</span><div class="cat-name">Practice Plans</div><div class="cat-sub">Full Season Blueprints</div></a>
+      <a class="cat-card"><span class="cat-icon">🏋️</span><div class="cat-name">Skill Workouts</div><div class="cat-sub">Player Development</div></a>
+      <a class="cat-card"><span class="cat-icon">🛡️</span><div class="cat-name">Defensive Schemes</div><div class="cat-sub">System-Level Defense</div></a>
+      <a class="cat-card"><span class="cat-icon">🎬</span><div class="cat-name">Film Breakdowns</div><div class="cat-sub">Opponent Scouting</div></a>
+      <a class="cat-card"><span class="cat-icon">💪</span><div class="cat-name">Strength & Conditioning</div><div class="cat-sub">Athlete Performance</div></a>
+    </div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="section" style="background:var(--navy-mid);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="section-label">Top Sellers</div>
+    <h2 class="section-title">Featured <em>Products</em></h2>
+    <p class="section-desc">Peer-reviewed resources from coaches who've been in the gym, on the field, and in the film room.</p>
+    <div class="products-grid reveal">
+      <div class="product-card">
+        <div class="product-thumb pt1"><span class="p-badge">Playbook</span><span class="p-sport-tag">🏀 Basketball</span>📒</div>
+        <div class="product-info"><div class="p-seller">Youth · AAU · High School</div><div class="p-name">Motion Offense Complete System</div><div class="p-type">PDF · Digital Download</div><div class="p-meta"><div class="p-price">$—</div><button class="p-btn">View</button></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb pt2"><span class="p-badge">Practice Plan</span><span class="p-sport-tag">⚽ Soccer</span>📅</div>
+        <div class="product-info"><div class="p-seller">Club · Recreational</div><div class="p-name">Youth Soccer Season Practice Bundle</div><div class="p-type">PDF · Template Pack</div><div class="p-meta"><div class="p-price">$—</div><button class="p-btn">View</button></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb pt3"><span class="p-badge">Playbook</span><span class="p-sport-tag">🏈 Football</span>🏈</div>
+        <div class="product-info"><div class="p-seller">Youth · Pop Warner</div><div class="p-name">Youth Spread Offense Playbook</div><div class="p-type">PDF · Diagrams</div><div class="p-meta"><div class="p-price">$—</div><button class="p-btn">View</button></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb pt4"><span class="p-badge">Workout</span><span class="p-sport-tag">Multi-Sport</span>🏋️</div>
+        <div class="product-info"><div class="p-seller">Youth · Development</div><div class="p-name">Athlete Skill Development 8-Week Program</div><div class="p-type">PDF · Video Drills</div><div class="p-meta"><div class="p-price">$—</div><button class="p-btn">View</button></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb pt5"><span class="p-badge">Defense</span><span class="p-sport-tag">⚽ Soccer</span>🛡️</div>
+        <div class="product-info"><div class="p-seller">Travel · HS</div><div class="p-name">Defensive Shape & Pressing System</div><div class="p-type">PDF · Video</div><div class="p-meta"><div class="p-price">$—</div><button class="p-btn">View</button></div></div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb pt6"><span class="p-badge">Film</span><span class="p-sport-tag">🏈 Football</span>🎬</div>
+        <div class="product-info"><div class="p-seller">Youth · HS</div><div class="p-name">Reading Defenses: Youth QB Guide</div><div class="p-type">Video Breakdown · PDF</div><div class="p-meta"><div class="p-price">$—</div><button class="p-btn">View</button></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHO IT'S FOR -->
+  <section class="section who-wrap">
+    <div class="section-label">Who It's For</div>
+    <h2 class="section-title">Built for <em>Every</em> Coach</h2>
+    <p class="section-desc">Whether you've coached for 20 years or just took over a rec team last weekend — this platform is for you.</p>
+    <div class="who-grid reveal">
+      <div class="who-card"><span class="who-emoji">👨‍👧</span><h3>Parent Coaches</h3><p>You volunteered, now you need a plan. Find ready-to-run practice plans, drills, and seasonal guides built by coaches who've been there.</p></div>
+      <div class="who-card"><span class="who-emoji">🏆</span><h3>AAU & Club Coaches</h3><p>High-level content for high-level programs. Playbooks, scouting reports, and film breakdowns built for competitive play.</p></div>
+      <div class="who-card"><span class="who-emoji">🎓</span><h3>High School Coaches</h3><p>Full-season systems, defensive schemes, and strength programs designed for the varsity level and up — across all sports.</p></div>
+      <div class="who-card"><span class="who-emoji">📐</span><h3>Skills & Trainers</h3><p>Sell your training programs, workout plans, and player development systems to coaches and parents nationwide.</p></div>
+      <div class="who-card"><span class="who-emoji">🌍</span><h3>International Coaches</h3><p>U.S. coaching resources are in demand worldwide. Access or sell proven content across borders, across sports.</p></div>
+      <div class="who-card"><span class="who-emoji">🏫</span><h3>PE Teachers</h3><p>Find beginner-friendly drill libraries, intro sport resources, and multi-sport materials built for the classroom and gym.</p></div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how">
+    <div class="section-label">Simple Process</div>
+    <h2 class="section-title">How It <em>Works</em></h2>
+    <p class="section-desc">Built by coaches, for coaches. Get what you need or earn from what you know — in any sport.</p>
+    <div class="how-grid reveal">
+      <div class="how-card"><div class="how-num">01</div><div class="how-icon">🏅</div><h3>Create Your Account</h3><p>Sign up free as a buyer, seller, or both. Build your public coach profile with your sport, bio, and credentials.</p></div>
+      <div class="how-card"><div class="how-num">02</div><div class="how-icon">📋</div><h3>Browse or Upload</h3><p>Shop peer-reviewed resources from real coaches — or upload your own playbooks, drills, and practice plans to start earning.</p></div>
+      <div class="how-card"><div class="how-num">03</div><div class="how-icon">💳</div><h3>Secure Checkout</h3><p>Every transaction is encrypted and protected. Files are watermarked and tracked to prevent unauthorized sharing.</p></div>
+      <div class="how-card"><div class="how-num">04</div><div class="how-icon">📥</div><h3>Instant Download</h3><p>Get your resources immediately after purchase. PDFs, videos, and templates delivered straight to your dashboard.</p></div>
+    </div>
+  </section>
+
+  <!-- SELL -->
+  <section class="section seller-strip" id="sell">
+    <div class="seller-inner">
+      <div class="reveal">
+        <div class="section-label">For Coaches Who Know</div>
+        <h2 class="section-title">Start <em>Earning</em><br/>From Your<br/>Expertise</h2>
+        <p class="section-desc">Your playbooks, your practice plans, your systems — in any sport, worth more than you think. Set your price, upload your work, and earn every time another coach downloads it.</p>
+        <ul class="earn-list">
+          <li><div class="chk">✓</div>Keep 70% of every sale — transparent, no surprises</li>
+          <li><div class="chk">✓</div>Upload PDFs, videos, templates, and graphics — all formats supported</li>
+          <li><div class="chk">✓</div>Your own public storefront with ratings and full sales history</li>
+          <li><div class="chk">✓</div>Passive income — sell the same resource to hundreds of coaches</li>
+          <li><div class="chk">✓</div>Files are watermarked and protected against piracy</li>
+        </ul>
+        <button class="btn btn-green" onclick="showPage('coaches')">Meet Our Coaches →</button>
+      </div>
+      <div class="seller-visual">
+        <div class="cpc-big">CPC</div>
+        <div class="seller-float">
+          <div class="sf"><div class="sf-val">70%</div><div class="sf-lbl">You keep per sale</div></div>
+          <div class="sf"><div class="sf-val">30%</div><div class="sf-lbl">Platform fee</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMISSION -->
+  <section class="section" style="text-align:center">
+    <div class="section-label" style="justify-content:center">Transparent Pricing</div>
+    <h2 class="section-title">Simple <em>Commission</em> Model</h2>
+    <p class="section-desc" style="margin:0 auto">No hidden fees. No confusing tiers. Straightforward revenue sharing — coaches first, every sport.</p>
+    <div class="comm-box reveal">
+      <div class="comm-top">
+        <div class="comm-pct">70%</div>
+        <div class="comm-sub">Goes Directly to You</div>
+        <p class="comm-desc">Set your price. Sell your knowledge. Every download puts 70% straight into your account — basketball, soccer, football, or any other sport.</p>
+      </div>
+      <div class="comm-rows">
+        <div class="cr"><div class="cr-val">You Set</div><div class="cr-lbl">Your Own Price</div></div>
+        <div class="cr"><div class="cr-val">70%</div><div class="cr-lbl">Goes to Seller</div></div>
+        <div class="cr"><div class="cr-val">30%</div><div class="cr-lbl">Platform Fee</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a class="footer-brand-logo" onclick="showPage('home')"><div class="fbadge">CPC</div><div class="ftext">COACHES <em>PAY</em> COACHES</div></a>
+        <p class="footer-tagline">The go-to resource hub for youth sports coaches around the world. Share knowledge, earn income, improve the game — one download at a time.</p>
+      </div>
+      <div class="footer-col"><h4>Browse</h4><ul><li><a>All Sports</a></li><li><a>Basketball</a></li><li><a>Soccer</a></li><li><a>Football</a></li><li><a>More Sports</a></li></ul></div>
+      <div class="footer-col"><h4>Sellers</h4><ul><li><a>Start Selling</a></li><li><a onclick="showPage('coaches')">Meet Coaches</a></li><li><a>Upload Guide</a></li><li><a>Pricing & Fees</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a>About Us</a></li><li><a>Contact</a></li><li><a>Terms of Service</a></li><li><a>Privacy Policy</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 <em>Coaches Pay Coaches</em>. Built for coaches, by coaches.</div>
+      <div class="socials"><a class="soc">𝕏</a><a class="soc">in</a><a class="soc">▶</a><a class="soc">📘</a></div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ COACHES PAGE ══ -->
+<div id="page-coaches" class="page">
+
+  <div class="coaches-hero">
+    <div class="coaches-hero-bg"></div>
+    <div class="section-label">Community</div>
+    <h1>Meet the <em>Coaches</em></h1>
+    <p>Real coaches. Real experience. Every sport. Browse profiles, explore their stores, and find resources that elevate your program — whether you're on the hardwood, the pitch, the field, or the ice.</p>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active">All Sports</button>
+    <button class="filter-btn">🏀 Basketball</button>
+    <button class="filter-btn">⚽ Soccer</button>
+    <button class="filter-btn">🏈 Football</button>
+    <button class="filter-btn">⚾ Baseball</button>
+    <button class="filter-btn">🏒 Hockey</button>
+    <button class="filter-btn">🏐 Volleyball</button>
+    <button class="filter-btn">🥍 Lacrosse</button>
+  </div>
+
+  <div class="featured-coach">
+    <div class="section-label">Featured Seller</div>
+    <div class="fc-inner">
+      <div class="fc-avatar">MW</div>
+      <div>
+        <div class="fc-badge">⭐ Top Seller</div>
+        <div class="fc-name">Coach Marcus Williams</div>
+        <div class="fc-role">AAU Head Coach · Player Development Specialist</div>
+        <p class="fc-bio">Veteran AAU basketball coach with over a decade of experience developing guards and wings at the youth and high school level. Known for detailed motion offense systems and defensive drill libraries that coaches at every level can implement immediately.</p>
+        <div class="fc-tags">
+          <span class="tag">🏀 Basketball</span><span class="tag">Motion Offense</span><span class="tag">Guard Development</span><span class="tag">Practice Planning</span><span class="tag">AAU</span>
+        </div>
+        <div class="fc-stats">
+          <div><div class="fcs-val">Playbooks</div><div class="fcs-lbl">Specialty</div></div>
+          <div><div class="fcs-val">PDFs & Video</div><div class="fcs-lbl">Formats</div></div>
+          <div><div class="fcs-val">Verified</div><div class="fcs-lbl">Coach Status</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="coaches-section">
+    <div class="section-label">All Coaches</div>
+    <h2 class="section-title">Browse <em>Seller Profiles</em></h2>
+    <p class="section-desc">Every coach is verified. Ratings and reviews come from real purchases across all sports and all levels.</p>
+    <div class="coaches-grid reveal">
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-a">DT</div><div class="coach-info"><div class="coach-name">Coach D. Thompson</div><div class="coach-title">HS Varsity · Defensive Specialist</div><div class="coach-specialty">Full-court press systems and zone schemes adaptable for high school basketball programs.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">🏀 Basketball</span><span class="tag-sm">Defense</span><span class="tag-sm">PDF</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-b">LM</div><div class="coach-info"><div class="coach-name">Coach L. Martinez</div><div class="coach-title">Club Soccer Director · Tactical Coach</div><div class="coach-specialty">Complete seasonal practice plans and tactical frameworks for youth and travel soccer coaches.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">⚽ Soccer</span><span class="tag-sm">Tactics</span><span class="tag-sm">Season Plans</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-c">JP</div><div class="coach-info"><div class="coach-name">Coach J. Patterson</div><div class="coach-title">Youth Development · S&C Specialist</div><div class="coach-specialty">6-to-12 week multi-sport athlete development programs covering skill work and athleticism for youth athletes.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">Multi-Sport</span><span class="tag-sm">S&C</span><span class="tag-sm">Programs</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-d">RG</div><div class="coach-info"><div class="coach-name">Coach R. Garcia</div><div class="coach-title">Pop Warner Football · Offensive Coordinator</div><div class="coach-specialty">Youth-friendly playbooks and offensive install guides designed for coaches working with young football players.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">🏈 Football</span><span class="tag-sm">Playbooks</span><span class="tag-sm">Youth</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-e">SB</div><div class="coach-info"><div class="coach-name">Coach S. Brown</div><div class="coach-title">PE Teacher · Multi-Sport Youth Coach</div><div class="coach-specialty">Beginner-friendly drill libraries and intro resources for PE educators and first-year coaches across multiple sports.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">Multi-Sport</span><span class="tag-sm">Drills</span><span class="tag-sm">Beginner</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-f">KN</div><div class="coach-info"><div class="coach-name">Coach K. Nielsen</div><div class="coach-title">Youth Hockey · Skills Development</div><div class="coach-specialty">On-ice drill progressions and practice plans for Mites through Bantam with age-appropriate structure.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">🏒 Hockey</span><span class="tag-sm">Drills</span><span class="tag-sm">Practice Plans</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-g">TC</div><div class="coach-info"><div class="coach-name">Coach T. Chen</div><div class="coach-title">Travel Volleyball · Club Director</div><div class="coach-specialty">Serve, pass, attack progressions and tournament-ready practice formats for club and high school volleyball programs.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">🏐 Volleyball</span><span class="tag-sm">Club</span><span class="tag-sm">Systems</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+      <div class="coach-card">
+        <div class="coach-card-top"><div class="coach-av av-h">RL</div><div class="coach-info"><div class="coach-name">Coach R. Lewis</div><div class="coach-title">HS Baseball · Pitching Coach</div><div class="coach-specialty">Pitching mechanics breakdowns, bullpen practice plans, and in-season game planning guides for high school programs.</div></div></div>
+        <div class="coach-card-bottom"><div class="coach-tags-small"><span class="sport-tag-sm">⚾ Baseball</span><span class="tag-sm">Pitching</span><span class="tag-sm">HS</span></div><button class="view-btn">View Store</button></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="become-cta">
+    <div class="cpc-mark">CPC</div>
+    <h2>Share Your <em>Knowledge</em></h2>
+    <p>Every coach — in every sport — has something valuable to offer. Create your profile, upload your resources, and join a community that's elevating youth sports together.</p>
+    <button class="btn btn-green">Become a Seller →</button>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <a class="footer-brand-logo" onclick="showPage('home')"><div class="fbadge">CPC</div><div class="ftext">COACHES <em>PAY</em> COACHES</div></a>
+        <p class="footer-tagline">The go-to resource hub for youth sports coaches around the world. Share knowledge, earn income, improve the game — one download at a time.</p>
+      </div>
+      <div class="footer-col"><h4>Browse</h4><ul><li><a>All Sports</a></li><li><a>Basketball</a></li><li><a>Soccer</a></li><li><a>Football</a></li></ul></div>
+      <div class="footer-col"><h4>Sellers</h4><ul><li><a>Start Selling</a></li><li><a onclick="showPage('home')">Back to Home</a></li><li><a>Upload Guide</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a>About Us</a></li><li><a>Contact</a></li><li><a>Terms of Service</a></li><li><a>Privacy Policy</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 <em>Coaches Pay Coaches</em>. Built for coaches, by coaches.</div>
+      <div class="socials"><a class="soc">𝕏</a><a class="soc">in</a><a class="soc">▶</a><a class="soc">📘</a></div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-links a[id^="nav-"]').forEach(a=>a.classList.remove('active'));
+  const el=document.getElementById('nav-'+name);
+  if(el)el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  initReveals();
+}
+function scrollTo(id){
+  setTimeout(()=>{const el=document.querySelector(id);if(el)el.scrollIntoView({behavior:'smooth'});},120);
+}
+document.querySelectorAll('.filter-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+function initReveals(){
+  const reveals=document.querySelectorAll('.reveal:not(.visible)');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
+  },{threshold:0.08});
+  reveals.forEach(r=>obs.observe(r));
+}
+initReveals();
+window.addEventListener('scroll',()=>{
+  document.getElementById('main-nav').style.background=
+    window.scrollY>40?'rgba(7,16,26,0.98)':'rgba(11,22,34,0.94)';
+});
+</script>
+</body>
+</html>
