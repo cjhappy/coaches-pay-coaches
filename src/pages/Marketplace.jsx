@@ -7,7 +7,7 @@ const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey',
 const CATEGORIES = ['All', 'Practice Plans', 'Drills', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Strength & Conditioning', 'Film Breakdown', 'Recruiting', 'Mental Performance', 'Other']
 
 export default function Marketplace() {
-  const { profile, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [listings, setListings] = useState([])
   const [filtered, setFiltered] = useState([])
@@ -16,38 +16,50 @@ export default function Marketplace() {
   const [category, setCategory] = useState('All')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('newest')
+  const [showFollowing, setShowFollowing] = useState(false)
+  const [followingIds, setFollowingIds] = useState([])
 
   useEffect(() => { fetchListings() }, [])
-  useEffect(() => { applyFilters() }, [listings, sport, category, search, sort])
+  useEffect(() => { applyFilters() }, [listings, sport, category, search, sort, showFollowing, followingIds])
 
   async function fetchListings() {
-  const { data: listingsData, error } = await supabase
-    .from('listings')
-    .select('*')
-    .order('created_at', { ascending: false })
-  
-  if (error || !listingsData) { setLoading(false); return }
+    const { data: listingsData, error } = await supabase
+      .from('listings')
+      .select('*')
+      .order('created_at', { ascending: false })
 
-  const sellerIds = [...new Set(listingsData.map(l => l.seller_id))]
-  const { data: profilesData } = await supabase
-    .from('profiles')
-    .select('id, full_name, avatar_url')
-    .in('id', sellerIds)
+    if (error || !listingsData) { setLoading(false); return }
 
-  const profileMap = {}
-  profilesData?.forEach(p => { profileMap[p.id] = p })
+    const sellerIds = [...new Set(listingsData.map(l => l.seller_id))]
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, full_name, avatar_url')
+      .in('id', sellerIds)
 
-  const combined = listingsData.map(l => ({
-    ...l,
-    profiles: profileMap[l.seller_id] || null
-  }))
+    const profileMap = {}
+    profilesData?.forEach(p => { profileMap[p.id] = p })
 
-  setListings(combined)
-  setLoading(false)
-}
+    const combined = listingsData.map(l => ({
+      ...l,
+      profiles: profileMap[l.seller_id] || null
+    }))
+
+    setListings(combined)
+
+    if (user) {
+      const { data: followingData } = await supabase
+        .from('followers')
+        .select('following_id')
+        .eq('follower_id', user.id)
+      setFollowingIds((followingData || []).map(f => f.following_id))
+    }
+
+    setLoading(false)
+  }
 
   function applyFilters() {
     let result = [...listings]
+    if (showFollowing && followingIds.length > 0) result = result.filter(l => followingIds.includes(l.seller_id))
     if (sport !== 'All') result = result.filter(l => l.sport === sport)
     if (category !== 'All') result = result.filter(l => l.category === category)
     if (search) result = result.filter(l =>
@@ -74,19 +86,19 @@ export default function Marketplace() {
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
         <ul className="nav-links">
-          <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
-          {profile?.role === 'seller' && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-          {profile?.role === 'buyer' && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+          <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
+          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
+          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
           <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
         </ul>
       </nav>
 
-      {/* Hero */}
       <div style={{ background: 'var(--navy-mid)', borderBottom: '1px solid var(--border)', padding: '3rem 5% 2rem' }}>
         <div className="section-label">Marketplace</div>
         <h1 className="section-title">Browse <em>Resources</em></h1>
         <p style={{ color: 'var(--muted)', maxWidth: '520px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-          Coaching materials from real coaches across every sport — practice plans, drills, playbooks, and more.
+          Coaching materials from real coaches across every sport.
         </p>
         <div style={{ position: 'relative', maxWidth: '480px' }}>
           <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }}>🔍</span>
@@ -102,21 +114,21 @@ export default function Marketplace() {
 
       <div style={{ padding: '2rem 5%' }}>
 
-        {/* Filters */}
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center', marginBottom: '2rem' }}>
-          <div style={{ flex: 1, minWidth: '160px' }}>
+        {/* Filter bar */}
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'flex-end', marginBottom: '1.5rem' }}>
+          <div style={{ flex: 1, minWidth: '140px' }}>
             <label className="form-label">Sport</label>
             <select className="form-input" value={sport} onChange={e => setSport(e.target.value)}>
               {SPORTS.map(s => <option key={s}>{s}</option>)}
             </select>
           </div>
-          <div style={{ flex: 1, minWidth: '160px' }}>
+          <div style={{ flex: 1, minWidth: '140px' }}>
             <label className="form-label">Category</label>
             <select className="form-input" value={category} onChange={e => setCategory(e.target.value)}>
               {CATEGORIES.map(c => <option key={c}>{c}</option>)}
             </select>
           </div>
-          <div style={{ flex: 1, minWidth: '160px' }}>
+          <div style={{ flex: 1, minWidth: '140px' }}>
             <label className="form-label">Sort By</label>
             <select className="form-input" value={sort} onChange={e => setSort(e.target.value)}>
               <option value="newest">Newest</option>
@@ -125,7 +137,23 @@ export default function Marketplace() {
               <option value="price-high">Price: High to Low</option>
             </select>
           </div>
-          <div style={{ alignSelf: 'flex-end', color: 'var(--muted)', fontSize: '.85rem', paddingBottom: '0.1rem' }}>
+          {user && (
+            <button
+              onClick={() => setShowFollowing(!showFollowing)}
+              style={{
+                padding: '10px 18px', borderRadius: '8px', border: '1px solid',
+                borderColor: showFollowing ? 'var(--green)' : 'var(--border)',
+                background: showFollowing ? 'var(--green-dim)' : 'transparent',
+                color: showFollowing ? 'var(--green)' : 'var(--muted)',
+                fontSize: '.85rem', fontWeight: 600, cursor: 'pointer',
+                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase',
+                letterSpacing: '.05em', transition: 'all .2s', whiteSpace: 'nowrap'
+              }}
+            >
+              {showFollowing ? '✓ Following' : 'Following'}
+            </button>
+          )}
+          <div style={{ color: 'var(--muted)', fontSize: '.85rem', paddingBottom: '0.1rem' }}>
             {filtered.length} result{filtered.length !== 1 ? 's' : ''}
           </div>
         </div>
@@ -137,19 +165,12 @@ export default function Marketplace() {
               key={s}
               onClick={() => setSport(s)}
               style={{
-                padding: '6px 14px',
-                borderRadius: '100px',
-                border: '1px solid',
+                padding: '6px 14px', borderRadius: '100px', border: '1px solid',
                 borderColor: sport === s ? 'var(--green)' : 'var(--border)',
                 background: sport === s ? 'var(--green-dim)' : 'transparent',
                 color: sport === s ? 'var(--green)' : 'var(--muted)',
-                fontSize: '.8rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all .2s',
-                fontFamily: 'Barlow Condensed, sans-serif',
-                textTransform: 'uppercase',
-                letterSpacing: '.05em'
+                fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all .2s',
+                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '.05em'
               }}
             >{s}</button>
           ))}
@@ -160,7 +181,18 @@ export default function Marketplace() {
           <p style={{ color: 'var(--muted)' }}>Loading...</p>
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
-            <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>No resources found. Try adjusting your filters.</p>
+            {showFollowing ? (
+              <>
+                <p style={{ color: 'var(--muted)', fontSize: '1.1rem', marginBottom: '1rem' }}>
+                  No listings from coaches you follow yet.
+                </p>
+                <button className="btn btn-green" onClick={() => navigate('/coaches')}>
+                  Discover Coaches →
+                </button>
+              </>
+            ) : (
+              <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>No resources found. Try adjusting your filters.</p>
+            )}
           </div>
         ) : (
           <div className="dash-grid">
