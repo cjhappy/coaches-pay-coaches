@@ -1,38 +1,182 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
-import AuthForm from './components/AuthForm'
-import ProtectedRoute from './components/ProtectedRoute'
-import Home from './pages/Home'
-import Dashboard from './pages/Dashboard'
-import SellerDashboard from './pages/SellerDashboard'
-import Marketplace from './pages/Marketplace'
-import ListingDetail from './pages/ListingDetail'
-import Purchases from './pages/Purchases'
-import CoachProfile from './pages/CoachProfile'
-import Coaches from './pages/Coaches'
-import ResetPassword from './pages/ResetPassword'
+cat > src/pages/Coaches.jsx << 'ENDOFFILE'
+import { useState, useEffect } from 'react'
+import { useAuth } from '../context/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 
-function App() {
-  const { user, loading } = useAuth()
-  if (loading) return <div>Loading...</div>
+const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
+
+export default function Coaches() {
+  const { profile, signOut } = useAuth()
+  const navigate = useNavigate()
+  const [coaches, setCoaches] = useState([])
+  const [filtered, setFiltered] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [sport, setSport] = useState('All')
+
+  useEffect(() => { fetchCoaches() }, [])
+  useEffect(() => { applyFilters() }, [coaches, search, sport])
+
+  async function fetchCoaches() {
+    const { data: sellers, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('role', 'seller')
+      .order('created_at', { ascending: false })
+
+    if (error || !sellers) { setLoading(false); return }
+
+    const coachesWithStats = await Promise.all(sellers.map(async seller => {
+      const { data: listings } = await supabase
+        .from('listings')
+        .select('id, sport, price')
+        .eq('seller_id', seller.id)
+
+      const sports = [...new Set((listings || []).map(l => l.sport))]
+      const avgPrice = listings?.length > 0
+        ? listings.reduce((sum, l) => sum + Number(l.price), 0) / listings.length
+        : 0
+
+      return { ...seller, listings: listings || [], sports, avgPrice }
+    }))
+
+    setCoaches(coachesWithStats)
+    setLoading(false)
+  }
+
+  function applyFilters() {
+    let result = [...coaches]
+    if (search) result = result.filter(c =>
+      c.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+      c.bio?.toLowerCase().includes(search.toLowerCase())
+    )
+    if (sport !== 'All') result = result.filter(c => c.sports.includes(sport))
+    setFiltered(result)
+  }
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/auth')
+  }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <AuthForm onSuccess={() => window.location.href = '/dashboard'} />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
-        <Route path="/listing/:id" element={<ProtectedRoute><ListingDetail /></ProtectedRoute>} />
-        <Route path="/coach/:id" element={<CoachProfile />} />
-        <Route path="/coaches" element={<Coaches />} />
-        <Route path="/seller" element={<ProtectedRoute requiredRole="seller"><SellerDashboard /></ProtectedRoute>} />
-        <Route path="/purchases" element={<ProtectedRoute><Purchases /></ProtectedRoute>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+    <div className="page-body">
+      <nav className="cpc-nav">
+        <a className="cpc-logo" onClick={() => navigate('/')}>
+          <div className="logo-badge">CPC</div>
+          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
+        </a>
+        <ul className="nav-links">
+          <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
+          <li><a onClick={() => navigate('/coaches')} className="active">Coaches</a></li>
+          {profile?.role === 'seller' || profile?.role === 'both' ? <li><a onClick={() => navigate('/seller')}>My Store</a></li> : null}
+          {profile?.role === 'buyer' || profile?.role === 'both' ? <li><a onClick={() => navigate('/purchases')}>My Library</a></li> : null}
+          {profile
+            ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+            : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
+          }
+        </ul>
+      </nav>
+
+      <div style={{ background: 'var(--navy-mid)', borderBottom: '1px solid var(--border)', padding: '3rem 5% 2rem' }}>
+        <div className="section-label">Community</div>
+        <h1 className="section-title">Meet the <em>Coaches</em></h1>
+        <p style={{ color: 'var(--muted)', maxWidth: '520px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+          Real coaches. Real experience. Every sport. Browse profiles, explore their stores, and find resources that elevate your program.
+        </p>
+        <div style={{ position: 'relative', maxWidth: '480px' }}>
+          <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }}>🔍</span>
+          <input
+            className="form-input"
+            style={{ paddingLeft: '2.5rem' }}
+            placeholder="Search coaches by name or specialty..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div style={{ padding: '2rem 5%' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '2rem' }}>
+          {SPORTS.map(s => (
+            <button
+              key={s}
+              onClick={() => setSport(s)}
+              style={{
+                padding: '6px 14px', borderRadius: '100px', border: '1px solid',
+                borderColor: sport === s ? 'var(--green)' : 'var(--border)',
+                background: sport === s ? 'var(--green-dim)' : 'transparent',
+                color: sport === s ? 'var(--green)' : 'var(--muted)',
+                fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all .2s',
+                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '.05em'
+              }}
+            >{s}</button>
+          ))}
+        </div>
+
+        <div style={{ color: 'var(--muted)', fontSize: '.85rem', marginBottom: '1.5rem' }}>
+          {filtered.length} coach{filtered.length !== 1 ? 'es' : ''} found
+        </div>
+
+        {loading ? (
+          <p style={{ color: 'var(--muted)' }}>Loading coaches...</p>
+        ) : filtered.length === 0 ? (
+          <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
+            <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>No coaches found. Try adjusting your search.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
+            {filtered.map(coach => (
+              <div
+                key={coach.id}
+                className="cpc-card"
+                style={{ padding: '1.5rem', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '1rem' }}
+                onClick={() => navigate('/coach/' + coach.id)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{ width: '60px', height: '60px', borderRadius: '14px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '20px', color: 'var(--navy)', flexShrink: 0 }}>
+                    {coach.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??'}
+                  </div>
+                  <div>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.15rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                      {coach.full_name}
+                    </div>
+                    <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                      {coach.sports.slice(0, 3).map(s => <span key={s} className="tag" style={{ fontSize: '.7rem' }}>{s}</span>)}
+                    </div>
+                  </div>
+                </div>
+
+                {coach.bio && (
+                  <p style={{ color: 'var(--muted)', fontSize: '.88rem', lineHeight: 1.65, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {coach.bio}
+                  </p>
+                )}
+
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', gap: '1.5rem' }}>
+                    <div>
+                      <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.3rem', lineHeight: 1 }}>{coach.listings.length}</div>
+                      <div style={{ color: 'var(--muted)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Resources</div>
+                    </div>
+                    <div>
+                      <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.3rem', lineHeight: 1 }}>
+                        {coach.avgPrice === 0 ? 'FREE' : '$' + coach.avgPrice.toFixed(0)}
+                      </div>
+                      <div style={{ color: 'var(--muted)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Avg Price</div>
+                    </div>
+                  </div>
+                  <button className="btn btn-green" style={{ padding: '8px 18px', fontSize: '13px' }} onClick={e => { e.stopPropagation(); navigate('/coach/' + coach.id) }}>
+                    View →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
-
-export default App
+ENDOFFILE
