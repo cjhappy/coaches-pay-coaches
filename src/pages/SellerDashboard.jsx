@@ -3,6 +3,43 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import ListingForm from '../components/ListingForm'
+import Avatar from '../components/Avatar'
+
+function AvatarUploader({ profile, onUpdate }) {
+  const [uploading, setUploading] = useState(false)
+
+  async function handleUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploading(true)
+    const ext = file.name.split('.').pop()
+    const path = profile.id + '/avatar.' + ext
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true })
+    if (!uploadError) {
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
+      onUpdate(publicUrl)
+    }
+    setUploading(false)
+  }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+      <Avatar url={profile?.avatar_url} name={profile?.full_name} size={80} radius={16} />
+      <div>
+        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.9rem', textTransform: 'uppercase', marginBottom: '6px' }}>Profile Photo</div>
+        <label style={{ cursor: 'pointer' }}>
+          <span className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '12px', pointerEvents: 'none' }}>
+            {uploading ? 'Uploading...' : 'Upload Photo'}
+          </span>
+          <input type="file" accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+        </label>
+      </div>
+    </div>
+  )
+}
 
 function BioEditor({ profile }) {
   const [bio, setBio] = useState(profile?.bio || '')
@@ -18,6 +55,7 @@ function BioEditor({ profile }) {
 
   return (
     <div className="cpc-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
+      <AvatarUploader profile={profile} onUpdate={(url) => { profile.avatar_url = url }} />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editing ? '1rem' : '0' }}>
         <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>Your Bio</div>
         <button className="btn btn-ghost" style={{ padding: '6px 14px', fontSize: '12px' }} onClick={() => setEditing(!editing)}>
@@ -35,7 +73,7 @@ function BioEditor({ profile }) {
             style={{ resize: 'vertical', marginBottom: '0.75rem' }}
           />
           <button className="btn btn-green" style={{ padding: '8px 20px', fontSize: '13px' }} onClick={saveBio} disabled={saving}>
-            {saving ? 'Saving...' : 'Save Bio →'}
+            {saving ? 'Saving...' : 'Save Bio'}
           </button>
         </>
       ) : (
@@ -122,13 +160,14 @@ export default function SellerDashboard() {
   return (
     <div className="page-body">
       <nav className="cpc-nav">
-        <a className="cpc-logo">
+        <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
         <ul className="nav-links">
           <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
+          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
           <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
         </ul>
       </nav>
@@ -148,14 +187,14 @@ export default function SellerDashboard() {
               <p style={{ color: 'var(--muted)', fontSize: '.88rem' }}>Connect a Stripe account before buyers can purchase your listings.</p>
             </div>
             <button className="btn btn-green" onClick={handleConnectStripe} disabled={stripeLoading}>
-              {stripeLoading ? 'Connecting...' : 'Connect Stripe →'}
+              {stripeLoading ? 'Connecting...' : 'Connect Stripe'}
             </button>
           </div>
         )}
 
         {stripeConnected && stripeStatus === 'success' && (
           <div style={{ background: 'var(--green-dim)', border: '1px solid var(--green-border)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', color: 'var(--green)', fontSize: '.9rem' }}>
-            ✅ Stripe connected! Buyers can now purchase your listings.
+            Stripe connected! Buyers can now purchase your listings.
           </div>
         )}
 
@@ -212,7 +251,7 @@ export default function SellerDashboard() {
             ) : listings.length === 0 ? (
               <div className="cpc-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
                 <p style={{ color: 'var(--muted)', marginBottom: '1rem' }}>No listings yet.</p>
-                <button className="btn btn-green" onClick={() => setShowForm(true)}>Upload a Resource →</button>
+                <button className="btn btn-green" onClick={() => setShowForm(true)}>Upload a Resource</button>
               </div>
             ) : (
               <div className="dash-grid">
@@ -227,7 +266,7 @@ export default function SellerDashboard() {
                       <span className="tag">{listing.category}</span>
                     </div>
                     <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.15rem', marginBottom: '1rem' }}>
-                      {listing.price === 0 ? 'FREE' : `$${Number(listing.price).toFixed(2)}`}
+                      {listing.price === 0 ? 'FREE' : '$' + Number(listing.price).toFixed(2)}
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button className="btn btn-ghost" style={{ flex: 1, padding: '8px', fontSize: '13px' }} onClick={() => { setEditListing(listing); setShowForm(true) }}>Edit</button>

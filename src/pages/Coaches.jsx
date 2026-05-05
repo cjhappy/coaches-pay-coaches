@@ -2,29 +2,32 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import Avatar from '../components/Avatar'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
 
 export default function Coaches() {
-  const { profile, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
   const [coaches, setCoaches] = useState([])
   const [filtered, setFiltered] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [sport, setSport] = useState('All')
+  const [showFollowing, setShowFollowing] = useState(false)
+  const [followingIds, setFollowingIds] = useState([])
 
   useEffect(() => { fetchCoaches() }, [])
-  useEffect(() => { applyFilters() }, [coaches, search, sport])
+  useEffect(() => { applyFilters() }, [coaches, search, sport, showFollowing, followingIds])
 
   async function fetchCoaches() {
-    const { data: sellers, error } = await supabase
+    const { data: sellers } = await supabase
       .from('profiles')
       .select('*')
       .in('role', ['seller', 'both'])
       .order('created_at', { ascending: false })
 
-    if (error || !sellers) { setLoading(false); return }
+    if (!sellers) { setLoading(false); return }
 
     const coachesWithStats = await Promise.all(sellers.map(async seller => {
       const { data: listings } = await supabase
@@ -32,20 +35,35 @@ export default function Coaches() {
         .select('id, sport, price')
         .eq('seller_id', seller.id)
 
+      const { count: followerCount } = await supabase
+        .from('followers')
+        .select('*', { count: 'exact', head: true })
+        .eq('following_id', seller.id)
+
       const sports = [...new Set((listings || []).map(l => l.sport))]
       const avgPrice = listings?.length > 0
         ? listings.reduce((sum, l) => sum + Number(l.price), 0) / listings.length
         : 0
 
-      return { ...seller, listings: listings || [], sports, avgPrice }
+      return { ...seller, listings: listings || [], sports, avgPrice, followerCount: followerCount || 0 }
     }))
 
     setCoaches(coachesWithStats)
+
+    if (user) {
+      const { data: followingData } = await supabase
+        .from('followers')
+        .select('following_id')
+        .eq('follower_id', user.id)
+      setFollowingIds((followingData || []).map(f => f.following_id))
+    }
+
     setLoading(false)
   }
 
   function applyFilters() {
     let result = [...coaches]
+    if (showFollowing) result = result.filter(c => followingIds.includes(c.id))
     if (search) result = result.filter(c =>
       c.full_name?.toLowerCase().includes(search.toLowerCase()) ||
       c.bio?.toLowerCase().includes(search.toLowerCase())
@@ -71,7 +89,7 @@ export default function Coaches() {
           <li><a onClick={() => navigate('/coaches')} className="active">Coaches</a></li>
           {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
           {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          {profile
+          {user
             ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
             : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
           }
@@ -97,6 +115,31 @@ export default function Coaches() {
       </div>
 
       <div style={{ padding: '2rem 5%' }}>
+
+        {/* Filter bar */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+          {user && (
+            <button
+              onClick={() => setShowFollowing(!showFollowing)}
+              style={{
+                padding: '8px 18px', borderRadius: '100px', border: '1px solid',
+                borderColor: showFollowing ? 'var(--green)' : 'var(--border)',
+                background: showFollowing ? 'var(--green-dim)' : 'transparent',
+                color: showFollowing ? 'var(--green)' : 'var(--muted)',
+                fontSize: '.85rem', fontWeight: 600, cursor: 'pointer',
+                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase',
+                letterSpacing: '.05em', transition: 'all .2s'
+              }}
+            >
+              {showFollowing ? '✓ Following' : 'Following'}
+            </button>
+          )}
+          <div style={{ color: 'var(--muted)', fontSize: '.85rem' }}>
+            {filtered.length} coach{filtered.length !== 1 ? 'es' : ''}
+          </div>
+        </div>
+
+        {/* Sport pills */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '2rem' }}>
           {SPORTS.map(s => (
             <button
@@ -114,15 +157,18 @@ export default function Coaches() {
           ))}
         </div>
 
-        <div style={{ color: 'var(--muted)', fontSize: '.85rem', marginBottom: '1.5rem' }}>
-          {filtered.length} coach{filtered.length !== 1 ? 'es' : ''} found
-        </div>
-
         {loading ? (
           <p style={{ color: 'var(--muted)' }}>Loading coaches...</p>
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
-            <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>No coaches found. Try adjusting your search.</p>
+            <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>
+              {showFollowing ? 'You are not following anyone yet.' : 'No coaches found.'}
+            </p>
+            {showFollowing && (
+              <button className="btn btn-green" style={{ marginTop: '1rem' }} onClick={() => setShowFollowing(false)}>
+                Browse All Coaches
+              </button>
+            )}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
@@ -134,11 +180,9 @@ export default function Coaches() {
                 onClick={() => navigate('/coach/' + coach.id)}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <div style={{ width: '60px', height: '60px', borderRadius: '14px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '20px', color: 'var(--navy)', flexShrink: 0 }}>
-                    {coach.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??'}
-                  </div>
+                  <Avatar url={coach.avatar_url} name={coach.full_name} size={60} radius={14} />
                   <div>
-                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.15rem', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem', textTransform: 'uppercase', marginBottom: '4px' }}>
                       {coach.full_name}
                     </div>
                     <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
@@ -154,20 +198,22 @@ export default function Coaches() {
                 )}
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-                  <div style={{ display: 'flex', gap: '1.5rem' }}>
+                  <div style={{ display: 'flex', gap: '1.25rem' }}>
                     <div>
-                      <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.3rem', lineHeight: 1 }}>{coach.listings.length}</div>
+                      <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.2rem', lineHeight: 1 }}>{coach.listings.length}</div>
                       <div style={{ color: 'var(--muted)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Resources</div>
                     </div>
                     <div>
-                      <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.3rem', lineHeight: 1 }}>
-                        {coach.avgPrice === 0 ? 'FREE' : '$' + coach.avgPrice.toFixed(0)}
-                      </div>
-                      <div style={{ color: 'var(--muted)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Avg Price</div>
+                      <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.2rem', lineHeight: 1 }}>{coach.followerCount}</div>
+                      <div style={{ color: 'var(--muted)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Followers</div>
                     </div>
                   </div>
-                  <button className="btn btn-green" style={{ padding: '8px 18px', fontSize: '13px' }} onClick={e => { e.stopPropagation(); navigate('/coach/' + coach.id) }}>
-                    View →
+                  <button
+                    className="btn btn-green"
+                    style={{ padding: '8px 18px', fontSize: '13px' }}
+                    onClick={e => { e.stopPropagation(); navigate('/coach/' + coach.id) }}
+                  >
+                    View
                   </button>
                 </div>
               </div>
