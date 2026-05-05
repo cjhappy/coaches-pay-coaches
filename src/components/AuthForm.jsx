@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import { supabase } from '../lib/supabase'
 
 export default function AuthForm({ onSuccess }) {
   const { signIn, signUp } = useAuth()
@@ -12,12 +13,24 @@ export default function AuthForm({ onSuccess }) {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
+  const [forgotPassword, setForgotPassword] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
     setMessage(null)
     setLoading(true)
+
+    if (forgotPassword) {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://coachespaycoaches.org/reset-password'
+      })
+      if (error) setError(error.message)
+      else setMessage('Check your email for a password reset link!')
+      setLoading(false)
+      return
+    }
+
     if (mode === 'signup') {
       const { error } = await signUp({ email, password, fullName, role })
       if (error) setError(error.message)
@@ -37,13 +50,19 @@ export default function AuthForm({ onSuccess }) {
           <div className="badge">CPC</div>
           COACHES <em>PAY</em> COACHES
         </div>
-        <p className="auth-sub">{mode === 'login' ? 'Welcome back, Coach.' : 'Join the community.'}</p>
-        <div className="auth-toggle">
-          <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')} type="button">Log In</button>
-          <button className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')} type="button">Sign Up</button>
-        </div>
+        <p className="auth-sub">
+          {forgotPassword ? 'Reset your password.' : mode === 'login' ? 'Welcome back, Coach.' : 'Join the community.'}
+        </p>
+
+        {!forgotPassword && (
+          <div className="auth-toggle">
+            <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')} type="button">Log In</button>
+            <button className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')} type="button">Sign Up</button>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit}>
-          {mode === 'signup' && (
+          {mode === 'signup' && !forgotPassword && (
             <>
               <label>Full Name
                 <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" required />
@@ -61,33 +80,49 @@ export default function AuthForm({ onSuccess }) {
               </div>
             </>
           )}
+
           <label>Email
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="coach@example.com" required />
           </label>
-          <label>Password
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
-          </label>
 
-          {mode === 'login' && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '1rem', cursor: 'pointer' }} onClick={() => setRememberMe(!rememberMe)}>
-              <div style={{
-                width: '18px', height: '18px', borderRadius: '4px',
-                border: '1px solid', borderColor: rememberMe ? 'var(--green)' : 'var(--border)',
-                background: rememberMe ? 'var(--green)' : 'transparent',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexShrink: 0, transition: 'all .2s'
-              }}>
-                {rememberMe && <span style={{ color: 'var(--navy)', fontSize: '11px', fontWeight: 900 }}>✓</span>}
+          {!forgotPassword && (
+            <label>Password
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} />
+            </label>
+          )}
+
+          {mode === 'login' && !forgotPassword && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => setRememberMe(!rememberMe)}>
+                <div style={{
+                  width: '18px', height: '18px', borderRadius: '4px',
+                  border: '1px solid', borderColor: rememberMe ? 'var(--green)' : 'var(--border)',
+                  background: rememberMe ? 'var(--green)' : 'transparent',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  flexShrink: 0, transition: 'all .2s'
+                }}>
+                  {rememberMe && <span style={{ color: 'var(--navy)', fontSize: '11px', fontWeight: 900 }}>✓</span>}
+                </div>
+                <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}>Remember me</span>
               </div>
-              <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}>Remember me</span>
+              <button type="button" onClick={() => { setForgotPassword(true); setError(null); setMessage(null) }} style={{ background: 'none', border: 'none', color: 'var(--green)', fontSize: '.85rem', cursor: 'pointer', padding: 0 }}>
+                Forgot password?
+              </button>
             </div>
           )}
 
           {error && <p className="auth-error">{error}</p>}
           {message && <p className="auth-message">{message}</p>}
+
           <button type="submit" className="auth-submit" disabled={loading}>
-            {loading ? 'Loading...' : mode === 'login' ? 'Log In →' : 'Create Account →'}
+            {loading ? 'Loading...' : forgotPassword ? 'Send Reset Link →' : mode === 'login' ? 'Log In →' : 'Create Account →'}
           </button>
+
+          {forgotPassword && (
+            <button type="button" onClick={() => { setForgotPassword(false); setError(null); setMessage(null) }} style={{ width: '100%', marginTop: '.75rem', padding: '.75rem', background: 'transparent', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--muted)', cursor: 'pointer', fontSize: '.9rem' }}>
+              Back to Login
+            </button>
+          )}
         </form>
       </div>
     </div>
