@@ -377,3 +377,59 @@ body {
 .form-input:focus { outline: none; border-color: var(--green); }
 .form-input::placeholder { color: #2e4459; }
 select.form-input option { background: var(--navy-card); }
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+
+  /* Nav */
+  .cpc-nav {
+    padding: 0 4%;
+  }
+  .nav-links {
+    gap: 12px;
+  }
+  .nav-links a {
+    font-size: 12px;
+  }
+
+  /* Hero */
+  .hero-btns-el {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Sections */
+  .section {
+    padding: 60px 4%;
+  }
+
+  /* Dash */
+  .dash-header {
+    padding: 1.5rem 4%;
+  }
+  .dash-body {
+    padding: 1.5rem 4%;
+  }
+
+  /* Stats grid — stack to 1 col */
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Earnings stats */
+  div[style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Listing detail two col */
+  div[style*="grid-template-columns: 1fr 340px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Purchase card unsticky on mobile */
+  div[style*="position: sticky"] {
+    position: relative !important;
+    top: 0 !important;
+  }
+
+  /* Foote

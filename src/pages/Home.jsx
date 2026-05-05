@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export default function Home() {
   const navigate = useNavigate()
   const { user, profile, signOut } = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
 
   async function handleSignOut() {
     await signOut()
@@ -15,10 +17,12 @@ export default function Home() {
 
       {/* NAV */}
       <nav className="cpc-nav">
-        <a className="cpc-logo">
+        <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
+
+        {/* Desktop nav */}
         <ul className="nav-links">
           <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
           <li><a>Sports</a></li>
@@ -33,13 +37,41 @@ export default function Home() {
             <li><a onClick={() => navigate('/auth')} className="nav-cta">Get Started →</a></li>
           )}
         </ul>
+
+        {/* Hamburger button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="hamburger-btn"
+          style={{ background: 'none', border: 'none', color: 'var(--white)', fontSize: '1.5rem', cursor: 'pointer', padding: '4px', display: 'none' }}
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div style={{ position: 'fixed', top: '66px', left: 0, right: 0, background: 'rgba(11,22,34,0.98)', borderBottom: '1px solid var(--border)', padding: '1.5rem 5%', zIndex: 499, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <a style={{ color: 'var(--off)', fontSize: '1.1rem', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em' }} onClick={() => { navigate('/marketplace'); setMenuOpen(false) }}>Browse</a>
+            {user && profile?.role === 'seller' && (
+              <a style={{ color: 'var(--off)', fontSize: '1.1rem', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em' }} onClick={() => { navigate('/seller'); setMenuOpen(false) }}>My Store</a>
+            )}
+            {user && profile?.role === 'buyer' && (
+              <a style={{ color: 'var(--off)', fontSize: '1.1rem', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em' }} onClick={() => { navigate('/purchases'); setMenuOpen(false) }}>My Library</a>
+            )}
+            {user ? (
+              <>
+                <a style={{ color: 'var(--off)', fontSize: '1.1rem', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em' }} onClick={() => { navigate('/dashboard'); setMenuOpen(false) }}>Dashboard</a>
+                <a style={{ color: '#f87171', fontSize: '1.1rem', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em' }} onClick={() => { handleSignOut(); setMenuOpen(false) }}>Sign Out</a>
+              </>
+            ) : (
+              <a style={{ color: 'var(--green)', fontSize: '1.1rem', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.05em' }} onClick={() => { navigate('/auth'); setMenuOpen(false) }}>Get Started →</a>
+            )}
+          </div>
+        )}
       </nav>
 
       {/* HERO */}
       <section style={{ minHeight: 'calc(100vh - 66px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 5% 60px', position: 'relative', overflow: 'hidden', paddingTop: '66px' }}>
-        {/* Glow */}
         <div style={{ position: 'absolute', width: '800px', height: '800px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(46,204,113,0.07) 0%, transparent 65%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
-        {/* Rings */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
           {[360, 580, 800, 1020].map((size, i) => (
             <div key={i} style={{ position: 'absolute', borderRadius: '50%', border: '1px solid rgba(46,204,113,0.06)', width: size, height: size, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', animation: `pulse 7s ease-in-out ${i * 1.2}s infinite` }} />
@@ -52,7 +84,6 @@ export default function Home() {
           @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
           @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
           @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
-          @keyframes floatStat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
           .hero-eyebrow { animation: fadeUp .7s ease both; }
           .hero-mark-el { animation: fadeUp .7s ease .05s both; }
           .hero-h1 { animation: fadeUp .7s ease .15s both; }
@@ -68,25 +99,25 @@ export default function Home() {
           .sport-card:hover { border-color:var(--green);background:var(--green-dim);transform:translateY(-4px); }
           .who-card { background:var(--navy-card);border:1px solid var(--border);border-radius:14px;padding:30px 24px;transition:all .3s; }
           .who-card:hover { border-color:var(--green-border);transform:translateY(-3px); }
-          .coach-card { background:var(--navy-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .3s; }
-          .coach-card:hover { transform:translateY(-4px);border-color:var(--green-border); }
           .view-btn { background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;padding:7px 16px;border-radius:6px;cursor:pointer;transition:all .2s; }
           .view-btn:hover { background:var(--green);color:var(--navy); }
+          @media (max-width: 640px) {
+            .nav-links { display: none !important; }
+            .hamburger-btn { display: block !important; }
+          }
         `}</style>
 
-        {/* Eyebrow */}
         <div className="hero-eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--green-dim)', border: '1px solid var(--green-border)', color: 'var(--green)', fontSize: '11px', fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', padding: '7px 18px', borderRadius: '100px', marginBottom: '28px', position: 'relative', zIndex: 2 }}>
           <span className="blink" /> Now Open to All Coaches
         </div>
 
-        {/* CPC Mark */}
         <div className="hero-mark-el" style={{ position: 'relative', zIndex: 2, marginBottom: '32px' }}>
           <div style={{ width: '110px', height: '110px', borderRadius: '22px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '38px', color: 'var(--navy)', letterSpacing: '1px', margin: '0 auto', boxShadow: '0 0 60px rgba(46,204,113,0.25)', animation: 'float 5s ease-in-out infinite' }}>
             CPC
           </div>
         </div>
 
-        <h1 className="hero-h1" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(56px, 9vw, 108px)', lineHeight: .92, letterSpacing: '-1px', textTransform: 'uppercase', position: 'relative', zIndex: 2, marginBottom: '4px' }}>
+        <h1 className="hero-h1" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(42px, 9vw, 108px)', lineHeight: .92, letterSpacing: '-1px', textTransform: 'uppercase', position: 'relative', zIndex: 2, marginBottom: '4px' }}>
           COACHES <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>PAY</em> COACHES
         </h1>
 
