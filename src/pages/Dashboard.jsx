@@ -10,17 +10,21 @@ export default function Dashboard() {
     navigate('/auth')
   }
 
+  const isSeller = profile?.role === 'seller' || profile?.role === 'both'
+  const isBuyer = profile?.role === 'buyer' || profile?.role === 'both'
+
   return (
     <div className="page-body">
       <nav className="cpc-nav">
-        <a className="cpc-logo">
+        <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
         <ul className="nav-links">
           <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
-          {profile?.role === 'buyer' && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          {profile?.role === 'seller' && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
+          {isBuyer && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+          {isSeller && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
           <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
         </ul>
       </nav>
@@ -28,27 +32,19 @@ export default function Dashboard() {
       <div className="dash-header">
         <div className="section-label">Dashboard</div>
         <h1>Welcome, <em>{profile?.full_name?.split(' ')[0] || 'Coach'}</em></h1>
-        <p style={{ color: 'var(--muted)' }}>You're logged in as a <strong style={{ color: 'var(--green)' }}>{profile?.role}</strong>.</p>
+        <p style={{ color: 'var(--muted)' }}>
+          {profile?.role === 'both' ? 'You can buy and sell on Coaches Pay Coaches.' : `You're logged in as a `}
+          {profile?.role !== 'both' && <strong style={{ color: 'var(--green)' }}>{profile?.role}</strong>}
+        </p>
       </div>
 
       <div className="dash-body">
-        {profile?.role === 'seller' ? (
-          <>
-            <div className="section-label">Quick Actions</div>
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
-              <button className="btn btn-green" onClick={() => navigate('/seller')}>Go to My Store →</button>
-              <button className="btn btn-ghost" onClick={() => navigate('/marketplace')}>Browse Marketplace</button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="section-label">Quick Actions</div>
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
-              <button className="btn btn-green" onClick={() => navigate('/marketplace')}>Browse Marketplace →</button>
-              <button className="btn btn-ghost" onClick={() => navigate('/purchases')}>My Library</button>
-            </div>
-          </>
-        )}
+        <div className="section-label">Quick Actions</div>
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+          <button className="btn btn-green" onClick={() => navigate('/marketplace')}>Browse Marketplace →</button>
+          {isBuyer && <button className="btn btn-ghost" onClick={() => navigate('/purchases')}>My Library</button>}
+          {isSeller && <button className="btn btn-ghost" onClick={() => navigate('/seller')}>My Store</button>}
+        </div>
       </div>
     </div>
   )

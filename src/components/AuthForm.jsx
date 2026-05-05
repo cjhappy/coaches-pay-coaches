@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 export default function AuthForm({ onSuccess }) {
   const { signIn, signUp } = useAuth()
   const [mode, setMode] = useState('login')
-  const [role, setRole] = useState('buyer')
+  const [roles, setRoles] = useState({ buyer: true, seller: false })
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -14,6 +14,20 @@ export default function AuthForm({ onSuccess }) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState(null)
   const [forgotPassword, setForgotPassword] = useState(false)
+
+  function toggleRole(r) {
+    setRoles(prev => {
+      const next = { ...prev, [r]: !prev[r] }
+      if (!next.buyer && !next.seller) return prev
+      return next
+    })
+  }
+
+  function getRole() {
+    if (roles.buyer && roles.seller) return 'both'
+    if (roles.seller) return 'seller'
+    return 'buyer'
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -32,7 +46,7 @@ export default function AuthForm({ onSuccess }) {
     }
 
     if (mode === 'signup') {
-      const { error } = await signUp({ email, password, fullName, role })
+      const { error } = await signUp({ email, password, fullName, role: getRole() })
       if (error) setError(error.message)
       else setMessage('Check your email to confirm your account!')
     } else {
@@ -67,17 +81,29 @@ export default function AuthForm({ onSuccess }) {
               <label>Full Name
                 <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" required />
               </label>
-              <label>I am a...</label>
+
+              <label style={{ marginBottom: '.5rem' }}>I want to... (select all that apply)</label>
               <div className="role-picker">
-                <button type="button" className={"role-btn " + (role === 'buyer' ? 'selected' : '')} onClick={() => setRole('buyer')}>
-                  🛒 Buyer
+                <button
+                  type="button"
+                  className={"role-btn " + (roles.buyer ? 'selected' : '')}
+                  onClick={() => toggleRole('buyer')}
+                >
+                  🛒 Buy
                   <span>Browse & purchase materials</span>
                 </button>
-                <button type="button" className={"role-btn " + (role === 'seller' ? 'selected' : '')} onClick={() => setRole('seller')}>
-                  📦 Seller
-                  <span>List & sell your materials</span>
+                <button
+                  type="button"
+                  className={"role-btn " + (roles.seller ? 'selected' : '')}
+                  onClick={() => toggleRole('seller')}
+                >
+                  📦 Sell
+                  <span>List & sell my materials</span>
                 </button>
               </div>
+              {roles.buyer && roles.seller && (
+                <p style={{ color: 'var(--green)', fontSize: '.78rem', marginTop: '.5rem' }}>✓ You'll be able to both buy and sell</p>
+              )}
             </>
           )}
 
