@@ -21,14 +21,28 @@ export default function Marketplace() {
   useEffect(() => { applyFilters() }, [listings, sport, category, search, sort])
 
   async function fetchListings() {
-  const { data, error } = await supabase
+  const { data: listingsData, error } = await supabase
     .from('listings')
-    .select('*, profiles(full_name)')
+    .select('*')
     .order('created_at', { ascending: false })
-  if (!error) {
-    console.log('listings data:', data)
-    setListings(data)
-  }
+  
+  if (error || !listingsData) { setLoading(false); return }
+
+  const sellerIds = [...new Set(listingsData.map(l => l.seller_id))]
+  const { data: profilesData } = await supabase
+    .from('profiles')
+    .select('id, full_name, avatar_url')
+    .in('id', sellerIds)
+
+  const profileMap = {}
+  profilesData?.forEach(p => { profileMap[p.id] = p })
+
+  const combined = listingsData.map(l => ({
+    ...l,
+    profiles: profileMap[l.seller_id] || null
+  }))
+
+  setListings(combined)
   setLoading(false)
 }
 
