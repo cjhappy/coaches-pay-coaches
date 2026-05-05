@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import StarRating from '../components/StarRating'
 import ReviewForm from '../components/ReviewForm'
 import MessageButton from '../components/MessageButton'
+import { Helmet } from 'react-helmet-async'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
