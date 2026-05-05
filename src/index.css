@@ -65,6 +65,7 @@ body {
   align-items: center;
   gap: 11px;
   text-decoration: none;
+  cursor: pointer;
 }
 .logo-badge {
   width: 44px; height: 44px;
@@ -75,6 +76,7 @@ body {
   font-weight: 900; font-size: 15px;
   color: var(--navy);
   letter-spacing: .5px;
+  flex-shrink: 0;
 }
 .logo-text {
   font-family: 'Barlow Condensed', sans-serif;
@@ -104,6 +106,7 @@ body {
   letter-spacing: .5px;
 }
 .nav-cta:hover { background: var(--green-dark) !important; }
+.hamburger-btn { display: none; }
 
 /* ── PAGE WRAPPER ── */
 .page-body { padding-top: 66px; min-height: 100vh; }
@@ -351,8 +354,8 @@ body {
   font-weight: 600;
   padding: 4px 10px;
   border-radius: 100px;
-
 }
+
 /* ── FORMS ── */
 .form-label {
   display: block;
@@ -378,58 +381,22 @@ body {
 .form-input::placeholder { color: #2e4459; }
 select.form-input option { background: var(--navy-card); }
 
-/* ── MOBILE RESPONSIVE ── */
-@media (max-width: 768px) {
+/* ── MOBILE ── */
+@media (max-width: 640px) {
+  .nav-links { display: none !important; }
+  .hamburger-btn { display: block !important; }
+  .cpc-nav { padding: 0 4%; }
+  .logo-text { font-size: 13px; }
+  .logo-badge { width: 36px; height: 36px; font-size: 12px; }
+  .dash-header { padding: 1.5rem 4%; }
+  .dash-body { padding: 1.5rem 4%; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .auth-card { padding: 1.5rem; }
+  .role-picker { flex-direction: column; }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
 
-  /* Nav */
-  .cpc-nav {
-    padding: 0 4%;
-  }
-  .nav-links {
-    gap: 12px;
-  }
-  .nav-links a {
-    font-size: 12px;
-  }
-
-  /* Hero */
-  .hero-btns-el {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  /* Sections */
-  .section {
-    padding: 60px 4%;
-  }
-
-  /* Dash */
-  .dash-header {
-    padding: 1.5rem 4%;
-  }
-  .dash-body {
-    padding: 1.5rem 4%;
-  }
-
-  /* Stats grid — stack to 1 col */
-  .dash-grid {
-    grid-template-columns: 1fr;
-  }
-
-  /* Earnings stats */
-  div[style*="grid-template-columns: repeat(3, 1fr)"] {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Listing detail two col */
-  div[style*="grid-template-columns: 1fr 340px"] {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Purchase card unsticky on mobile */
-  div[style*="position: sticky"] {
-    position: relative !important;
-    top: 0 !important;
-  }
-
-  /* Foote
+@media (max-width: 480px) {
+  .footer-inner { grid-template-columns: 1fr; }
+  .section-title { font-size: 32px; }
+}
