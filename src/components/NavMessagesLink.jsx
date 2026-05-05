@@ -7,22 +7,10 @@ export default function NavMessagesLink() {
 
   return (
     <li>
-      
-        onClick={() => navigate('/messages')}
-        style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-      >
+      <a onClick={() => navigate('/messages')} style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
         Messages
         {unreadCount > 0 && (
-          <span style={{
-            background: 'var(--green)',
-            color: 'var(--navy)',
-            fontSize: '10px',
-            fontWeight: 900,
-            borderRadius: '100px',
-            padding: '2px 6px',
-            lineHeight: 1,
-            fontFamily: 'Barlow Condensed, sans-serif'
-          }}>
+          <span style={{ background: 'var(--green)', color: 'var(--navy)', fontSize: '10px', fontWeight: 900, borderRadius: '100px', padding: '2px 6px', lineHeight: 1, fontFamily: 'Barlow Condensed, sans-serif' }}>
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
