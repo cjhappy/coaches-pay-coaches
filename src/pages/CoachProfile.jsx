@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-
+import { StarRating } from '../components/StarRating'
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
   function handleCopy() {
@@ -248,6 +248,69 @@ export default function CoachProfile() {
           </div>
         )}
       </div>
+    </div>
+  )
+}function CoachReviews({ sellerId }) {
+  const [reviews, setReviews] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchReviews() {
+      const { data } = await supabase
+        .from('reviews')
+        .select('*, profiles(full_name), listings(title)')
+        .eq('seller_id', sellerId)
+        .order('created_at', { ascending: false })
+      setReviews(data || [])
+      setLoading(false)
+    }
+    fetchReviews()
+  }, [sellerId])
+
+  const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
+
+  if (loading) return null
+
+  return (
+    <div className="dash-body" style={{ borderTop: '1px solid var(--border)', paddingTop: '2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+        <div className="section-label" style={{ margin: 0 }}>Reviews ({reviews.length})</div>
+        {reviews.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <StarRating rating={Math.round(avgRating)} size={16} />
+            <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}>{avgRating.toFixed(1)}</span>
+          </div>
+        )}
+      </div>
+
+      {reviews.length === 0 ? (
+        <p style={{ color: 'var(--muted)', fontSize: '.9rem' }}>No reviews yet.</p>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {reviews.map(review => (
+            <div key={review.id} className="cpc-card" style={{ padding: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '10px', color: 'var(--navy)' }}>
+                    {review.profiles?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??'}
+                  </div>
+                  <div>
+                    <span style={{ color: 'var(--off)', fontSize: '.9rem', fontWeight: 600 }}>{review.profiles?.full_name}</span>
+                    {review.listings?.title && (
+                      <div style={{ color: 'var(--muted)', fontSize: '.75rem' }}>on {review.listings.title}</div>
+                    )}
+                  </div>
+                </div>
+                <span style={{ color: 'var(--muted)', fontSize: '.78rem' }}>{new Date(review.created_at).toLocaleDateString()}</span>
+              </div>
+              <StarRating rating={review.rating} size={16} />
+              {review.review && (
+                <p style={{ color: 'var(--muted)', fontSize: '.88rem', lineHeight: 1.6, marginTop: '8px' }}>{review.review}</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
