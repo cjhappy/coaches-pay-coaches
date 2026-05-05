@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { StarRating } from '../components/StarRating'
+import StarRating from '../components/StarRating'
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
   function handleCopy() {
