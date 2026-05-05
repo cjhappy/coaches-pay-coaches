@@ -204,17 +204,18 @@ export default function CoachProfile() {
           <div className="logo-badge">CPC</div>
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          {user ? (
-            <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-          ) : (
-            <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
-          )}
-        </ul>
+       <ul className="nav-links">
+  <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
+  <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
+  {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+  {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+  {user && <li><a onClick={() => navigate('/messages')}>Messages</a></li>}
+  {user ? (
+    <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+  ) : (
+    <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
+  )}
+</ul>
       </nav>
 
       <div style={{ background: 'var(--navy-mid)', borderBottom: '1px solid var(--border)', padding: '3rem 5%' }}>

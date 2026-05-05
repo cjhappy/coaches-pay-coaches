@@ -22,9 +22,11 @@ export default function Dashboard() {
         </a>
        <ul className="nav-links">
   <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
+  <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {profile?.is_admin && <li><a onClick={() => navigate('/admin')}>Admin</a></li>}
+  <li><a onClick={() => navigate('/messages')}>Messages</a></li>
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
 </ul>
       </nav>
