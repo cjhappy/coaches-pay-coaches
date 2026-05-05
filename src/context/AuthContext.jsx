@@ -46,8 +46,12 @@ export function AuthProvider({ children }) {
     return { data, error }
   }
 
-  async function signIn({ email, password }) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  async function signIn({ email, password, rememberMe = true }) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: { persistSession: rememberMe }
+    })
     return { data, error }
   }
 
