@@ -21,7 +21,7 @@ export default function Coaches() {
     const { data: sellers, error } = await supabase
       .from('profiles')
       .select('*')
-      .eq('role', 'seller')
+      .in('role', ['seller', 'both'])
       .order('created_at', { ascending: false })
 
     if (error || !sellers) { setLoading(false); return }
