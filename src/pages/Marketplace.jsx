@@ -21,13 +21,16 @@ export default function Marketplace() {
   useEffect(() => { applyFilters() }, [listings, sport, category, search, sort])
 
   async function fetchListings() {
-    const { data, error } = await supabase
-      .from('listings')
-      .select('*, profiles(full_name)')
-      .order('created_at', { ascending: false })
-    if (!error) setListings(data)
-    setLoading(false)
+  const { data, error } = await supabase
+    .from('listings')
+    .select('*, profiles(full_name)')
+    .order('created_at', { ascending: false })
+  if (!error) {
+    console.log('listings data:', data)
+    setListings(data)
   }
+  setLoading(false)
+}
 
   function applyFilters() {
     let result = [...listings]
