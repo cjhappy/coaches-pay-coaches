@@ -177,17 +177,25 @@ function ListingCard({ listing, navigate }) {
           {listing.description}
         </p>
         {listing.profiles?.full_name && (
-          <div style={{ color: 'var(--muted)', fontSize: '.78rem', marginBottom: '10px', cursor: 'pointer' }} onClick={() => navigate(`/coach/${listing.seller_id}`)}>
-            by <span style={{ color: 'var(--green)', textDecoration: 'underline' }}>{listing.profiles.full_name}</span>
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', cursor: 'pointer' }}
+            onClick={(e) => { e.stopPropagation(); navigate('/coach/' + listing.seller_id) }}
+          >
+            <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '9px', color: 'var(--navy)', flexShrink: 0 }}>
+              {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+            </div>
+            <span style={{ color: 'var(--green)', fontSize: '.8rem', fontWeight: 600, textDecoration: 'underline' }}>
+              {listing.profiles.full_name}
+            </span>
           </div>
         )}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
         <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.25rem' }}>
-          {listing.price === 0 ? 'FREE' : `$${Number(listing.price).toFixed(2)}`}
+          {listing.price === 0 ? 'FREE' : '$' + Number(listing.price).toFixed(2)}
         </div>
-        <button className="btn btn-green" style={{ padding: '8px 18px', fontSize: '13px' }} onClick={() => navigate(`/listing/${listing.id}`)}>
-          View →
+        <button className="btn btn-green" style={{ padding: '8px 18px', fontSize: '13px' }} onClick={() => navigate('/listing/' + listing.id)}>
+          View
         </button>
       </div>
     </div>

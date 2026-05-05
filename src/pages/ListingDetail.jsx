@@ -201,13 +201,19 @@ export default function ListingDetail() {
             </h1>
 
             {listing.profiles?.full_name && (
-              <div
-                style={{ color: 'var(--muted)', fontSize: '.9rem', marginBottom: '1.5rem', cursor: 'pointer' }}
-                onClick={() => navigate('/coach/' + listing.seller_id)}
-              >
-                by <span style={{ color: 'var(--green)', textDecoration: 'underline' }}>{listing.profiles.full_name}</span>
-              </div>
-            )}
+  <div
+    style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer' }}
+    onClick={() => navigate('/coach/' + listing.seller_id)}
+  >
+    <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '11px', color: 'var(--navy)', flexShrink: 0 }}>
+      {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+    </div>
+    <div>
+      <div style={{ color: 'var(--muted)', fontSize: '.75rem' }}>Posted by</div>
+      <div style={{ color: 'var(--green)', fontSize: '.9rem', fontWeight: 600, textDecoration: 'underline' }}>{listing.profiles.full_name}</div>
+    </div>
+  </div>
+)}
 
             <div className="section-label">About this resource</div>
             <p style={{ color: 'var(--off)', lineHeight: 1.8, fontSize: '.95rem', marginTop: '0.5rem' }}>
