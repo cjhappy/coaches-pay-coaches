@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { Helmet } from 'react-helmet-async'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
 const CATEGORIES = ['All', 'Practice Plans', 'Drills', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Strength & Conditioning', 'Film Breakdown', 'Recruiting', 'Mental Performance', 'Other']
@@ -80,6 +81,12 @@ export default function Marketplace() {
 
   return (
     <div className="page-body">
+      <Helmet>
+  <title>Browse Resources — Coaches Pay Coaches</title>
+  <meta name="description" content="Browse coaching materials from real coaches — practice plans, drills, playbooks, season plans and more across every sport." />
+  <meta property="og:title" content="Browse Resources — Coaches Pay Coaches" />
+  <meta property="og:url" content="https://coachespaycoaches.org/marketplace" />
+</Helmet>
       <nav className="cpc-nav">
         <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>

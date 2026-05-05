@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import StarRating from '../components/StarRating'
 import Avatar from '../components/Avatar'
+import { Helmet } from 'react-helmet-async'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -180,7 +181,13 @@ export default function CoachProfile() {
   }
 
   if (loading) return <div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Loading...</div>
-  if (!coach) return <div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Coach not found.</div>
+  if (!coach) return <><div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Coach not found.</div><Helmet>
+    <title>{coach.full_name} — Coaches Pay Coaches</title>
+    <meta name="description" content={coach.bio || 'Browse coaching resources from ' + coach.full_name + ' on Coaches Pay Coaches.'} />
+    <meta property="og:title" content={coach.full_name + ' — Coaches Pay Coaches'} />
+    <meta property="og:description" content={coach.bio || 'Browse coaching resources from ' + coach.full_name + '.'} />
+    <meta property="og:url" content={'https://coachespaycoaches.org/coach/' + coach.id} />
+  </Helmet></>
 
   const avgPrice = listings.length > 0 ? listings.reduce((sum, l) => sum + Number(l.price), 0) / listings.length : 0
   const sports = [...new Set(listings.map(l => l.sport))]

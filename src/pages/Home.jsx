@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { Helmet } from 'react-helmet-async'
 
 export default function Home() {
   const navigate = useNavigate()
@@ -12,8 +13,15 @@ export default function Home() {
     navigate('/auth')
   }
 
-  return (
+return (
     <div style={{ background: 'var(--navy)', minHeight: '100vh', overflowX: 'hidden' }}>
+      <Helmet>
+        <title>Coaches Pay Coaches — The Marketplace for Youth Sports Coaches</title>
+        <meta name="description" content="Buy and sell coaching materials — practice plans, drills, playbooks, and more. Built by coaches, for coaches." />
+        <meta property="og:title" content="Coaches Pay Coaches — The Marketplace for Youth Sports Coaches" />
+        <meta property="og:description" content="Buy and sell coaching materials — practice plans, drills, playbooks, and more. Built by coaches, for coaches." />
+        <meta property="og:url" content="https://coachespaycoaches.org/" />
+      </Helmet>
 
       {/* NAV */}
       <nav className="cpc-nav">

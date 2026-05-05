@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
+import { Helmet } from 'react-helmet-async'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
 
@@ -79,6 +80,12 @@ export default function Coaches() {
 
   return (
     <div className="page-body">
+      <Helmet>
+  <title>Meet the Coaches — Coaches Pay Coaches</title>
+  <meta name="description" content="Browse coach profiles from real youth sports coaches across every sport. Follow coaches and discover their resources." />
+  <meta property="og:title" content="Meet the Coaches — Coaches Pay Coaches" />
+  <meta property="og:url" content="https://coachespaycoaches.org/coaches" />
+</Helmet>
       <nav className="cpc-nav">
         <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>

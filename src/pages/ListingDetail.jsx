@@ -147,9 +147,17 @@ export default function ListingDetail() {
   const isOwnListing = user?.id === listing.seller_id
   const shareUrl = 'https://coachespaycoaches.org/listing/' + listing.id
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
+  
 
   return (
     <div className="page-body">
+      <Helmet>
+        <title>{listing.title} — Coaches Pay Coaches</title>
+        <meta name="description" content={listing.description} />
+        <meta property="og:title" content={listing.title} />
+        <meta property="og:description" content={listing.description} />
+        <meta property="og:url" content={shareUrl} />
+      </Helmet>
       <nav className="cpc-nav">
         <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>
