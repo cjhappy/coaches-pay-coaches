@@ -11,6 +11,7 @@ import Purchases from './pages/Purchases'
 import CoachProfile from './pages/CoachProfile'
 import Coaches from './pages/Coaches'
 import ResetPassword from './pages/ResetPassword'
+import Admin from './pages/Admin'
 
 function App() {
   const { user, loading } = useAuth()
@@ -29,6 +30,7 @@ function App() {
         <Route path="/coaches" element={<Coaches />} />
         <Route path="/seller" element={<ProtectedRoute requiredRole="seller"><SellerDashboard /></ProtectedRoute>} />
         <Route path="/purchases" element={<ProtectedRoute><Purchases /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
