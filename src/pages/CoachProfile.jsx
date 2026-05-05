@@ -13,10 +13,70 @@ function CopyLinkButton({ url }) {
   return (
     <button
       onClick={handleCopy}
-      style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.65rem 1rem', background: 'var(--navy)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--off)', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.8rem', textTransform: 'uppercase', letterSpacing: '.05em', width: '100%', textAlign: 'left' }}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '.75rem',
+        padding: '.65rem 1rem', background: 'var(--navy)',
+        border: '1px solid var(--border)', borderRadius: '8px',
+        color: 'var(--off)', cursor: 'pointer',
+        fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+        fontSize: '.8rem', textTransform: 'uppercase',
+        letterSpacing: '.05em', width: '100%', textAlign: 'left'
+      }}
     >
-      {copied ? '✓ Copied!' : '🔗 Copy Link'}
+      {copied ? 'Copied!' : 'Copy Link'}
     </button>
+  )
+}
+
+function ShareCard({ url, name }) {
+  const shareText = 'Check out ' + name + ' on Coaches Pay Coaches'
+  const twitterUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) + '&url=' + encodeURIComponent(url) + '&hashtags=coaching,youthsports'
+
+  return (
+    <div className="cpc-card" style={{ padding: '1rem' }}>
+      <div style={{
+        fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+        fontSize: '.75rem', textTransform: 'uppercase',
+        letterSpacing: '.05em', color: 'var(--muted)', marginBottom: '.75rem'
+      }}>
+        Share Profile
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+        <a
+          href={twitterUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '.75rem',
+            padding: '.65rem 1rem', background: '#000',
+            border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px',
+            color: '#fff', textDecoration: 'none',
+            fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+            fontSize: '.8rem', textTransform: 'uppercase', letterSpacing: '.05em'
+          }}
+        >
+          X — Share on X (Twitter)
+        </a>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(url)
+            alert('Link copied! Paste it in your Instagram bio, story, or DM.')
+          }}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '.75rem',
+            padding: '.65rem 1rem',
+            background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)',
+            border: 'none', borderRadius: '8px', color: '#fff', cursor: 'pointer',
+            fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+            fontSize: '.8rem', textTransform: 'uppercase',
+            letterSpacing: '.05em', width: '100%', textAlign: 'left'
+          }}
+        >
+          Copy for Instagram
+        </button>
+        <CopyLinkButton url={url} />
+      </div>
+    </div>
   )
 }
 
@@ -59,8 +119,6 @@ export default function CoachProfile() {
   const avgPrice = listings.length > 0 ? listings.reduce((sum, l) => sum + Number(l.price), 0) / listings.length : 0
   const sports = [...new Set(listings.map(l => l.sport))]
   const shareUrl = 'https://coachespaycoaches.org/coach/' + coach.id
-  const shareText = 'Check out ' + coach.full_name + ' on Coaches Pay Coaches'
-  const twitterUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) + '&url=' + encodeURIComponent(shareUrl) + '&hashtags=coaching,youthsports'
 
   return (
     <div className="page-body">
@@ -72,17 +130,29 @@ export default function CoachProfile() {
         <ul className="nav-links">
           <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
           <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          {user
-            ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-            : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
-          }
+          {(profile?.role === 'seller' || profile?.role === 'both') && (
+            <li><a onClick={() => navigate('/seller')}>My Store</a></li>
+          )}
+          {(profile?.role === 'buyer' || profile?.role === 'both') && (
+            <li><a onClick={() => navigate('/purchases')}>My Library</a></li>
+          )}
+          {user ? (
+            <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+          ) : (
+            <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
+          )}
         </ul>
       </nav>
 
       <div style={{ background: 'var(--navy-mid)', borderBottom: '1px solid var(--border)', padding: '3rem 5%' }}>
-        <button className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '13px', marginBottom: '2rem' }} onClick={() => navigate(-1)}>Back</button>
+        <button
+          className="btn btn-ghost"
+          style={{ padding: '8px 16px', fontSize: '13px', marginBottom: '2rem' }}
+          onClick={() => navigate(-1)}
+        >
+          Back
+        </button>
+
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2rem', flexWrap: 'wrap' }}>
           <div style={{ width: '100px', height: '100px', borderRadius: '20px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '32px', color: 'var(--navy)', flexShrink: 0 }}>
             {initials}
@@ -98,13 +168,19 @@ export default function CoachProfile() {
                 {sports.map(s => <span key={s} className="tag">{s}</span>)}
               </div>
             )}
-            {coach.bio && <p style={{ color: 'var(--muted)', fontSize: '.95rem', lineHeight: 1.7, maxWidth: '600px' }}>{coach.bio}</p>}
+            {coach.bio && (
+              <p style={{ color: 'var(--muted)', fontSize: '.95rem', lineHeight: 1.7, maxWidth: '600px' }}>
+                {coach.bio}
+              </p>
+            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div style={{ display: 'flex', gap: '1rem' }}>
               <div className="cpc-card" style={{ padding: '1.25rem', textAlign: 'center', minWidth: '110px' }}>
-                <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem', lineHeight: 1 }}>{listings.length}</div>
+                <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem', lineHeight: 1 }}>
+                  {listings.length}
+                </div>
                 <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px', textTransform: 'uppercase', letterSpacing: '.05em' }}>Resources</div>
               </div>
               <div className="cpc-card" style={{ padding: '1.25rem', textAlign: 'center', minWidth: '110px' }}>
@@ -115,35 +191,15 @@ export default function CoachProfile() {
               </div>
             </div>
 
-            <div className="cpc-card" style={{ padding: '1rem' }}>
-              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.75rem', textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--muted)', marginBottom: '.75rem' }}>Share Profile</div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-                
-                  href={twitterUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.65rem 1rem', background: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff', textDecoration: 'none', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.8rem', textTransform: 'uppercase', letterSpacing: '.05em' }}
-                >
-                  𝕏 Share on X
-                </a>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(shareUrl)
-                    alert('Link copied! Paste it in your Instagram bio, story, or DM.')
-                  }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.65rem 1rem', background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', border: 'none', borderRadius: '8px', color: '#fff', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.8rem', textTransform: 'uppercase', letterSpacing: '.05em', width: '100%', textAlign: 'left' }}
-                >
-                  📸 Copy for Instagram
-                </button>
-                <CopyLinkButton url={shareUrl} />
-              </div>
-            </div>
+            <ShareCard url={shareUrl} name={coach.full_name} />
           </div>
         </div>
       </div>
 
       <div className="dash-body">
-        <div className="section-label" style={{ marginBottom: '1.5rem' }}>Resources by {coach.full_name?.split(' ')[0]}</div>
+        <div className="section-label" style={{ marginBottom: '1.5rem' }}>
+          Resources by {coach.full_name?.split(' ')[0]}
+        </div>
         {listings.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
             <p style={{ color: 'var(--muted)' }}>This coach has not uploaded any resources yet.</p>
@@ -153,23 +209,39 @@ export default function CoachProfile() {
             {listings.map(listing => (
               <div key={listing.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
                 {listing.thumbnail_url ? (
-                  <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
+                  <img
+                    src={listing.thumbnail_url}
+                    alt={listing.title}
+                    style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }}
+                  />
                 ) : (
-                  <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', marginBottom: '1rem' }}>📋</div>
+                  <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', marginBottom: '1rem' }}>
+                    📋
+                  </div>
                 )}
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
                     <span className="tag">{listing.sport}</span>
                     <span className="tag">{listing.category}</span>
                   </div>
-                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1.05rem', textTransform: 'uppercase', marginBottom: '6px', lineHeight: 1.2 }}>{listing.title}</div>
-                  <p style={{ color: 'var(--muted)', fontSize: '.85rem', lineHeight: 1.6, marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{listing.description}</p>
+                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1.05rem', textTransform: 'uppercase', marginBottom: '6px', lineHeight: 1.2 }}>
+                    {listing.title}
+                  </div>
+                  <p style={{ color: 'var(--muted)', fontSize: '.85rem', lineHeight: 1.6, marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {listing.description}
+                  </p>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
                   <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.25rem' }}>
                     {listing.price === 0 ? 'FREE' : '$' + Number(listing.price).toFixed(2)}
                   </div>
-                  <button className="btn btn-green" style={{ padding: '8px 18px', fontSize: '13px' }} onClick={() => navigate('/listing/' + listing.id)}>View</button>
+                  <button
+                    className="btn btn-green"
+                    style={{ padding: '8px 18px', fontSize: '13px' }}
+                    onClick={() => navigate('/listing/' + listing.id)}
+                  >
+                    View
+                  </button>
                 </div>
               </div>
             ))}
