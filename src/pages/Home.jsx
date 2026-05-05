@@ -26,7 +26,7 @@ export default function Home() {
         <ul className="nav-links">
           <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
           <li><a>Sports</a></li>
-          <li><a>Coaches</a></li>
+          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
           {user ? (
             <>
               {profile?.role === 'seller' && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
