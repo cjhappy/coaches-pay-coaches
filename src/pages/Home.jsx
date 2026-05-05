@@ -1,289 +1,233 @@
-import { useNavigate } from 'react-router-dom';
-import { useReveal } from '../hooks/useReveal';
-import Footer from '../components/Footer';
-
-const MARQUEE_ITEMS = [
-  'Playbooks', 'Practice Plans', 'Scouting Reports', 'Film Breakdowns',
-  'Skill Workouts', 'Defensive Schemes', 'Strength & Conditioning',
-  'Video Clinics', 'All Sports', 'All Levels',
-];
-
-const SPORTS = [
-  { emoji: '🏀', name: 'Basketball', sub: 'Youth · AAU · HS · College' },
-  { emoji: '⚽', name: 'Soccer', sub: 'Club · Rec · Travel' },
-  { emoji: '🏈', name: 'Football', sub: 'Pop Warner · HS · Flag' },
-  { emoji: '⚾', name: 'Baseball', sub: 'Little League · Travel Ball' },
-  { emoji: '🥎', name: 'Softball', sub: 'Rec · Travel · HS' },
-  { emoji: '🏒', name: 'Hockey', sub: 'Mites · Squirts · Bantam' },
-  { emoji: '🏐', name: 'Volleyball', sub: 'Club · Rec · HS' },
-  { emoji: '🥍', name: 'Lacrosse', sub: 'Youth · HS · Club' },
-];
-
-const CATEGORIES = [
-  { icon: '📒', name: 'Playbooks', sub: 'Offensive & Defensive Sets' },
-  { icon: '📅', name: 'Practice Plans', sub: 'Full Season Blueprints' },
-  { icon: '🏋️', name: 'Skill Workouts', sub: 'Player Development' },
-  { icon: '🛡️', name: 'Defensive Schemes', sub: 'System-Level Defense' },
-  { icon: '🎬', name: 'Film Breakdowns', sub: 'Opponent Scouting' },
-  { icon: '💪', name: 'Strength & Conditioning', sub: 'Athlete Performance' },
-];
-
-const PRODUCTS = [
-  { thumb: 'pt1', badge: 'Playbook', sport: '🏀 Basketball', emoji: '📒', seller: 'Youth · AAU · High School', name: 'Motion Offense Complete System', type: 'PDF · Digital Download' },
-  { thumb: 'pt2', badge: 'Practice Plan', sport: '⚽ Soccer', emoji: '📅', seller: 'Club · Recreational', name: 'Youth Soccer Season Practice Bundle', type: 'PDF · Template Pack' },
-  { thumb: 'pt3', badge: 'Playbook', sport: '🏈 Football', emoji: '🏈', seller: 'Youth · Pop Warner', name: 'Youth Spread Offense Playbook', type: 'PDF · Diagrams' },
-  { thumb: 'pt4', badge: 'Workout', sport: 'Multi-Sport', emoji: '🏋️', seller: 'Youth · Development', name: 'Athlete Skill Development 8-Week Program', type: 'PDF · Video Drills' },
-  { thumb: 'pt5', badge: 'Defense', sport: '⚽ Soccer', emoji: '🛡️', seller: 'Travel · HS', name: 'Defensive Shape & Pressing System', type: 'PDF · Video' },
-  { thumb: 'pt6', badge: 'Film', sport: '🏈 Football', emoji: '🎬', seller: 'Youth · HS', name: 'Reading Defenses: Youth QB Guide', type: 'Video Breakdown · PDF' },
-];
-
-const WHO = [
-  { emoji: '👨‍👧', title: 'Parent Coaches', desc: 'You volunteered, now you need a plan. Find ready-to-run practice plans, drills, and seasonal guides built by coaches who\'ve been there.' },
-  { emoji: '🏆', title: 'AAU & Club Coaches', desc: 'High-level content for high-level programs. Playbooks, scouting reports, and film breakdowns built for competitive play.' },
-  { emoji: '🎓', title: 'High School Coaches', desc: 'Full-season systems, defensive schemes, and strength programs designed for the varsity level and up — across all sports.' },
-  { emoji: '📐', title: 'Skills & Trainers', desc: 'Sell your training programs, workout plans, and player development systems to coaches and parents nationwide.' },
-  { emoji: '🌍', title: 'International Coaches', desc: 'U.S. coaching resources are in demand worldwide. Access or sell proven content across borders, across sports.' },
-  { emoji: '🏫', title: 'PE Teachers', desc: 'Find beginner-friendly drill libraries, intro sport resources, and multi-sport materials built for the classroom and gym.' },
-];
-
-const SPORT_PILLS = ['🏀 Basketball', '⚽ Soccer', '🏈 Football', '⚾ Baseball', '🏒 Hockey', '🏐 Volleyball', '🥍 Lacrosse', '+ More'];
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 export default function Home() {
-  useReveal();
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const { user, profile, signOut } = useAuth()
 
-  const scrollToSection = (id) => {
-    setTimeout(() => {
-      const el = document.querySelector(id);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
-    }, 50);
-  };
-
-  const goCoaches = () => {
-    navigate('/coaches');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const doubled = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
+  async function handleSignOut() {
+    await signOut()
+    navigate('/auth')
+  }
 
   return (
-    <div style={{ paddingTop: '66px' }}>
+    <div style={{ background: 'var(--navy)', minHeight: '100vh', overflowX: 'hidden' }}>
 
-      {/* ── HERO ── */}
-      <section className="hero">
-        <div className="hero-glow" />
-        <div className="hero-rings">
-          <div className="ring" /><div className="ring" /><div className="ring" /><div className="ring" />
-        </div>
-        <div className="sports-orbit">
-          {['🏀','⚽','🏈','⚾','🏒','🎾','🏐','🥍'].map((s, i) => (
-            <span key={i} className="orbit-sport">{s}</span>
+      {/* NAV */}
+      <nav className="cpc-nav">
+        <a className="cpc-logo">
+          <div className="logo-badge">CPC</div>
+          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
+        </a>
+        <ul className="nav-links">
+          <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
+          <li><a>Sports</a></li>
+          <li><a>Coaches</a></li>
+          {user ? (
+            <>
+              {profile?.role === 'seller' && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+              {profile?.role === 'buyer' && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+              <li><a onClick={() => navigate('/dashboard')} className="nav-cta">Dashboard →</a></li>
+            </>
+          ) : (
+            <li><a onClick={() => navigate('/auth')} className="nav-cta">Get Started →</a></li>
+          )}
+        </ul>
+      </nav>
+
+      {/* HERO */}
+      <section style={{ minHeight: 'calc(100vh - 66px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '80px 5% 60px', position: 'relative', overflow: 'hidden', paddingTop: '66px' }}>
+        {/* Glow */}
+        <div style={{ position: 'absolute', width: '800px', height: '800px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(46,204,113,0.07) 0%, transparent 65%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
+        {/* Rings */}
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+          {[360, 580, 800, 1020].map((size, i) => (
+            <div key={i} style={{ position: 'absolute', borderRadius: '50%', border: '1px solid rgba(46,204,113,0.06)', width: size, height: size, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', animation: `pulse 7s ease-in-out ${i * 1.2}s infinite` }} />
           ))}
         </div>
 
-        <div className="hero-mark"><div className="cpc-mark">CPC</div></div>
-        <div className="hero-eyebrow"><span className="blink" />The Marketplace for Youth Sports Coaches</div>
-        <h1>Coaches <em>Pay</em><br />Coaches</h1>
-        <p className="hero-sub">
-          A peer-driven digital marketplace where youth sports coaches buy and sell high-quality coaching materials — playbooks, drills, practice plans, scouting reports, film breakdowns, and more. Every sport. Every level.
-        </p>
-        <div className="hero-btns">
-          <button className="btn btn-green" onClick={() => scrollToSection('#sports')}>Browse by Sport →</button>
-          <button className="btn btn-ghost" onClick={() => scrollToSection('#sell')}>Start Selling</button>
+        <style>{`
+          @keyframes pulse { 0%,100%{opacity:.3} 50%{opacity:.9} }
+          @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+          @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+          @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+          @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+          @keyframes floatStat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+          .hero-eyebrow { animation: fadeUp .7s ease both; }
+          .hero-mark-el { animation: fadeUp .7s ease .05s both; }
+          .hero-h1 { animation: fadeUp .7s ease .15s both; }
+          .hero-sub-el { animation: fadeUp .7s ease .25s both; }
+          .hero-btns-el { animation: fadeUp .7s ease .35s both; }
+          .hero-pills-el { animation: fadeUp .7s ease .45s both; }
+          .blink { width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.6s ease-in-out infinite;display:inline-block; }
+          .sport-pill { display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--off);font-size:13px;font-weight:600;padding:7px 15px;border-radius:100px;transition:all .25s;cursor:default; }
+          .sport-pill:hover { border-color:var(--green);color:var(--green);background:var(--green-dim); }
+          .how-card { background:var(--navy-card);padding:38px 30px;position:relative;transition:background .3s; }
+          .how-card:hover { background:var(--navy-light); }
+          .sport-card { background:var(--navy-card);border:1px solid var(--border);border-radius:12px;padding:26px 16px;text-align:center;cursor:pointer;transition:all .25s;color:var(--white); }
+          .sport-card:hover { border-color:var(--green);background:var(--green-dim);transform:translateY(-4px); }
+          .who-card { background:var(--navy-card);border:1px solid var(--border);border-radius:14px;padding:30px 24px;transition:all .3s; }
+          .who-card:hover { border-color:var(--green-border);transform:translateY(-3px); }
+          .coach-card { background:var(--navy-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .3s; }
+          .coach-card:hover { transform:translateY(-4px);border-color:var(--green-border); }
+          .view-btn { background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.8px;padding:7px 16px;border-radius:6px;cursor:pointer;transition:all .2s; }
+          .view-btn:hover { background:var(--green);color:var(--navy); }
+        `}</style>
+
+        {/* Eyebrow */}
+        <div className="hero-eyebrow" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'var(--green-dim)', border: '1px solid var(--green-border)', color: 'var(--green)', fontSize: '11px', fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', padding: '7px 18px', borderRadius: '100px', marginBottom: '28px', position: 'relative', zIndex: 2 }}>
+          <span className="blink" /> Now Open to All Coaches
         </div>
-        <div className="sport-pills">
-          {SPORT_PILLS.map((p, i) => (
-            <div key={i} className="sport-pill">
-              <span>{p.split(' ')[0]}</span> {p.split(' ').slice(1).join(' ')}
-            </div>
+
+        {/* CPC Mark */}
+        <div className="hero-mark-el" style={{ position: 'relative', zIndex: 2, marginBottom: '32px' }}>
+          <div style={{ width: '110px', height: '110px', borderRadius: '22px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '38px', color: 'var(--navy)', letterSpacing: '1px', margin: '0 auto', boxShadow: '0 0 60px rgba(46,204,113,0.25)', animation: 'float 5s ease-in-out infinite' }}>
+            CPC
+          </div>
+        </div>
+
+        <h1 className="hero-h1" style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(56px, 9vw, 108px)', lineHeight: .92, letterSpacing: '-1px', textTransform: 'uppercase', position: 'relative', zIndex: 2, marginBottom: '4px' }}>
+          COACHES <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>PAY</em> COACHES
+        </h1>
+
+        <p className="hero-sub-el" style={{ fontSize: 'clamp(15px,1.8vw,18px)', color: 'var(--muted)', maxWidth: '560px', margin: '22px auto 40px', lineHeight: 1.7, position: 'relative', zIndex: 2 }}>
+          The marketplace where coaches buy and sell practice plans, drills, playbooks, and more — built by coaches, for coaches.
+        </p>
+
+        <div className="hero-btns-el" style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', position: 'relative', zIndex: 2 }}>
+          <button className="btn btn-green" onClick={() => navigate('/marketplace')}>Browse Resources →</button>
+          <button className="btn btn-ghost" onClick={() => navigate(user ? '/seller' : '/auth')}>Start Selling</button>
+        </div>
+
+        <div className="hero-pills-el" style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '40px', position: 'relative', zIndex: 2 }}>
+          {['🏀 Basketball', '⚽ Soccer', '🏈 Football', '⚾ Baseball', '🏒 Hockey', '🏐 Volleyball'].map(s => (
+            <span key={s} className="sport-pill">{s}</span>
           ))}
         </div>
       </section>
 
-      {/* ── MARQUEE ── */}
-      <div className="marquee-bar">
-        <div className="marquee-track">
-          {doubled.map((item, i) => (
-            <span key={i} className="m-item">
-              {item} <span className="m-dot">●</span>
+      {/* MARQUEE */}
+      <div style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'var(--navy-mid)', padding: '13px 0', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', animation: 'marquee 32s linear infinite', whiteSpace: 'nowrap' }}>
+          {Array(2).fill(['Practice Plans', 'Drill Libraries', 'Playbooks', 'Season Plans', 'Film Breakdowns', 'Scouting Reports', 'S&C Programs', 'Recruiting Guides']).flat().map((item, i) => (
+            <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: '14px', padding: '0 28px', fontFamily: 'Barlow Condensed, sans-serif', fontSize: '12px', fontWeight: 700, letterSpacing: '2.5px', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              {item} <span style={{ color: 'var(--green)', fontSize: '16px' }}>✦</span>
             </span>
           ))}
         </div>
       </div>
 
-      {/* ── PROBLEM / SOLUTION ── */}
-      <section className="problem-strip">
-        <div className="problem-inner">
-          <div className="reveal">
-            <div className="problem-tag">The Problem</div>
-            <h2 className="problem-title">Youth Coaches<br />Deserve <em>Better</em><br />Resources</h2>
-            <ul className="problem-list">
-              <li><div className="prob-x">✕</div>Most youth coaches are parents — not always versed in practice planning, drills, or skill development</li>
-              <li><div className="prob-x">✕</div>No centralized, trusted platform exists to buy or sell sport-specific coaching content</li>
-              <li><div className="prob-x">✕</div>Quality resources are scattered, inconsistent, and often overpriced</li>
-            </ul>
-          </div>
-          <div className="reveal">
-            <div className="problem-tag">Our Solution</div>
-            <div className="solution-cards">
-              {[
-                { icon: '🤝', title: 'Peer-Driven Marketplace', desc: 'Coaches upload, sell, and purchase materials quickly and securely — all in one place, across every sport.' },
-                { icon: '⭐', title: 'Curated & Reviewed', desc: 'Quality content from real coaches. User ratings, product reviews, and top-seller recognition built in.' },
-                { icon: '🔒', title: 'Secure & Protected', desc: 'Safe file delivery, watermarked downloads, and encrypted payments — built for coaches, not tech experts.' },
-              ].map((s, i) => (
-                <div key={i} className="sol-card">
-                  <div className="sol-icon">{s.icon}</div>
-                  <div><h4>{s.title}</h4><p>{s.desc}</p></div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* HOW IT WORKS */}
+      <section style={{ padding: '90px 5%' }}>
+        <div style={{ marginBottom: '52px' }}>
+          <div className="section-label">How It Works</div>
+          <h2 className="section-title">Simple. <em>Powerful.</em></h2>
+          <p style={{ color: 'var(--muted)', fontSize: '16px', maxWidth: '500px', lineHeight: 1.7 }}>Everything you need to buy or sell coaching materials — in three steps.</p>
         </div>
-      </section>
-
-      {/* ── SPORTS ── */}
-      <section className="section sports-wrap" id="sports">
-        <div className="section-label">Every Sport</div>
-        <h2 className="section-title">Browse <em>By Sport</em></h2>
-        <p className="section-desc">From the hardwood to the pitch to the ice — resources for every youth sports coach, at every level.</p>
-        <div className="sports-grid reveal">
-          {SPORTS.map((s, i) => (
-            <a key={i} className="sport-card">
-              <span className="sport-emoji">{s.emoji}</span>
-              <div className="sport-name">{s.name}</div>
-              <div className="sport-sub">{s.sub}</div>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* ── CATEGORIES ── */}
-      <section className="section">
-        <div className="section-label">Browse By Type</div>
-        <h2 className="section-title">Find What You <em>Need</em></h2>
-        <p className="section-desc">Every format a coach needs — downloadable, game-ready, and built by coaches who've been there.</p>
-        <div className="cats-grid reveal">
-          {CATEGORIES.map((c, i) => (
-            <a key={i} className="cat-card">
-              <span className="cat-icon">{c.icon}</span>
-              <div className="cat-name">{c.name}</div>
-              <div className="cat-sub">{c.sub}</div>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* ── PRODUCTS ── */}
-      <section className="section" style={{ background: 'var(--navy-mid)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-        <div className="section-label">Top Sellers</div>
-        <h2 className="section-title">Featured <em>Products</em></h2>
-        <p className="section-desc">Peer-reviewed resources from coaches who've been in the gym, on the field, and in the film room.</p>
-        <div className="products-grid reveal">
-          {PRODUCTS.map((p, i) => (
-            <div key={i} className="product-card">
-              <div className={`product-thumb ${p.thumb}`}>
-                <span className="p-badge">{p.badge}</span>
-                <span className="p-sport-tag">{p.sport}</span>
-                {p.emoji}
-              </div>
-              <div className="product-info">
-                <div className="p-seller">{p.seller}</div>
-                <div className="p-name">{p.name}</div>
-                <div className="p-type">{p.type}</div>
-                <div className="p-meta">
-                  <div className="p-price">$—</div>
-                  <button className="p-btn">View</button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── WHO IT'S FOR ── */}
-      <section className="section who-wrap">
-        <div className="section-label">Who It's For</div>
-        <h2 className="section-title">Built for <em>Every</em> Coach</h2>
-        <p className="section-desc">Whether you've coached for 20 years or just took over a rec team last weekend — this platform is for you.</p>
-        <div className="who-grid reveal">
-          {WHO.map((w, i) => (
-            <div key={i} className="who-card">
-              <span className="who-emoji">{w.emoji}</span>
-              <h3>{w.title}</h3>
-              <p>{w.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ── */}
-      <section className="section" id="how">
-        <div className="section-label">Simple Process</div>
-        <h2 className="section-title">How It <em>Works</em></h2>
-        <p className="section-desc">Built by coaches, for coaches. Get what you need or earn from what you know — in any sport.</p>
-        <div className="how-grid reveal">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '2px', border: '1px solid var(--border)', borderRadius: '16px', overflow: 'hidden' }}>
           {[
-            { num: '01', icon: '🏅', title: 'Create Your Account', desc: 'Sign up free as a buyer, seller, or both. Build your public coach profile with your sport, bio, and credentials.' },
-            { num: '02', icon: '📋', title: 'Browse or Upload', desc: 'Shop peer-reviewed resources from real coaches — or upload your own playbooks, drills, and practice plans to start earning.' },
-            { num: '03', icon: '💳', title: 'Secure Checkout', desc: 'Every transaction is encrypted and protected. Files are watermarked and tracked to prevent unauthorized sharing.' },
-            { num: '04', icon: '📥', title: 'Instant Download', desc: 'Get your resources immediately after purchase. PDFs, videos, and templates delivered straight to your dashboard.' },
-          ].map((h, i) => (
+            { icon: '🔍', num: '01', title: 'Browse the Marketplace', desc: 'Search by sport, category, or keyword. Filter by price and find resources that fit your program.' },
+            { icon: '💳', num: '02', title: 'Purchase Instantly', desc: 'Secure checkout powered by Stripe. Pay once and get immediate access to your download.' },
+            { icon: '📥', num: '03', title: 'Download & Implement', desc: 'Access your files anytime from your library. Implement immediately with your team.' },
+            { icon: '📤', num: '04', title: 'Sell Your Knowledge', desc: 'Create a seller account, upload your materials, and start earning from your coaching expertise.' },
+          ].map((step, i) => (
             <div key={i} className="how-card">
-              <div className="how-num">{h.num}</div>
-              <div className="how-icon">{h.icon}</div>
-              <h3>{h.title}</h3>
-              <p>{h.desc}</p>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '72px', lineHeight: 1, color: 'rgba(46,204,113,0.08)', position: 'absolute', top: '16px', right: '20px' }}>{step.num}</div>
+              <div style={{ width: '50px', height: '50px', borderRadius: '11px', background: 'var(--green-dim)', border: '1px solid var(--green-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', marginBottom: '18px' }}>{step.icon}</div>
+              <h3 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '21px', textTransform: 'uppercase', letterSpacing: '.3px', marginBottom: '10px' }}>{step.title}</h3>
+              <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.65 }}>{step.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── SELL ── */}
-      <section className="section seller-strip" id="sell">
-        <div className="seller-inner">
-          <div className="reveal">
-            <div className="section-label">For Coaches Who Know</div>
-            <h2 className="section-title">Start <em>Earning</em><br />From Your<br />Expertise</h2>
-            <p className="section-desc">Your playbooks, your practice plans, your systems — in any sport, worth more than you think. Set your price, upload your work, and earn every time another coach downloads it.</p>
-            <ul className="earn-list">
-              <li><div className="chk">✓</div>Keep 70% of every sale — transparent, no surprises</li>
-              <li><div className="chk">✓</div>Upload PDFs, videos, templates, and graphics — all formats supported</li>
-              <li><div className="chk">✓</div>Your own public storefront with ratings and full sales history</li>
-              <li><div className="chk">✓</div>Passive income — sell the same resource to hundreds of coaches</li>
-              <li><div className="chk">✓</div>Files are watermarked and protected against piracy</li>
-            </ul>
-            <button className="btn btn-green" onClick={goCoaches}>Meet Our Coaches →</button>
-          </div>
-          <div className="seller-visual">
-            <div className="cpc-big">CPC</div>
-            <div className="seller-float">
-              <div className="sf"><div className="sf-val">70%</div><div className="sf-lbl">You keep per sale</div></div>
-              <div className="sf"><div className="sf-val">30%</div><div className="sf-lbl">Platform fee</div></div>
+      {/* SPORTS */}
+      <div style={{ background: 'var(--navy-mid)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '90px 5%' }}>
+        <div className="section-label">Browse by Sport</div>
+        <h2 className="section-title">Every <em>Sport.</em> Every Level.</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(148px, 1fr))', gap: '10px', marginTop: '48px' }}>
+          {[
+            { emoji: '🏀', name: 'Basketball', sub: '120+ resources' },
+            { emoji: '⚽', name: 'Soccer', sub: '80+ resources' },
+            { emoji: '🏈', name: 'Football', sub: '95+ resources' },
+            { emoji: '⚾', name: 'Baseball', sub: '60+ resources' },
+            { emoji: '🏒', name: 'Hockey', sub: '45+ resources' },
+            { emoji: '🏐', name: 'Volleyball', sub: '38+ resources' },
+            { emoji: '🥍', name: 'Lacrosse', sub: '29+ resources' },
+            { emoji: '🎾', name: 'Tennis', sub: '22+ resources' },
+          ].map(sport => (
+            <div key={sport.name} className="sport-card" onClick={() => navigate('/marketplace')}>
+              <span style={{ fontSize: '30px', marginBottom: '10px', display: 'block' }}>{sport.emoji}</span>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '15px', textTransform: 'uppercase', letterSpacing: '.3px' }}>{sport.name}</div>
+              <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '4px' }}>{sport.sub}</div>
             </div>
-          </div>
+          ))}
+        </div>
+      </div>
+
+      {/* WHO IT'S FOR */}
+      <section style={{ padding: '90px 5%' }}>
+        <div className="section-label">Who It's For</div>
+        <h2 className="section-title">Built for <em>Every</em> Coach.</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '16px', marginTop: '48px' }}>
+          {[
+            { emoji: '🏫', title: 'Youth & Rec Coaches', desc: 'Find age-appropriate drills, practice plans, and resources to develop young athletes the right way.' },
+            { emoji: '🏆', title: 'Travel & Club Coaches', desc: 'Level up your program with competitive systems, tactical frameworks, and tournament-ready content.' },
+            { emoji: '🎓', title: 'High School Coaches', desc: 'Access complete season plans, film breakdown tools, and recruiting guidance for your program.' },
+            { emoji: '💼', title: 'PE Teachers', desc: 'Multi-sport drill libraries and beginner-friendly resources designed for physical education.' },
+          ].map(w => (
+            <div key={w.title} className="who-card">
+              <span style={{ fontSize: '32px', marginBottom: '14px', display: 'block' }}>{w.emoji}</span>
+              <h3 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '21px', textTransform: 'uppercase', marginBottom: '8px' }}>{w.title}</h3>
+              <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.65 }}>{w.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── COMMISSION ── */}
-      <section className="section" style={{ textAlign: 'center' }}>
-        <div className="section-label" style={{ justifyContent: 'center' }}>Transparent Pricing</div>
-        <h2 className="section-title">Simple <em>Commission</em> Model</h2>
-        <p className="section-desc" style={{ margin: '0 auto' }}>No hidden fees. No confusing tiers. Straightforward revenue sharing — coaches first, every sport.</p>
-        <div className="comm-box reveal">
-          <div className="comm-top">
-            <div className="comm-pct">70%</div>
-            <div className="comm-sub">Goes Directly to You</div>
-            <p className="comm-desc">Set your price. Sell your knowledge. Every download puts 70% straight into your account — basketball, soccer, football, or any other sport.</p>
-          </div>
-          <div className="comm-rows">
-            <div className="cr"><div className="cr-val">You Set</div><div className="cr-lbl">Your Own Price</div></div>
-            <div className="cr"><div className="cr-val">70%</div><div className="cr-lbl">Goes to Seller</div></div>
-            <div className="cr"><div className="cr-val">30%</div><div className="cr-lbl">Platform Fee</div></div>
-          </div>
-        </div>
-      </section>
+      {/* BECOME A SELLER CTA */}
+      <div style={{ background: 'var(--navy-mid)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', padding: '90px 5%', textAlign: 'center' }}>
+        <div style={{ width: '90px', height: '90px', borderRadius: '20px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '32px', color: 'var(--navy)', margin: '0 auto 28px', animation: 'float 5s ease-in-out infinite' }}>CPC</div>
+        <h2 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(34px, 5vw, 60px)', textTransform: 'uppercase', marginBottom: '16px' }}>Share Your <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Knowledge</em></h2>
+        <p style={{ color: 'var(--muted)', fontSize: '16px', maxWidth: '500px', margin: '0 auto 36px', lineHeight: 1.7 }}>Every coach has something valuable to offer. Create your profile, upload your resources, and join a community elevating youth sports together.</p>
+        <button className="btn btn-green" onClick={() => navigate(user ? '/seller' : '/auth')}>Become a Seller →</button>
+      </div>
 
-      <Footer />
+      {/* FOOTER */}
+      <footer style={{ background: 'var(--navy-mid)', borderTop: '1px solid var(--border)', padding: '3rem 5% 1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '13px', color: 'var(--navy)' }}>CPC</div>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '15px', letterSpacing: '.8px' }}>COACHES <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>PAY</em> COACHES</div>
+            </div>
+            <p style={{ color: 'var(--muted)', fontSize: '.88rem', lineHeight: 1.6, maxWidth: '280px' }}>The go-to resource hub for youth sports coaches. Share knowledge, earn income, improve the game.</p>
+          </div>
+          {[
+            { title: 'Browse', links: ['All Sports', 'Basketball', 'Soccer', 'Football'] },
+            { title: 'Sellers', links: ['Start Selling', 'Upload Guide', 'Earnings'] },
+            { title: 'Company', links: ['About Us', 'Contact', 'Terms', 'Privacy'] },
+          ].map(col => (
+            <div key={col.title}>
+              <h4 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.75rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '.75rem' }}>{col.title}</h4>
+              <ul style={{ listStyle: 'none' }}>
+                {col.links.map(link => (
+                  <li key={link} style={{ marginBottom: '.5rem' }}>
+                    <a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer', transition: 'color .2s' }}
+                      onMouseEnter={e => e.target.style.color = 'var(--green)'}
+                      onMouseLeave={e => e.target.style.color = 'var(--off)'}
+                    >{link}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+          <div style={{ color: 'var(--muted)', fontSize: '.82rem' }}>© 2025 <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Coaches Pay Coaches</em>. Built for coaches, by coaches.</div>
+        </div>
+      </footer>
+
     </div>
-  );
+  )
 }
