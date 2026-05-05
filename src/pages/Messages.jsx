@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import NavMessagesLink from '../components/NavMessagesLink'
 
 export default function Messages() {
   const { user, profile, signOut } = useAuth()
@@ -23,14 +24,18 @@ export default function Messages() {
       markAsRead(activeConvo.id)
 
       const subscription = supabase
-        .channel('messages:' + activeConvo.id)
+        .channel('messages-' + activeConvo.id)
         .on('postgres_changes', {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
           filter: 'conversation_id=eq.' + activeConvo.id
-        }, payload => {
-          setMessages(prev => [...prev, payload.new])
+        }, (payload) => {
+          setMessages(prev => {
+            const exists = prev.find(m => m.id === payload.new.id)
+            if (exists) return prev
+            return [...prev, payload.new]
+          })
         })
         .subscribe()
 
@@ -84,18 +89,37 @@ export default function Messages() {
     if (!newMessage.trim() || !activeConvo) return
     setSending(true)
 
-    await supabase.from('messages').insert({
+    const optimisticMsg = {
+      id: 'temp-' + Date.now(),
       conversation_id: activeConvo.id,
       sender_id: user.id,
-      content: newMessage.trim()
-    })
+      content: newMessage.trim(),
+      read: false,
+      created_at: new Date().toISOString()
+    }
+
+    setMessages(prev => [...prev, optimisticMsg])
+    setNewMessage('')
+
+    const { data } = await supabase
+      .from('messages')
+      .insert({
+        conversation_id: activeConvo.id,
+        sender_id: user.id,
+        content: optimisticMsg.content
+      })
+      .select()
+      .single()
+
+    if (data) {
+      setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? data : m))
+    }
 
     await supabase
       .from('conversations')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', activeConvo.id)
 
-    setNewMessage('')
     setSending(false)
   }
 
@@ -126,13 +150,13 @@ export default function Messages() {
           <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
           {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
           {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+          <NavMessagesLink />
           <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
         </ul>
       </nav>
 
       <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', height: 'calc(100vh - 66px)', overflow: 'hidden' }}>
 
-        {/* Sidebar */}
         <div style={{ borderRight: '1px solid var(--border)', overflowY: 'auto', background: 'var(--navy-mid)' }}>
           <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)' }}>
             <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>Messages</div>
@@ -171,10 +195,8 @@ export default function Messages() {
           )}
         </div>
 
-        {/* Chat */}
         {activeConvo ? (
           <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            {/* Chat header */}
             <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', background: 'var(--navy-mid)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '12px', color: 'var(--navy)' }}>
                 {getInitials(getOtherPerson(activeConvo)?.full_name)}
@@ -194,7 +216,6 @@ export default function Messages() {
               </button>
             </div>
 
-            {/* Messages */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {messages.length === 0 ? (
                 <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '.9rem', marginTop: '2rem' }}>
@@ -206,7 +227,8 @@ export default function Messages() {
                   return (
                     <div key={msg.id} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
                       <div style={{
-                        maxWidth: '65%', padding: '.75rem 1rem', borderRadius: isMe ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                        maxWidth: '65%', padding: '.75rem 1rem',
+                        borderRadius: isMe ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
                         background: isMe ? 'var(--green)' : 'var(--navy-card)',
                         color: isMe ? 'var(--navy)' : 'var(--off)',
                         fontSize: '.9rem', lineHeight: 1.5,
@@ -224,7 +246,6 @@ export default function Messages() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input */}
             <form onSubmit={sendMessage} style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', background: 'var(--navy-mid)', display: 'flex', gap: '10px' }}>
               <input
                 className="form-input"
