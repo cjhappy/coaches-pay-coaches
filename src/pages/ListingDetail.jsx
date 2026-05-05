@@ -80,7 +80,7 @@ export default function ListingDetail() {
         .eq('buyer_id', user.id)
         .eq('listing_id', id)
         .eq('status', 'completed')
-        .single()
+        .maybeSingle()
       setHasPurchased(!!purchaseData)
 
       const { data: reviewCheck } = await supabase
@@ -88,7 +88,7 @@ export default function ListingDetail() {
         .select('id')
         .eq('buyer_id', user.id)
         .eq('listing_id', id)
-        .single()
+        .maybeSingle()
       setHasReviewed(!!reviewCheck)
     }
 
@@ -192,7 +192,10 @@ export default function ListingDetail() {
             )}
 
             {listing.profiles?.full_name && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer' }} onClick={() => navigate('/coach/' + listing.seller_id)}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer' }}
+                onClick={() => navigate('/coach/' + listing.seller_id)}
+              >
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '11px', color: 'var(--navy)', flexShrink: 0 }}>
                   {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
@@ -214,14 +217,21 @@ export default function ListingDetail() {
                   Reviews {reviews.length > 0 && '(' + reviews.length + ')'}
                 </div>
                 {hasPurchased && !hasReviewed && !isOwnListing && (
-                  <button className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => setShowReviewForm(!showReviewForm)}>
+                  <button
+                    className="btn btn-ghost"
+                    style={{ padding: '8px 16px', fontSize: '13px' }}
+                    onClick={() => setShowReviewForm(!showReviewForm)}
+                  >
                     {showReviewForm ? 'Cancel' : 'Write a Review'}
                   </button>
                 )}
               </div>
 
               {showReviewForm && (
-                <ReviewForm listing={listing} onSubmit={() => { setShowReviewForm(false); setHasReviewed(true); fetchListing() }} />
+                <ReviewForm
+                  listing={listing}
+                  onSubmit={() => { setShowReviewForm(false); setHasReviewed(true); fetchListing() }}
+                />
               )}
 
               {reviews.length === 0 ? (
@@ -287,7 +297,12 @@ export default function ListingDetail() {
                   Seller has not set up payments yet.
                 </div>
               ) : (
-                <button className="btn btn-green" style={{ width: '100%', justifyContent: 'center' }} onClick={handlePurchase} disabled={purchasing}>
+                <button
+                  className="btn btn-green"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                  onClick={handlePurchase}
+                  disabled={purchasing}
+                >
                   {purchasing ? 'Redirecting...' : 'Purchase $' + Number(listing.price).toFixed(2)}
                 </button>
               )}
