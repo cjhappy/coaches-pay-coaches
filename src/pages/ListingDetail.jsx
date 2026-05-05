@@ -52,6 +52,7 @@ export default function ListingDetail() {
   const [purchasing, setPurchasing] = useState(false)
   const [error, setError] = useState(null)
   const [reviews, setReviews] = useState([])
+  const [related, setRelated] = useState([])
   const [hasPurchased, setHasPurchased] = useState(false)
   const [hasReviewed, setHasReviewed] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
@@ -64,7 +65,10 @@ export default function ListingDetail() {
       .select('*, profiles(full_name, stripe_account_id, avatar_url)')
       .eq('id', id)
       .single()
-    if (!error) setListing(data)
+    if (!error) {
+      setListing(data)
+      fetchRelated(data)
+    }
 
     const { data: reviewData } = await supabase
       .from('reviews')
@@ -93,6 +97,16 @@ export default function ListingDetail() {
     }
 
     setLoading(false)
+  }
+
+  async function fetchRelated(currentListing) {
+    const { data } = await supabase
+      .from('listings')
+      .select('*, profiles(full_name)')
+      .eq('sport', currentListing.sport)
+      .neq('id', currentListing.id)
+      .limit(3)
+    setRelated(data || [])
   }
 
   async function handlePurchase() {
@@ -144,12 +158,8 @@ export default function ListingDetail() {
         <ul className="nav-links">
           <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
           <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {(profile?.role === 'seller' || profile?.role === 'both') && (
-            <li><a onClick={() => navigate('/seller')}>My Store</a></li>
-          )}
-          {(profile?.role === 'buyer' || profile?.role === 'both') && (
-            <li><a onClick={() => navigate('/purchases')}>My Library</a></li>
-          )}
+          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
           {user ? (
             <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
           ) : (
@@ -168,9 +178,7 @@ export default function ListingDetail() {
             {listing.thumbnail_url ? (
               <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '260px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.5rem' }} />
             ) : (
-              <div style={{ width: '100%', height: '260px', borderRadius: '12px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', marginBottom: '1.5rem' }}>
-                📋
-              </div>
+              <div style={{ width: '100%', height: '260px', borderRadius: '12px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', marginBottom: '1.5rem' }}>📋</div>
             )}
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
@@ -192,10 +200,7 @@ export default function ListingDetail() {
             )}
 
             {listing.profiles?.full_name && (
-              <div
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer' }}
-                onClick={() => navigate('/coach/' + listing.seller_id)}
-              >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer' }} onClick={() => navigate('/coach/' + listing.seller_id)}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '11px', color: 'var(--navy)', flexShrink: 0 }}>
                   {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
@@ -211,27 +216,21 @@ export default function ListingDetail() {
               {listing.description}
             </p>
 
+            {/* Reviews */}
             <div style={{ marginTop: '2.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                 <div className="section-label" style={{ margin: 0 }}>
                   Reviews {reviews.length > 0 && '(' + reviews.length + ')'}
                 </div>
                 {hasPurchased && !hasReviewed && !isOwnListing && (
-                  <button
-                    className="btn btn-ghost"
-                    style={{ padding: '8px 16px', fontSize: '13px' }}
-                    onClick={() => setShowReviewForm(!showReviewForm)}
-                  >
+                  <button className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => setShowReviewForm(!showReviewForm)}>
                     {showReviewForm ? 'Cancel' : 'Write a Review'}
                   </button>
                 )}
               </div>
 
               {showReviewForm && (
-                <ReviewForm
-                  listing={listing}
-                  onSubmit={() => { setShowReviewForm(false); setHasReviewed(true); fetchListing() }}
-                />
+                <ReviewForm listing={listing} onSubmit={() => { setShowReviewForm(false); setHasReviewed(true); fetchListing() }} />
               )}
 
               {reviews.length === 0 ? (
@@ -250,9 +249,7 @@ export default function ListingDetail() {
                         <span style={{ color: 'var(--muted)', fontSize: '.78rem' }}>{new Date(review.created_at).toLocaleDateString()}</span>
                       </div>
                       <StarRating rating={review.rating} size={16} />
-                      {review.review && (
-                        <p style={{ color: 'var(--muted)', fontSize: '.88rem', lineHeight: 1.6, marginTop: '8px' }}>{review.review}</p>
-                      )}
+                      {review.review && <p style={{ color: 'var(--muted)', fontSize: '.88rem', lineHeight: 1.6, marginTop: '8px' }}>{review.review}</p>}
                     </div>
                   ))}
                 </div>
@@ -297,12 +294,7 @@ export default function ListingDetail() {
                   Seller has not set up payments yet.
                 </div>
               ) : (
-                <button
-                  className="btn btn-green"
-                  style={{ width: '100%', justifyContent: 'center' }}
-                  onClick={handlePurchase}
-                  disabled={purchasing}
-                >
+                <button className="btn btn-green" style={{ width: '100%', justifyContent: 'center' }} onClick={handlePurchase} disabled={purchasing}>
                   {purchasing ? 'Redirecting...' : 'Purchase $' + Number(listing.price).toFixed(2)}
                 </button>
               )}
@@ -317,6 +309,35 @@ export default function ListingDetail() {
             <ShareCard url={shareUrl} title={listing.title} />
           </div>
         </div>
+
+        {/* Related Listings */}
+        {related.length > 0 && (
+          <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border)', paddingTop: '2.5rem' }}>
+            <div className="section-label" style={{ marginBottom: '1.5rem' }}>More {listing.sport} Resources</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+              {related.map(r => (
+                <div key={r.id} className="cpc-card" style={{ padding: '1.25rem', cursor: 'pointer' }} onClick={() => navigate('/listing/' + r.id)}>
+                  {r.thumbnail_url ? (
+                    <img src={r.thumbnail_url} alt={r.title} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
+                  ) : (
+                    <div style={{ width: '100%', height: '120px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', marginBottom: '1rem' }}>📋</div>
+                  )}
+                  <div style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
+                    <span className="tag">{r.sport}</span>
+                    <span className="tag">{r.category}</span>
+                  </div>
+                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '4px', lineHeight: 1.2 }}>{r.title}</div>
+                  {r.profiles?.full_name && (
+                    <div style={{ color: 'var(--muted)', fontSize: '.78rem', marginBottom: '8px' }}>by {r.profiles.full_name}</div>
+                  )}
+                  <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem' }}>
+                    {r.price === 0 ? 'FREE' : '$' + Number(r.price).toFixed(2)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
