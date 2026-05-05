@@ -16,9 +16,6 @@ import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
 import Messages from './pages/Messages'
 
-// Add inside Routes:
-<Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-
 function App() {
   const { user, loading } = useAuth()
   if (loading) return <div>Loading...</div>
@@ -39,6 +36,7 @@ function App() {
         <Route path="/seller" element={<ProtectedRoute requiredRole="seller"><SellerDashboard /></ProtectedRoute>} />
         <Route path="/purchases" element={<ProtectedRoute><Purchases /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+        <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
