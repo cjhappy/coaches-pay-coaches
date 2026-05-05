@@ -1,4 +1,3 @@
-cat > src/pages/Coaches.jsx << 'ENDOFFILE'
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -70,8 +69,8 @@ export default function Coaches() {
         <ul className="nav-links">
           <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
           <li><a onClick={() => navigate('/coaches')} className="active">Coaches</a></li>
-          {profile?.role === 'seller' || profile?.role === 'both' ? <li><a onClick={() => navigate('/seller')}>My Store</a></li> : null}
-          {profile?.role === 'buyer' || profile?.role === 'both' ? <li><a onClick={() => navigate('/purchases')}>My Library</a></li> : null}
+          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
           {profile
             ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
             : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
@@ -179,4 +178,3 @@ export default function Coaches() {
     </div>
   )
 }
-ENDOFFILE
