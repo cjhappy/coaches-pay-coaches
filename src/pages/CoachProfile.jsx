@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import StarRating from '../components/StarRating'
 import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
+import MessageButton from '../components/MessageButton'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -181,13 +182,7 @@ export default function CoachProfile() {
   }
 
   if (loading) return <div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Loading...</div>
-  if (!coach) return <><div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Coach not found.</div><Helmet>
-    <title>{coach.full_name} — Coaches Pay Coaches</title>
-    <meta name="description" content={coach.bio || 'Browse coaching resources from ' + coach.full_name + ' on Coaches Pay Coaches.'} />
-    <meta property="og:title" content={coach.full_name + ' — Coaches Pay Coaches'} />
-    <meta property="og:description" content={coach.bio || 'Browse coaching resources from ' + coach.full_name + '.'} />
-    <meta property="og:url" content={'https://coachespaycoaches.org/coach/' + coach.id} />
-  </Helmet></>
+  if (!coach) return <div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Coach not found.</div>
 
   const avgPrice = listings.length > 0 ? listings.reduce((sum, l) => sum + Number(l.price), 0) / listings.length : 0
   const sports = [...new Set(listings.map(l => l.sport))]
@@ -196,6 +191,14 @@ export default function CoachProfile() {
 
   return (
     <div className="page-body">
+      <Helmet>
+        <title>{coach.full_name} — Coaches Pay Coaches</title>
+        <meta name="description" content={coach.bio || 'Browse coaching resources from ' + coach.full_name + ' on Coaches Pay Coaches.'} />
+        <meta property="og:title" content={coach.full_name + ' — Coaches Pay Coaches'} />
+        <meta property="og:description" content={coach.bio || 'Browse coaching resources from ' + coach.full_name + '.'} />
+        <meta property="og:url" content={'https://coachespaycoaches.org/coach/' + coach.id} />
+      </Helmet>
+
       <nav className="cpc-nav">
         <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>
@@ -255,20 +258,25 @@ export default function CoachProfile() {
               </p>
             )}
 
-            {!isOwnProfile ? (
-              <button
-                className={isFollowing ? 'btn btn-ghost' : 'btn btn-green'}
-                onClick={handleFollow}
-                disabled={followLoading}
-                style={{ padding: '10px 28px' }}
-              >
-                {followLoading ? '...' : isFollowing ? 'Following ✓' : 'Follow'}
-              </button>
-            ) : (
-              <button className="btn btn-ghost" onClick={() => navigate('/seller')} style={{ padding: '10px 28px' }}>
-                Edit Profile
-              </button>
-            )}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {!isOwnProfile ? (
+                <button
+                  className={isFollowing ? 'btn btn-ghost' : 'btn btn-green'}
+                  onClick={handleFollow}
+                  disabled={followLoading}
+                  style={{ padding: '10px 28px' }}
+                >
+                  {followLoading ? '...' : isFollowing ? 'Following ✓' : 'Follow'}
+                </button>
+              ) : (
+                <button className="btn btn-ghost" onClick={() => navigate('/seller')} style={{ padding: '10px 28px' }}>
+                  Edit Profile
+                </button>
+              )}
+              {!isOwnProfile && (
+                <MessageButton sellerId={coach.id} listingId={null} listingTitle={null} />
+              )}
+            </div>
           </div>
 
           <ShareCard url={shareUrl} name={coach.full_name} />

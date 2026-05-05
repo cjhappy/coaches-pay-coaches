@@ -14,6 +14,10 @@ import ResetPassword from './pages/ResetPassword'
 import Admin from './pages/Admin'
 import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
+import Messages from './pages/Messages'
+
+// Add inside Routes:
+<Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
 
 function App() {
   const { user, loading } = useAuth()

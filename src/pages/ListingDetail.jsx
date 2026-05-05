@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import StarRating from '../components/StarRating'
 import ReviewForm from '../components/ReviewForm'
+import MessageButton from '../components/MessageButton'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -308,7 +309,13 @@ export default function ListingDetail() {
               )}
 
               {error && <p className="auth-error">{error}</p>}
-
+{!isOwnListing && (
+  <MessageButton
+    sellerId={listing.seller_id}
+    listingId={listing.id}
+    listingTitle={listing.title}
+  />
+)}
               <p style={{ color: 'var(--muted)', fontSize: '.75rem', textAlign: 'center', marginTop: '1rem' }}>
                 {listing.price === 0 ? 'No charges.' : 'Secure checkout powered by Stripe.'}
               </p>
