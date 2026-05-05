@@ -12,6 +12,8 @@ import CoachProfile from './pages/CoachProfile'
 import Coaches from './pages/Coaches'
 import ResetPassword from './pages/ResetPassword'
 import Admin from './pages/Admin'
+import Terms from './pages/Terms'
+import Privacy from './pages/Privacy'
 
 function App() {
   const { user, loading } = useAuth()
@@ -23,6 +25,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <AuthForm onSuccess={() => window.location.href = '/dashboard'} />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/marketplace" element={<ProtectedRoute><Marketplace /></ProtectedRoute>} />
         <Route path="/listing/:id" element={<ProtectedRoute><ListingDetail /></ProtectedRoute>} />

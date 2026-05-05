@@ -247,19 +247,14 @@ return (
             { title: 'Sellers', links: ['Start Selling', 'Upload Guide', 'Earnings'] },
             { title: 'Company', links: ['About Us', 'Contact', 'Terms', 'Privacy'] },
           ].map(col => (
-            <div key={col.title}>
-              <h4 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.75rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '.75rem' }}>{col.title}</h4>
-              <ul style={{ listStyle: 'none' }}>
-                {col.links.map(link => (
-                  <li key={link} style={{ marginBottom: '.5rem' }}>
-                    <a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer', transition: 'color .2s' }}
-                      onMouseEnter={e => e.target.style.color = 'var(--green)'}
-                      onMouseLeave={e => e.target.style.color = 'var(--off)'}
-                    >{link}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+           <div key="Company">
+  <h4 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.75rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '.75rem' }}>Company</h4>
+  <ul style={{ listStyle: 'none' }}>
+    <li style={{ marginBottom: '.5rem' }}><a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer' }} onClick={() => navigate('/terms')}>Terms of Service</a></li>
+    <li style={{ marginBottom: '.5rem' }}><a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer' }} onClick={() => navigate('/privacy')}>Privacy Policy</a></li>
+    <li style={{ marginBottom: '.5rem' }}><a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer' }} href="mailto:christopherhappy05@gmail.com">Contact</a></li>
+  </ul>
+</div>
           ))}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
