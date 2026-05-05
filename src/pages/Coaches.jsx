@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
+import NavMessagesLink from '../components/NavMessagesLink'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
 
@@ -96,7 +97,7 @@ export default function Coaches() {
   <li><a onClick={() => navigate('/coaches')} className="active">Coaches</a></li>
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-  {user && <li><a onClick={() => navigate('/messages')}>Messages</a></li>}
+ <NavMessagesLink />
   {user
     ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
     : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>

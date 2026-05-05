@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import ListingForm from '../components/ListingForm'
 import Avatar from '../components/Avatar'
+import NavMessagesLink from '../components/NavMessagesLink'
 
 function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)
@@ -168,7 +169,7 @@ export default function SellerDashboard() {
   <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
   <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
   <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-  <li><a onClick={() => navigate('/messages')}>Messages</a></li>
+ <NavMessagesLink />
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
 </ul>
       </nav>

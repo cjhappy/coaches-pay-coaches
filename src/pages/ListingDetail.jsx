@@ -6,6 +6,7 @@ import StarRating from '../components/StarRating'
 import ReviewForm from '../components/ReviewForm'
 import MessageButton from '../components/MessageButton'
 import { Helmet } from 'react-helmet-async'
+import NavMessagesLink from '../components/NavMessagesLink'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -170,7 +171,7 @@ export default function ListingDetail() {
   <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-  <li><a onClick={() => navigate('/messages')}>Messages</a></li>
+ <NavMessagesLink />
   {user ? (
     <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
   ) : (

@@ -1,5 +1,6 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import NavMessagesLink from '../components/NavMessagesLink'
 <li><a onClick={() => navigate('/messages')}>Messages</a></li>
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()
@@ -26,7 +27,7 @@ export default function Dashboard() {
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {profile?.is_admin && <li><a onClick={() => navigate('/admin')}>Admin</a></li>}
-  <li><a onClick={() => navigate('/messages')}>Messages</a></li>
+  <NavMessagesLink />
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
 </ul>
       </nav>
