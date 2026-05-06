@@ -106,7 +106,18 @@ body {
   letter-spacing: .5px;
 }
 .nav-cta:hover { background: var(--green-dark) !important; }
-.hamburger-btn { display: none; }
+.hamburger-btn {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  padding: 8px 10px;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ── PAGE WRAPPER ── */
 .page-body { padding-top: 66px; min-height: 100vh; }

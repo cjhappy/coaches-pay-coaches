@@ -22,23 +22,10 @@ export default function MobileNav() {
 
   return (
     <>
-     <button
-  onClick={() => setOpen(!open)}
-  className="hamburger-btn"
-  style={{
-    background: 'transparent',
-    border: '1px solid var(--border)',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    padding: '8px 10px',
-    flexDirection: 'column',
-    gap: '5px',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1001,
-    position: 'relative'
-  }}
->
+      <button
+        onClick={() => setOpen(!open)}
+        className="hamburger-btn"
+      >
         <span style={{ display: 'block', width: '20px', height: '2px', background: open ? 'var(--green)' : 'var(--off)', transition: 'all .2s', transform: open ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
         <span style={{ display: 'block', width: '20px', height: '2px', background: open ? 'transparent' : 'var(--off)', transition: 'all .2s' }} />
         <span style={{ display: 'block', width: '20px', height: '2px', background: open ? 'var(--green)' : 'var(--off)', transition: 'all .2s', transform: open ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
@@ -47,7 +34,7 @@ export default function MobileNav() {
       {open && (
         <div style={{
           position: 'fixed',
-          top: '60px',
+          top: '66px',
           left: 0,
           right: 0,
           bottom: 0,
