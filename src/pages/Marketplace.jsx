@@ -113,6 +113,7 @@ export default function Marketplace() {
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
        <ul className="nav-links">
+        <li><a onClick={() => navigate('/feed')}>Feed</a></li>
   <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
   <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}

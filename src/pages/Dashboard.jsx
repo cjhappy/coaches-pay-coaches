@@ -24,6 +24,7 @@ export default function Dashboard() {
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
        <ul className="nav-links">
+        <li><a onClick={() => navigate('/feed')}>Feed</a></li>
   <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
   <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}

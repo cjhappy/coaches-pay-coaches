@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useUnreadMessages } from '../hooks/useUnreadMessages'
 
 export default function MobileNav() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   const unreadCount = useUnreadMessages()
@@ -25,6 +25,7 @@ export default function MobileNav() {
       zIndex: 999,
       paddingBottom: 'env(safe-area-inset-bottom)'
     }} className="mobile-bottom-nav">
+      <NavItem label="Feed" onClick={() => navigate('/feed')} active={active('/feed')} />
       <NavItem label="Browse" onClick={() => navigate('/marketplace')} active={active('/marketplace') || active('/listing')} />
       <NavItem label="Coaches" onClick={() => navigate('/coaches')} active={active('/coaches') || active('/coach')} />
       {user && <NavItem label="Messages" onClick={() => navigate('/messages')} active={active('/messages')} badge={unreadCount} />}

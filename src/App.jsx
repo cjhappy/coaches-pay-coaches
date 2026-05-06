@@ -16,7 +16,10 @@ import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
 import Messages from './pages/Messages'
 import MobileNav from './components/MobileNav'
+import Feed from './pages/Feed'
 
+// Inside Routes:
+<Route path="/feed" element={<Feed />} />
 function App() {
   const { user, loading } = useAuth()
   if (loading) return <div>Loading...</div>

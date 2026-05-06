@@ -81,6 +81,7 @@ export default function Admin() {
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
         <ul className="nav-links">
+          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
           <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
           <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
           <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
