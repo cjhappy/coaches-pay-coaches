@@ -5,7 +5,6 @@ import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
 import NavMessagesLink from '../components/NavMessagesLink'
-import MobileNav from '../components/MobileNav'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
 
@@ -99,7 +98,6 @@ export default function Coaches() {
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
  <NavMessagesLink />
- <MobileNav />
   {user
     ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
     : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>

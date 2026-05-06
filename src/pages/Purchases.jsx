@@ -3,7 +3,6 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import NavMessagesLink from '../components/NavMessagesLink'
-import MobileNav from '../components/MobileNav'
 
 export default function Purchases() {
   const { profile, signOut } = useAuth()
@@ -59,7 +58,6 @@ export default function Purchases() {
   <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
   <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
   <NavMessagesLink />
-  <MobileNav />
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
 </ul>
       </nav>

@@ -5,7 +5,6 @@ import { supabase } from '../lib/supabase'
 import ListingForm from '../components/ListingForm'
 import Avatar from '../components/Avatar'
 import NavMessagesLink from '../components/NavMessagesLink'
-import MobileNav from '../components/MobileNav'
 
 function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)
@@ -180,7 +179,6 @@ export default function SellerDashboard() {
   <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
   <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
  <NavMessagesLink />
- <MobileNav />
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
 </ul>
       </nav>

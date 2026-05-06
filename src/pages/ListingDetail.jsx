@@ -7,7 +7,6 @@ import ReviewForm from '../components/ReviewForm'
 import MessageButton from '../components/MessageButton'
 import { Helmet } from 'react-helmet-async'
 import NavMessagesLink from '../components/NavMessagesLink'
-import MobileNav from '../components/MobileNav'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -181,7 +180,6 @@ export default function ListingDetail() {
             <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
           )}
         </ul>
-        <MobileNav />
       </nav>
 
       <div style={{ padding: '2.5rem 5%', maxWidth: '900px', margin: '0 auto' }}>
