@@ -26,8 +26,9 @@ function AvatarUploader({ profile, onUpdate }) {
     console.log('Public URL:', publicUrl)
     const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
     console.log('Update error:', updateError)
-    setPreviewUrl(publicUrl)
-    onUpdate(publicUrl)
+    const bustUrl = publicUrl + '?t=' + Date.now()
+setPreviewUrl(bustUrl)
+onUpdate(bustUrl)
   }
   setUploading(false)
 }
