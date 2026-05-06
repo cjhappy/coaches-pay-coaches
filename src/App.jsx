@@ -15,6 +15,7 @@ import Admin from './pages/Admin'
 import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
 import Messages from './pages/Messages'
+import MobileNav from './components/MobileNav'
 
 function App() {
   const { user, loading } = useAuth()
@@ -39,6 +40,7 @@ function App() {
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <MobileNav />
     </BrowserRouter>
   )
 }
