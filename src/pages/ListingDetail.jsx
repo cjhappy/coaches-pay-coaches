@@ -113,22 +113,23 @@ export default function ListingDetail() {
   }
 
   async function handlePurchase() {
-    setPurchasing(true)
-    setError(null)
-    try {
-      const res = await fetch('/.netlify/functions/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ listingId: listing.id, buyerId: profile.id, returnUrl: window.location.origin })
-      })
-      const data = await res.json()
-      if (data.error) throw new Error(data.error)
-      window.location.href = data.url
-    } catch (err) {
-      setError(err.message)
-    }
-    setPurchasing(false)
+  if (!user) { navigate('/auth'); return }
+  setPurchasing(true)
+  setError(null)
+  try {
+    const res = await fetch('/.netlify/functions/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ listingId: listing.id, buyerId: profile.id, returnUrl: window.location.origin })
+    })
+    const data = await res.json()
+    if (data.error) throw new Error(data.error)
+    window.location.href = data.url
+  } catch (err) {
+    setError(err.message)
   }
+  setPurchasing(false)
+}
 
   async function handleDownload() {
     const { data, error } = await supabase.storage
