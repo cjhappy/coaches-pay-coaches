@@ -8,9 +8,7 @@ export default function MobileNav() {
   const location = useLocation()
   const unreadCount = useUnreadMessages()
 
-  if (!user) return null
-
-  const active = (path) => location.pathname === path
+  const active = (path) => location.pathname.startsWith(path)
 
   return (
     <div style={{
@@ -18,7 +16,7 @@ export default function MobileNav() {
       bottom: 0,
       left: 0,
       right: 0,
-      height: '60px',
+      height: '64px',
       background: '#0b1622',
       borderTop: '1px solid rgba(255,255,255,0.07)',
       display: 'flex',
@@ -27,27 +25,23 @@ export default function MobileNav() {
       zIndex: 999,
       paddingBottom: 'env(safe-area-inset-bottom)'
     }} className="mobile-bottom-nav">
-      <NavItem icon="🏠" label="Home" onClick={() => navigate('/dashboard')} active={active('/dashboard')} />
-      <NavItem icon="🛒" label="Browse" onClick={() => navigate('/marketplace')} active={active('/marketplace')} />
-      <NavItem icon="👥" label="Coaches" onClick={() => navigate('/coaches')} active={active('/coaches')} />
-      <NavItem
-        icon="💬"
-        label="Messages"
-        onClick={() => navigate('/messages')}
-        active={active('/messages')}
-        badge={unreadCount}
-      />
-      {(profile?.role === 'seller' || profile?.role === 'both') && (
-        <NavItem icon="🏪" label="Store" onClick={() => navigate('/seller')} active={active('/seller')} />
+      <NavItem label="Browse" onClick={() => navigate('/marketplace')} active={active('/marketplace') || active('/listing')} />
+      <NavItem label="Coaches" onClick={() => navigate('/coaches')} active={active('/coaches') || active('/coach')} />
+      {user && <NavItem label="Messages" onClick={() => navigate('/messages')} active={active('/messages')} badge={unreadCount} />}
+      {user && (profile?.role === 'seller' || profile?.role === 'both') && (
+        <NavItem label="Store" onClick={() => navigate('/seller')} active={active('/seller')} />
       )}
-      {(profile?.role === 'buyer' || profile?.role === 'both') && (
-        <NavItem icon="📚" label="Library" onClick={() => navigate('/purchases')} active={active('/purchases')} />
+      {user && (profile?.role === 'buyer' || profile?.role === 'both') && (
+        <NavItem label="Library" onClick={() => navigate('/purchases')} active={active('/purchases')} />
+      )}
+      {!user && (
+        <NavItem label="Sign In" onClick={() => navigate('/auth')} active={active('/auth')} />
       )}
     </div>
   )
 }
 
-function NavItem({ icon, label, onClick, active, badge }) {
+function NavItem({ label, onClick, active, badge }) {
   return (
     <button
       onClick={onClick}
@@ -58,25 +52,34 @@ function NavItem({ icon, label, onClick, active, badge }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '2px',
-        padding: '4px 8px',
-        position: 'relative'
+        gap: '4px',
+        padding: '4px 10px',
+        position: 'relative',
+        flex: 1
       }}
     >
-      <span style={{ fontSize: '20px' }}>{icon}</span>
+      <div style={{
+        width: '28px',
+        height: '3px',
+        borderRadius: '2px',
+        background: active ? '#2ecc71' : 'transparent',
+        marginBottom: '2px',
+        transition: 'background .2s'
+      }} />
       <span style={{
-        fontSize: '9px',
+        fontSize: '11px',
         fontFamily: 'Barlow Condensed, sans-serif',
-        fontWeight: 700,
+        fontWeight: active ? 800 : 600,
         textTransform: 'uppercase',
-        letterSpacing: '.05em',
-        color: active ? '#2ecc71' : '#7a95ae'
+        letterSpacing: '.08em',
+        color: active ? '#2ecc71' : '#7a95ae',
+        transition: 'color .2s'
       }}>{label}</span>
       {badge > 0 && (
         <span style={{
           position: 'absolute',
-          top: 0,
-          right: 0,
+          top: '4px',
+          right: 'calc(50% - 20px)',
           background: '#2ecc71',
           color: '#0b1622',
           fontSize: '9px',
