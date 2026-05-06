@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 
-const SPORTS = ['Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
-const CATEGORIES = ['Practice Plans', 'Drills', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Strength & Conditioning', 'Film Breakdown', 'Recruiting', 'Mental Performance', 'Other']
-
+const SPORTS = ['Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
+const CATEGORIES = ['Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
 export default function ListingForm({ listing, onSave, onCancel }) {
   const { user } = useAuth()
   const [title, setTitle] = useState(listing?.title || '')

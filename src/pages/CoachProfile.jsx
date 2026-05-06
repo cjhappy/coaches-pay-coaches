@@ -7,6 +7,8 @@ import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
 import MessageButton from '../components/MessageButton'
 import NavMessagesLink from '../components/NavMessagesLink'
+import MobileNav from '../components/MobileNav'
+
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
   function handleCopy() {
@@ -210,6 +212,7 @@ export default function CoachProfile() {
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
   <NavMessagesLink />
+  <MobileNav />
   {user ? (
     <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
   ) : (

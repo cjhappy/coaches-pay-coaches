@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Helmet } from 'react-helmet-async'
 import NavMessagesLink from '../components/NavMessagesLink'
-const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
-const CATEGORIES = ['All', 'Practice Plans', 'Drills', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Strength & Conditioning', 'Film Breakdown', 'Recruiting', 'Mental Performance', 'Other']
+import MobileNav from '../components/MobileNav'
 
+const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
+const CATEGORIES = ['All', 'Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
 export default function Marketplace() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
@@ -117,6 +118,7 @@ export default function Marketplace() {
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
  <NavMessagesLink />
+ <MobileNav />
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
         </ul>
       </nav>
