@@ -85,6 +85,7 @@ export default function Admin() {
           <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
           <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
         </ul>
+        <MobileNav />
       </nav>
 
       <div className="dash-header">

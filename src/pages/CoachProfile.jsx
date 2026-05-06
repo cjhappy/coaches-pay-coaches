@@ -210,6 +210,7 @@ export default function CoachProfile() {
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
   <NavMessagesLink />
+  <MobileNav />
   {user ? (
     <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
   ) : (

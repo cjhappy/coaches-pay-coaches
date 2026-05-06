@@ -28,6 +28,7 @@ export default function Dashboard() {
   {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
   {profile?.is_admin && <li><a onClick={() => navigate('/admin')}>Admin</a></li>}
   <NavMessagesLink />
+  <MobileNav />
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
 </ul>
       </nav>

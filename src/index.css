@@ -384,7 +384,7 @@ select.form-input option { background: var(--navy-card); }
 /* ── MOBILE ── */
 @media (max-width: 640px) {
   .nav-links { display: none !important; }
-  .hamburger-btn { display: block !important; }
+  .hamburger-btn { display: flex !important; }
   .cpc-nav { padding: 0 4%; }
   .logo-text { font-size: 13px; }
   .logo-badge { width: 36px; height: 36px; font-size: 12px; }
@@ -395,7 +395,6 @@ select.form-input option { background: var(--navy-card); }
   .role-picker { flex-direction: column; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
 }
-
 @media (max-width: 480px) {
   .footer-inner { grid-template-columns: 1fr; }
   .section-title { font-size: 32px; }

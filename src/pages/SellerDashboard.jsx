@@ -179,6 +179,7 @@ export default function SellerDashboard() {
   <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
   <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
  <NavMessagesLink />
+ <MobileNav />
   <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
 </ul>
       </nav>
