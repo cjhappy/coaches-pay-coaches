@@ -7,6 +7,7 @@ import ReviewForm from '../components/ReviewForm'
 import MessageButton from '../components/MessageButton'
 import { Helmet } from 'react-helmet-async'
 import NavMessagesLink from '../components/NavMessagesLink'
+import MobileNav from '../components/MobileNav'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)

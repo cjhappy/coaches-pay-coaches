@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import ListingForm from '../components/ListingForm'
 import Avatar from '../components/Avatar'
 import NavMessagesLink from '../components/NavMessagesLink'
+import MobileNav from '../components/MobileNav'
 
 function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import NavMessagesLink from '../components/NavMessagesLink'
+import MobileNav from '../components/MobileNav'
 
 export default function Purchases() {
   const { profile, signOut } = useAuth()

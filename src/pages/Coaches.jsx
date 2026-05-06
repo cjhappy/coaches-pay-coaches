@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
 import NavMessagesLink from '../components/NavMessagesLink'
+import MobileNav from '../components/MobileNav'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Multi-Sport', 'Other']
 

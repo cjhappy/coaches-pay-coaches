@@ -1,6 +1,7 @@
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import NavMessagesLink from '../components/NavMessagesLink'
+import MobileNav from '../components/MobileNav'
 <li><a onClick={() => navigate('/messages')}>Messages</a></li>
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()

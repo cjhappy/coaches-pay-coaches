@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import MobileNav from '../components/MobileNav'
 
 export default function Admin() {
   const { user, profile, signOut } = useAuth()
