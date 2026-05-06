@@ -8,23 +8,42 @@ import NavMessagesLink from '../components/NavMessagesLink'
 
 function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState(profile?.avatar_url || null)
 
   async function handleUpload(e) {
     const file = e.target.files[0]
     if (!file) return
     setUploading(true)
+
     const ext = file.name.split('.').pop()
     const path = profile.id + '/avatar.' + ext
     const { error: uploadError } = await supabase.storage
       .from('avatars')
       .upload(path, file, { upsert: true })
+
     if (!uploadError) {
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
       await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
+      setPreviewUrl(publicUrl)
       onUpdate(publicUrl)
     }
     setUploading(false)
   }
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+      <Avatar url={previewUrl} name={profile?.full_name} size={80} radius={16} />
+      <div>
+        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.9rem', textTransform: 'uppercase', marginBottom: '6px' }}>Profile Photo</div>
+        <label style={{ cursor: 'pointer' }}>
+          <span className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '12px', pointerEvents: 'none' }}>
+            {uploading ? 'Uploading...' : 'Upload Photo'}
+          </span>
+          <input type="file" accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+        </label>
+      </div>
+    </div>
+  )
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
