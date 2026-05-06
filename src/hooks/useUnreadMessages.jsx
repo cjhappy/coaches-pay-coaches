@@ -1,17 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
 export function useUnreadMessages() {
   const { user } = useAuth()
   const [unreadCount, setUnreadCount] = useState(0)
+  const subscriptionRef = useRef(null)
 
   useEffect(() => {
     if (!user) return
     fetchUnread()
 
-    const subscription = supabase
-      .channel('unread-messages')
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe()
+    }
+
+    subscriptionRef.current = supabase
+      .channel('unread-messages-' + user.id)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -19,7 +24,12 @@ export function useUnreadMessages() {
       }, () => { fetchUnread() })
       .subscribe()
 
-    return () => subscription.unsubscribe()
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe()
+        subscriptionRef.current = null
+      }
+    }
   }, [user])
 
   async function fetchUnread() {
@@ -28,7 +38,7 @@ export function useUnreadMessages() {
       .select('id')
       .or('buyer_id.eq.' + user.id + ',seller_id.eq.' + user.id)
 
-    if (!convos || convos.length === 0) return
+    if (!convos || convos.length === 0) { setUnreadCount(0); return }
 
     const convoIds = convos.map(c => c.id)
 
