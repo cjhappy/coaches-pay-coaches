@@ -23,40 +23,59 @@ export default function Marketplace() {
   useEffect(() => { fetchListings() }, [])
   useEffect(() => { applyFilters() }, [listings, sport, category, search, sort, showFollowing, followingIds])
 
-  async function fetchListings() {
-    const { data: listingsData, error } = await supabase
-      .from('listings')
-      .select('*')
-      .order('created_at', { ascending: false })
+ async function fetchListings() {
+  const { data: listingsData, error } = await supabase
+    .from('listings')
+    .select('*')
+    .order('created_at', { ascending: false })
 
-    if (error || !listingsData) { setLoading(false); return }
+  if (error || !listingsData) { setLoading(false); return }
 
-    const sellerIds = [...new Set(listingsData.map(l => l.seller_id))]
-    const { data: profilesData } = await supabase
-      .from('profiles')
-      .select('id, full_name, avatar_url')
-      .in('id', sellerIds)
+  const sellerIds = [...new Set(listingsData.map(l => l.seller_id))]
+  const listingIds = listingsData.map(l => l.id)
 
-    const profileMap = {}
-    profilesData?.forEach(p => { profileMap[p.id] = p })
+  const { data: profilesData } = await supabase
+    .from('profiles')
+    .select('id, full_name, avatar_url')
+    .in('id', sellerIds)
 
-    const combined = listingsData.map(l => ({
+  const { data: reviewsData } = await supabase
+    .from('reviews')
+    .select('listing_id, rating')
+    .in('listing_id', listingIds)
+
+  const profileMap = {}
+  profilesData?.forEach(p => { profileMap[p.id] = p })
+
+  const reviewMap = {}
+  reviewsData?.forEach(r => {
+    if (!reviewMap[r.listing_id]) reviewMap[r.listing_id] = []
+    reviewMap[r.listing_id].push(r.rating)
+  })
+
+  const combined = listingsData.map(l => {
+    const ratings = reviewMap[l.id] || []
+    const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
+    return {
       ...l,
-      profiles: profileMap[l.seller_id] || null
-    }))
-
-    setListings(combined)
-
-    if (user) {
-      const { data: followingData } = await supabase
-        .from('followers')
-        .select('following_id')
-        .eq('follower_id', user.id)
-      setFollowingIds((followingData || []).map(f => f.following_id))
+      profiles: profileMap[l.seller_id] || null,
+      avgRating,
+      reviewCount: ratings.length
     }
+  })
 
-    setLoading(false)
+  setListings(combined)
+
+  if (user) {
+    const { data: followingData } = await supabase
+      .from('followers')
+      .select('following_id')
+      .eq('follower_id', user.id)
+    setFollowingIds((followingData || []).map(f => f.following_id))
   }
+
+  setLoading(false)
+}
 
   function applyFilters() {
     let result = [...listings]
@@ -233,6 +252,18 @@ function ListingCard({ listing, navigate }) {
         <p style={{ color: 'var(--muted)', fontSize: '.85rem', lineHeight: 1.6, marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {listing.description}
         </p>
+        {listing.reviewCount > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', gap: '1px' }}>
+              {[1,2,3,4,5].map(star => (
+                <span key={star} style={{ fontSize: '13px', color: star <= Math.round(listing.avgRating) ? '#f59e0b' : 'var(--border)' }}>★</span>
+              ))}
+            </div>
+            <span style={{ color: 'var(--muted)', fontSize: '.75rem' }}>
+              {listing.avgRating.toFixed(1)} ({listing.reviewCount})
+            </span>
+          </div>
+        )}
         {listing.profiles?.full_name && (
           <div
             style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', cursor: 'pointer' }}
