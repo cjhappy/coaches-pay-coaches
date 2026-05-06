@@ -47,7 +47,11 @@ function BioEditor({ profile }) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
 
+  const wordCount = bio.trim() === '' ? 0 : bio.trim().split(/\s+/).length
+  const overLimit = wordCount > 150
+
   async function saveBio() {
+    if (overLimit) return
     setSaving(true)
     await supabase.from('profiles').update({ bio }).eq('id', profile.id)
     setSaving(false)
@@ -71,9 +75,14 @@ function BioEditor({ profile }) {
             onChange={e => setBio(e.target.value)}
             rows={3}
             placeholder="Tell buyers about your coaching background, experience, and specialties..."
-            style={{ resize: 'vertical', marginBottom: '0.75rem' }}
+            style={{ resize: 'vertical', marginBottom: '0.5rem', borderColor: overLimit ? '#f87171' : undefined }}
           />
-          <button className="btn btn-green" style={{ padding: '8px 20px', fontSize: '13px' }} onClick={saveBio} disabled={saving}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+            <span style={{ fontSize: '.78rem', color: overLimit ? '#f87171' : 'var(--muted)' }}>
+              {wordCount}/150 words {overLimit && '— over limit'}
+            </span>
+          </div>
+          <button className="btn btn-green" style={{ padding: '8px 20px', fontSize: '13px', opacity: overLimit ? 0.5 : 1 }} onClick={saveBio} disabled={saving || overLimit}>
             {saving ? 'Saving...' : 'Save Bio'}
           </button>
         </>
