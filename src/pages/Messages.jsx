@@ -14,7 +14,9 @@ export default function Messages() {
   const [newMessage, setNewMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
+  const [showChat, setShowChat] = useState(false)
   const messagesEndRef = useRef(null)
+  const isMobile = window.innerWidth <= 768
 
   useEffect(() => { fetchConversations() }, [])
 
@@ -59,8 +61,8 @@ export default function Messages() {
     const convoId = searchParams.get('convo')
     if (convoId && data) {
       const found = data.find(c => c.id === convoId)
-      if (found) setActiveConvo(found)
-    } else if (data && data.length > 0) {
+      if (found) { setActiveConvo(found); setShowChat(true) }
+    } else if (data && data.length > 0 && !isMobile) {
       setActiveConvo(data[0])
     }
 
@@ -103,11 +105,7 @@ export default function Messages() {
 
     const { data } = await supabase
       .from('messages')
-      .insert({
-        conversation_id: activeConvo.id,
-        sender_id: user.id,
-        content: optimisticMsg.content
-      })
+      .insert({ conversation_id: activeConvo.id, sender_id: user.id, content: optimisticMsg.content })
       .select()
       .single()
 
@@ -115,11 +113,7 @@ export default function Messages() {
       setMessages(prev => prev.map(m => m.id === optimisticMsg.id ? data : m))
     }
 
-    await supabase
-      .from('conversations')
-      .update({ updated_at: new Date().toISOString() })
-      .eq('id', activeConvo.id)
-
+    await supabase.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', activeConvo.id)
     setSending(false)
   }
 
@@ -134,6 +128,11 @@ export default function Messages() {
 
   function getInitials(name) {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??'
+  }
+
+  function selectConvo(convo) {
+    setActiveConvo(convo)
+    setShowChat(true)
   }
 
   if (loading) return <div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Loading...</div>
@@ -155,9 +154,18 @@ export default function Messages() {
         </ul>
       </nav>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', height: 'calc(100vh - 66px)', overflow: 'hidden' }}>
+      <div style={{ height: 'calc(100vh - 66px)', overflow: 'hidden', display: 'flex' }}>
 
-        <div style={{ borderRight: '1px solid var(--border)', overflowY: 'auto', background: 'var(--navy-mid)' }}>
+        {/* Sidebar — hide on mobile when chat is open */}
+        <div style={{
+          width: isMobile ? '100%' : '320px',
+          display: isMobile && showChat ? 'none' : 'flex',
+          flexDirection: 'column',
+          borderRight: '1px solid var(--border)',
+          background: 'var(--navy-mid)',
+          overflowY: 'auto',
+          flexShrink: 0
+        }}>
           <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)' }}>
             <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>Messages</div>
           </div>
@@ -173,7 +181,7 @@ export default function Messages() {
               return (
                 <div
                   key={convo.id}
-                  onClick={() => setActiveConvo(convo)}
+                  onClick={() => selectConvo(convo)}
                   style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', cursor: 'pointer', background: isActive ? 'var(--navy-light)' : 'transparent', transition: 'background .15s' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -195,9 +203,18 @@ export default function Messages() {
           )}
         </div>
 
-        {activeConvo ? (
-          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border)', background: 'var(--navy-mid)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Chat — full screen on mobile */}
+        {activeConvo && (isMobile ? showChat : true) ? (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', background: 'var(--navy-mid)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {isMobile && (
+                <button
+                  onClick={() => setShowChat(false)}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--green)', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', paddingRight: '8px' }}
+                >
+                  ← Back
+                </button>
+              )}
               <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '12px', color: 'var(--navy)' }}>
                 {getInitials(getOtherPerson(activeConvo)?.full_name)}
               </div>
@@ -227,7 +244,7 @@ export default function Messages() {
                   return (
                     <div key={msg.id} style={{ display: 'flex', justifyContent: isMe ? 'flex-end' : 'flex-start' }}>
                       <div style={{
-                        maxWidth: '65%', padding: '.75rem 1rem',
+                        maxWidth: '75%', padding: '.75rem 1rem',
                         borderRadius: isMe ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
                         background: isMe ? 'var(--green)' : 'var(--navy-card)',
                         color: isMe ? 'var(--navy)' : 'var(--off)',
@@ -246,7 +263,7 @@ export default function Messages() {
               <div ref={messagesEndRef} />
             </div>
 
-            <form onSubmit={sendMessage} style={{ padding: '1rem 1.5rem', borderTop: '1px solid var(--border)', background: 'var(--navy-mid)', display: 'flex', gap: '10px' }}>
+            <form onSubmit={sendMessage} style={{ padding: '1rem', borderTop: '1px solid var(--border)', background: 'var(--navy-mid)', display: 'flex', gap: '10px' }}>
               <input
                 className="form-input"
                 value={newMessage}
@@ -259,11 +276,11 @@ export default function Messages() {
               </button>
             </form>
           </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: '1rem' }}>
+        ) : !isMobile ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: '1rem' }}>
             Select a conversation to start messaging.
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   )
