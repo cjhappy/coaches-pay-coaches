@@ -24,32 +24,43 @@ export default function MobileNav() {
     <>
       <button
         onClick={() => setOpen(!open)}
+        className="hamburger-btn"
         style={{
           display: 'none',
           background: 'transparent',
-          border: 'none',
+          border: '1px solid var(--border)',
+          borderRadius: '8px',
           cursor: 'pointer',
-          padding: '8px',
+          padding: '8px 10px',
           flexDirection: 'column',
           gap: '5px',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          zIndex: 1001,
+          position: 'relative'
         }}
-        className="hamburger-btn"
       >
-        <span style={{ display: 'block', width: '22px', height: '2px', background: open ? 'var(--green)' : 'var(--off)', transition: 'all .2s', transform: open ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
-        <span style={{ display: 'block', width: '22px', height: '2px', background: open ? 'transparent' : 'var(--off)', transition: 'all .2s' }} />
-        <span style={{ display: 'block', width: '22px', height: '2px', background: open ? 'var(--green)' : 'var(--off)', transition: 'all .2s', transform: open ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+        <span style={{ display: 'block', width: '20px', height: '2px', background: open ? 'var(--green)' : 'var(--off)', transition: 'all .2s', transform: open ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+        <span style={{ display: 'block', width: '20px', height: '2px', background: open ? 'transparent' : 'var(--off)', transition: 'all .2s' }} />
+        <span style={{ display: 'block', width: '20px', height: '2px', background: open ? 'var(--green)' : 'var(--off)', transition: 'all .2s', transform: open ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
       </button>
 
       {open && (
         <div style={{
-          position: 'fixed', top: '60px', left: 0, right: 0, bottom: 0,
-          background: 'var(--navy-mid)', zIndex: 999,
+          position: 'fixed',
+          top: '60px',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: '#0b1622',
+          zIndex: 1000,
           borderTop: '1px solid var(--border)',
-          display: 'flex', flexDirection: 'column', padding: '1.5rem'
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '1rem 1.5rem',
+          overflowY: 'auto'
         }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <button onClick={() => go('/marketplace')} style={linkStyle}>Marketplace</button>
             <button onClick={() => go('/coaches')} style={linkStyle}>Coaches</button>
             {(profile?.role === 'seller' || profile?.role === 'both') && (
@@ -60,7 +71,8 @@ export default function MobileNav() {
             )}
             {user && (
               <button onClick={() => go('/messages')} style={linkStyle}>
-                Messages {unreadCount > 0 && (
+                Messages
+                {unreadCount > 0 && (
                   <span style={{ background: 'var(--green)', color: 'var(--navy)', fontSize: '11px', fontWeight: 900, borderRadius: '100px', padding: '2px 8px', marginLeft: '8px' }}>
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </span>
@@ -92,6 +104,7 @@ export default function MobileNav() {
 const linkStyle = {
   background: 'transparent',
   border: 'none',
+  borderBottom: '1px solid var(--border)',
   color: 'var(--off)',
   fontFamily: 'Barlow Condensed, sans-serif',
   fontWeight: 700,
@@ -99,8 +112,7 @@ const linkStyle = {
   textTransform: 'uppercase',
   letterSpacing: '.05em',
   cursor: 'pointer',
-  padding: '1rem 0',
+  padding: '1.1rem 0',
   textAlign: 'left',
-  borderBottom: '1px solid var(--border)',
   width: '100%'
 }
