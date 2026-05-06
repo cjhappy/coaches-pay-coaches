@@ -382,6 +382,14 @@ body {
 select.form-input option { background: var(--navy-card); }
 
 /* ── MOBILE ── */
+@media (max-width: 768px) {
+  .listing-detail-grid { grid-template-columns: 1fr !important; }
+  .messages-grid { grid-template-columns: 1fr !important; }
+  .coach-header-grid { flex-direction: column !important; }
+  .admin-stats-grid { grid-template-columns: 1fr 1fr !important; }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
+}
+
 @media (max-width: 640px) {
   .nav-links { display: none !important; }
   .hamburger-btn { display: flex !important; }
@@ -393,30 +401,9 @@ select.form-input option { background: var(--navy-card); }
   .dash-grid { grid-template-columns: 1fr; }
   .auth-card { padding: 1.5rem; }
   .role-picker { flex-direction: column; }
-  .footer-inner { grid-template-columns: 1fr 1fr; }
 }
+
 @media (max-width: 480px) {
   .footer-inner { grid-template-columns: 1fr; }
   .section-title { font-size: 32px; }
-}
-@media (max-width: 768px) {
-  /* Listing detail - stack columns */
-  .listing-detail-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Messages - stack sidebar and chat */
-  .messages-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* Coach profile - stack */
-  .coach-header-grid {
-    flex-direction: column !important;
-  }
-
-  /* Admin stats - 2 col on mobile */
-  .admin-stats-grid {
-    grid-template-columns: 1fr 1fr !important;
-  }
 }
