@@ -418,3 +418,11 @@ select.form-input option { background: var(--navy-card); }
   .footer-inner { grid-template-columns: 1fr; }
   .section-title { font-size: 32px; }
 }
+@media (max-width: 640px) {
+  .page-body { padding-bottom: 60px; }
+  .mobile-bottom-nav { display: flex; }
+}
+
+@media (min-width: 641px) {
+  .mobile-bottom-nav { display: none !important; }
+}

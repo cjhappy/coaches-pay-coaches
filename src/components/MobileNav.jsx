@@ -1,134 +1,91 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useUnreadMessages } from '../hooks/useUnreadMessages'
 
 export default function MobileNav() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
-  const [open, setOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 640)
+  const location = useLocation()
   const unreadCount = useUnreadMessages()
 
-  useEffect(() => {
-    function handleResize() {
-      setIsMobile(window.innerWidth <= 640)
-    }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  if (!user) return null
 
-  if (!isMobile) return null
-
-  async function handleSignOut() {
-    await signOut()
-    navigate('/auth')
-    setOpen(false)
-  }
-
-  function go(path) {
-    navigate(path)
-    setOpen(false)
-  }
+  const active = (path) => location.pathname === path
 
   return (
-    <>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          background: 'transparent',
-          border: '1px solid rgba(255,255,255,0.15)',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          padding: '8px 10px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '5px',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1001,
-          position: 'relative'
-        }}
-      >
-        <span style={{ display: 'block', width: '20px', height: '2px', background: open ? '#2ecc71' : '#dce8f2', transition: 'all .2s', transform: open ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
-        <span style={{ display: 'block', width: '20px', height: '2px', background: open ? 'transparent' : '#dce8f2', transition: 'all .2s' }} />
-        <span style={{ display: 'block', width: '20px', height: '2px', background: open ? '#2ecc71' : '#dce8f2', transition: 'all .2s', transform: open ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
-      </button>
-
-      {open && (
-        <div style={{
-          position: 'fixed',
-          top: '66px',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: '#0b1622',
-          zIndex: 1000,
-          borderTop: '1px solid rgba(255,255,255,0.07)',
-          display: 'flex',
-          flexDirection: 'column',
-          padding: '1rem 1.5rem',
-          overflowY: 'auto'
-        }}>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <button onClick={() => go('/marketplace')} style={linkStyle}>Marketplace</button>
-            <button onClick={() => go('/coaches')} style={linkStyle}>Coaches</button>
-            {(profile?.role === 'seller' || profile?.role === 'both') && (
-              <button onClick={() => go('/seller')} style={linkStyle}>My Store</button>
-            )}
-            {(profile?.role === 'buyer' || profile?.role === 'both') && (
-              <button onClick={() => go('/purchases')} style={linkStyle}>My Library</button>
-            )}
-            {user && (
-              <button onClick={() => go('/messages')} style={linkStyle}>
-                Messages
-                {unreadCount > 0 && (
-                  <span style={{ background: '#2ecc71', color: '#0b1622', fontSize: '11px', fontWeight: 900, borderRadius: '100px', padding: '2px 8px', marginLeft: '8px' }}>
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </span>
-                )}
-              </button>
-            )}
-            {profile?.is_admin && (
-              <button onClick={() => go('/admin')} style={linkStyle}>Admin</button>
-            )}
-          </div>
-
-          <div style={{ marginTop: 'auto', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
-            {user ? (
-              <button
-                onClick={handleSignOut}
-                style={{ width: '100%', padding: '14px', background: '#2ecc71', color: '#0b1622', border: 'none', borderRadius: '8px', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', cursor: 'pointer' }}
-              >
-                Sign Out
-              </button>
-            ) : (
-              <button
-                onClick={() => go('/auth')}
-                style={{ width: '100%', padding: '14px', background: '#2ecc71', color: '#0b1622', border: 'none', borderRadius: '8px', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', cursor: 'pointer' }}
-              >
-                Get Started
-              </button>
-            )}
-          </div>
-        </div>
+    <div style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      height: '60px',
+      background: '#0b1622',
+      borderTop: '1px solid rgba(255,255,255,0.07)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-around',
+      zIndex: 999,
+      paddingBottom: 'env(safe-area-inset-bottom)'
+    }} className="mobile-bottom-nav">
+      <NavItem icon="🏠" label="Home" onClick={() => navigate('/dashboard')} active={active('/dashboard')} />
+      <NavItem icon="🛒" label="Browse" onClick={() => navigate('/marketplace')} active={active('/marketplace')} />
+      <NavItem icon="👥" label="Coaches" onClick={() => navigate('/coaches')} active={active('/coaches')} />
+      <NavItem
+        icon="💬"
+        label="Messages"
+        onClick={() => navigate('/messages')}
+        active={active('/messages')}
+        badge={unreadCount}
+      />
+      {(profile?.role === 'seller' || profile?.role === 'both') && (
+        <NavItem icon="🏪" label="Store" onClick={() => navigate('/seller')} active={active('/seller')} />
       )}
-    </>
+      {(profile?.role === 'buyer' || profile?.role === 'both') && (
+        <NavItem icon="📚" label="Library" onClick={() => navigate('/purchases')} active={active('/purchases')} />
+      )}
+    </div>
   )
 }
 
-const linkStyle = {
-  background: 'transparent',
-  border: 'none',
-  borderBottom: '1px solid rgba(255,255,255,0.07)',
-  color: '#dce8f2',
-  fontFamily: 'Barlow Condensed, sans-serif',
-  fontWeight: 700,
-  fontSize: '1.2rem',
-  textTransform: 'uppercase',
-  letterSpacing: '.05em',
-  cursor: 'pointer',
-  padding: '1.1rem 0',
-  textAlign: 'left',
-  width: '100%'
+function NavItem({ icon, label, onClick, active, badge }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: 'transparent',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '2px',
+        padding: '4px 8px',
+        position: 'relative'
+      }}
+    >
+      <span style={{ fontSize: '20px' }}>{icon}</span>
+      <span style={{
+        fontSize: '9px',
+        fontFamily: 'Barlow Condensed, sans-serif',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '.05em',
+        color: active ? '#2ecc71' : '#7a95ae'
+      }}>{label}</span>
+      {badge > 0 && (
+        <span style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          background: '#2ecc71',
+          color: '#0b1622',
+          fontSize: '9px',
+          fontWeight: 900,
+          borderRadius: '100px',
+          padding: '1px 5px',
+          lineHeight: 1.4
+        }}>{badge > 9 ? '9+' : badge}</span>
+      )}
+    </button>
+  )
 }
