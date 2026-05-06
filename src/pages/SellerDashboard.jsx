@@ -10,23 +10,27 @@ function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState(profile?.avatar_url || null)
 
-  async function handleUpload(e) {
-    const file = e.target.files[0]
-    if (!file) return
-    setUploading(true)
-    const ext = file.name.split('.').pop()
-    const path = profile.id + '/avatar.' + ext
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(path, file, { upsert: true })
-    if (!uploadError) {
-      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
-      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
-      setPreviewUrl(publicUrl)
-      onUpdate(publicUrl)
-    }
-    setUploading(false)
+ async function handleUpload(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  setUploading(true)
+  const ext = file.name.split('.').pop()
+  const path = profile.id + '/avatar.' + ext
+  console.log('Uploading to path:', path)
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file, { upsert: true })
+  console.log('Upload error:', uploadError)
+  if (!uploadError) {
+    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+    console.log('Public URL:', publicUrl)
+    const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
+    console.log('Update error:', updateError)
+    setPreviewUrl(publicUrl)
+    onUpdate(publicUrl)
   }
+  setUploading(false)
+}
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -65,6 +69,7 @@ function BioEditor({ profile, setProfile }) {
       <AvatarUploader
         profile={profile}
         onUpdate={(url) => setProfile(prev => ({ ...prev, avatar_url: url }))}
+        
       />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editing ? '1rem' : '0' }}>
         <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>Your Bio</div>
