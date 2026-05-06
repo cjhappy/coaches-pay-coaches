@@ -14,13 +14,11 @@ function AvatarUploader({ profile, onUpdate }) {
     const file = e.target.files[0]
     if (!file) return
     setUploading(true)
-
     const ext = file.name.split('.').pop()
     const path = profile.id + '/avatar.' + ext
     const { error: uploadError } = await supabase.storage
       .from('avatars')
       .upload(path, file, { upsert: true })
-
     if (!uploadError) {
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
       await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
@@ -44,24 +42,9 @@ function AvatarUploader({ profile, onUpdate }) {
       </div>
     </div>
   )
-
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-      <Avatar url={profile?.avatar_url} name={profile?.full_name} size={80} radius={16} />
-      <div>
-        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.9rem', textTransform: 'uppercase', marginBottom: '6px' }}>Profile Photo</div>
-        <label style={{ cursor: 'pointer' }}>
-          <span className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '12px', pointerEvents: 'none' }}>
-            {uploading ? 'Uploading...' : 'Upload Photo'}
-          </span>
-          <input type="file" accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
-        </label>
-      </div>
-    </div>
-  )
 }
 
-function BioEditor({ profile }) {
+function BioEditor({ profile, setProfile }) {
   const [bio, setBio] = useState(profile?.bio || '')
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -79,7 +62,10 @@ function BioEditor({ profile }) {
 
   return (
     <div className="cpc-card" style={{ padding: '1.25rem', marginBottom: '1.5rem' }}>
-      <AvatarUploader profile={profile} onUpdate={(url) => { profile.avatar_url = url }} />
+      <AvatarUploader
+        profile={profile}
+        onUpdate={(url) => setProfile(prev => ({ ...prev, avatar_url: url }))}
+      />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editing ? '1rem' : '0' }}>
         <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>Your Bio</div>
         <button className="btn btn-ghost" style={{ padding: '6px 14px', fontSize: '12px' }} onClick={() => setEditing(!editing)}>
@@ -115,7 +101,7 @@ function BioEditor({ profile }) {
 }
 
 export default function SellerDashboard() {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, setProfile, signOut } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [listings, setListings] = useState([])
@@ -194,12 +180,12 @@ export default function SellerDashboard() {
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
         <ul className="nav-links">
-  <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
-  <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-  <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
- <NavMessagesLink />
-  <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-</ul>
+          <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
+          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
+          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
+          <NavMessagesLink />
+          <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+        </ul>
       </nav>
 
       <div className="dash-header">
@@ -209,7 +195,6 @@ export default function SellerDashboard() {
       </div>
 
       <div className="dash-body">
-
         {!stripeConnected && (
           <div className="cpc-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderColor: 'var(--green-border)', background: 'var(--green-dim)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
@@ -234,7 +219,7 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        <BioEditor profile={profile} />
+        <BioEditor profile={profile} setProfile={setProfile} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
