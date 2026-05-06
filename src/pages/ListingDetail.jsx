@@ -114,23 +114,23 @@ export default function ListingDetail() {
   }
 
   async function handlePurchase() {
-  if (!user) { navigate('/auth'); return }
-  setPurchasing(true)
-  setError(null)
-  try {
-    const res = await fetch('/.netlify/functions/create-checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ listingId: listing.id, buyerId: profile.id, returnUrl: window.location.origin })
-    })
-    const data = await res.json()
-    if (data.error) throw new Error(data.error)
-    window.location.href = data.url
-  } catch (err) {
-    setError(err.message)
+    if (!user) { navigate('/auth'); return }
+    setPurchasing(true)
+    setError(null)
+    try {
+      const res = await fetch('/.netlify/functions/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ listingId: listing.id, buyerId: profile.id, returnUrl: window.location.origin })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      window.location.href = data.url
+    } catch (err) {
+      setError(err.message)
+    }
+    setPurchasing(false)
   }
-  setPurchasing(false)
-}
 
   async function handleDownload() {
     const { data, error } = await supabase.storage
@@ -152,35 +152,36 @@ export default function ListingDetail() {
   const isOwnListing = user?.id === listing.seller_id
   const shareUrl = 'https://coachespaycoaches.org/listing/' + listing.id
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
-  
 
   return (
     <div className="page-body">
       <Helmet>
         <title>{listing.title} — Coaches Pay Coaches</title>
-        <meta name="description" content={listing.description} />
-        <meta property="og:title" content={listing.title} />
-        <meta property="og:description" content={listing.description} />
+        <meta name="description" content={listing.description?.slice(0, 155)} />
+        <meta property="og:title" content={listing.title + ' — Coaches Pay Coaches'} />
+        <meta property="og:description" content={listing.description?.slice(0, 155)} />
+        <meta property="og:image" content={listing.thumbnail_url || 'https://coachespaycoaches.org/og-image.png'} />
         <meta property="og:url" content={shareUrl} />
       </Helmet>
+
       <nav className="cpc-nav">
         <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
-       <ul className="nav-links">
-  <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-  <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-  {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-  {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
- <NavMessagesLink />
- <MobileNav />
-  {user ? (
-    <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-  ) : (
-    <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
-  )}
-</ul>
+        <ul className="nav-links">
+          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
+          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
+          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+          <NavMessagesLink />
+          {user ? (
+            <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+          ) : (
+            <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
+          )}
+        </ul>
+        <MobileNav />
       </nav>
 
       <div style={{ padding: '2.5rem 5%', maxWidth: '900px', margin: '0 auto' }}>
@@ -188,7 +189,7 @@ export default function ListingDetail() {
           Back
         </button>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', alignItems: 'start' }}>
+        <div className="listing-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '2rem', alignItems: 'start' }}>
           <div>
             {listing.thumbnail_url ? (
               <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '260px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.5rem' }} />
@@ -231,7 +232,6 @@ export default function ListingDetail() {
               {listing.description}
             </p>
 
-            {/* Reviews */}
             <div style={{ marginTop: '2.5rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                 <div className="section-label" style={{ margin: 0 }}>
@@ -315,13 +315,15 @@ export default function ListingDetail() {
               )}
 
               {error && <p className="auth-error">{error}</p>}
-{!isOwnListing && (
-  <MessageButton
-    sellerId={listing.seller_id}
-    listingId={listing.id}
-    listingTitle={listing.title}
-  />
-)}
+
+              {!isOwnListing && (
+                <MessageButton
+                  sellerId={listing.seller_id}
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                />
+              )}
+
               <p style={{ color: 'var(--muted)', fontSize: '.75rem', textAlign: 'center', marginTop: '1rem' }}>
                 {listing.price === 0 ? 'No charges.' : 'Secure checkout powered by Stripe.'}
               </p>
@@ -331,7 +333,6 @@ export default function ListingDetail() {
           </div>
         </div>
 
-        {/* Related Listings */}
         {related.length > 0 && (
           <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border)', paddingTop: '2.5rem' }}>
             <div className="section-label" style={{ marginBottom: '1.5rem' }}>More {listing.sport} Resources</div>
