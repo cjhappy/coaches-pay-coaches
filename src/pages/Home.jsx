@@ -260,6 +260,7 @@ export default function Home() {
             <ul style={{ listStyle: 'none' }}>
               <li style={{ marginBottom: '.5rem' }}><a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer' }} onClick={() => navigate('/terms')}>Terms of Service</a></li>
               <li style={{ marginBottom: '.5rem' }}><a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer' }} onClick={() => navigate('/privacy')}>Privacy Policy</a></li>
+              <li style={{ marginBottom: '.5rem' }}><a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none', cursor: 'pointer' }} onClick={() => navigate('/refunds')}>Refund Policy</a></li>
               <li style={{ marginBottom: '.5rem' }}><a style={{ color: 'var(--off)', fontSize: '.9rem', textDecoration: 'none' }} href="mailto:christopherhappy05@gmail.com">Contact</a></li>
             </ul>
           </div>
@@ -270,6 +271,7 @@ export default function Home() {
           <div style={{ display: 'flex', gap: '1.5rem' }}>
             <a style={{ color: 'var(--muted)', fontSize: '.82rem', cursor: 'pointer', textDecoration: 'none' }} onClick={() => navigate('/terms')}>Terms</a>
             <a style={{ color: 'var(--muted)', fontSize: '.82rem', cursor: 'pointer', textDecoration: 'none' }} onClick={() => navigate('/privacy')}>Privacy</a>
+            <a style={{ color: 'var(--muted)', fontSize: '.82rem', cursor: 'pointer', textDecoration: 'none' }} onClick={() => navigate('/refunds')}>Refunds</a>
             <a style={{ color: 'var(--muted)', fontSize: '.82rem', textDecoration: 'none' }} href="mailto:christopherhappy05@gmail.com">Contact</a>
           </div>
         </div>
