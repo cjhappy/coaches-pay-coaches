@@ -50,7 +50,7 @@ exports.handler = async (event) => {
       }],
       mode: 'payment',
       success_url: `${returnUrl}/purchases?success=true`,
-      cancel_url: `${returnUrl}/listing/${listingId}`,
+      cancel_url: `${returnUrl}/listing/${listingId}?cancelled=true`,
       payment_intent_data: {
         application_fee_amount: platformFeeInCents,
         transfer_data: { destination: sellerStripeId },

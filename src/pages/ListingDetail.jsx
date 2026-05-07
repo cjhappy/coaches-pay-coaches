@@ -46,6 +46,15 @@ function ShareCard({ url, title }) {
   )
 }
 
+function ErrorBox({ message }) {
+  if (!message) return null
+  return (
+    <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px', padding: '0.75rem 1rem', marginTop: '0.75rem' }}>
+      <p style={{ color: '#f87171', fontSize: '.82rem', margin: 0, lineHeight: 1.5 }}>⚠ {message}</p>
+    </div>
+  )
+}
+
 export default function ListingDetail() {
   const { id } = useParams()
   const { user, profile, signOut } = useAuth()
@@ -61,7 +70,13 @@ export default function ListingDetail() {
   const [showReviewForm, setShowReviewForm] = useState(false)
   const [refundConsent, setRefundConsent] = useState(false)
 
-  useEffect(() => { fetchListing() }, [id])
+  useEffect(() => {
+    fetchListing()
+    // Show message if buyer cancelled out of Stripe checkout
+    if (new URLSearchParams(window.location.search).get('cancelled') === 'true') {
+      setError('Checkout was cancelled. No charge was made.')
+    }
+  }, [id])
 
   async function fetchListing() {
     const { data, error } = await supabase
@@ -116,8 +131,24 @@ export default function ListingDetail() {
   async function handlePurchase() {
     if (!user) { navigate('/auth'); return }
     if (!refundConsent) { setError('Please confirm you have read and agree to the no-refund policy.'); return }
+
+    // Pre-flight checks
+    if (!listing.profiles?.stripe_account_id) {
+      setError('This seller has not set up payments yet. Please check back later.')
+      return
+    }
+    if (listing.price > 0 && listing.price < 3) {
+      setError('This listing has an invalid price. Please contact support.')
+      return
+    }
+    if (profile?.id === listing.seller_id) {
+      setError('You cannot purchase your own listing.')
+      return
+    }
+
     setPurchasing(true)
     setError(null)
+
     try {
       const res = await fetch('/.netlify/functions/create-checkout', {
         method: 'POST',
@@ -128,8 +159,18 @@ export default function ListingDetail() {
       if (data.error) throw new Error(data.error)
       window.location.href = data.url
     } catch (err) {
-      setError(err.message)
+      const msg = err.message || ''
+      if (msg.includes('stripe_account_id') || msg.includes('Stripe')) {
+        setError('Payment setup issue with this seller. Please try again later.')
+      } else if (msg.includes('Listing not found')) {
+        setError('This listing is no longer available.')
+      } else if (msg.includes('network') || msg.includes('fetch')) {
+        setError('Network error — please check your connection and try again.')
+      } else {
+        setError('Something went wrong. Please try again or contact support.')
+      }
     }
+
     setPurchasing(false)
   }
 
@@ -337,12 +378,12 @@ export default function ListingDetail() {
                       I understand that all sales are final. I have reviewed the listing and agree to the{' '}
                       <a
                         href="/refunds"
-  target="_blank"
-  rel="noopener noreferrer"
-  style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}
->
-  no-refund policy
-</a>
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}
+                      >
+                        no-refund policy
+                      </a>
                       .
                     </span>
                   </label>
@@ -358,7 +399,7 @@ export default function ListingDetail() {
                 </>
               )}
 
-              {error && <p className="auth-error" style={{ marginTop: '0.75rem' }}>{error}</p>}
+              <ErrorBox message={error} />
 
               {!isOwnListing && (
                 <MessageButton
