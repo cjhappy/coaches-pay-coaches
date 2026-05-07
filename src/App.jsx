@@ -17,6 +17,7 @@ import Privacy from './pages/Privacy'
 import Messages from './pages/Messages'
 import MobileNav from './components/MobileNav'
 import Feed from './pages/Feed'
+import RefundPolicy from './pages/Refunds'
 
 function App() {
   const { user, loading } = useAuth()
@@ -30,6 +31,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/refunds" element={<RefundPolicy />} />
         <Route path="/feed" element={<Feed />} />
         <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/listing/:id" element={<ListingDetail />} />
