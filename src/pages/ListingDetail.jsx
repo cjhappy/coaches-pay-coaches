@@ -336,12 +336,13 @@ export default function ListingDetail() {
                     <span style={{ color: 'var(--muted)', fontSize: '.78rem', lineHeight: 1.5 }}>
                       I understand that all sales are final. I have reviewed the listing and agree to the{' '}
                       <a
-                        onClick={e => { e.preventDefault(); window.open('/refunds', '_blank') }}
                         href="/refunds"
-                        style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}
-                      >
-                        no-refund policy
-                      </a>
+  target="_blank"
+  rel="noopener noreferrer"
+  style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}
+>
+  no-refund policy
+</a>
                       .
                     </span>
                   </label>
