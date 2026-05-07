@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 
 const SPORTS = ['Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
+
 export default function ListingForm({ listing, onSave, onCancel }) {
   const { user } = useAuth()
   const [title, setTitle] = useState(listing?.title || '')
@@ -16,9 +17,20 @@ export default function ListingForm({ listing, onSave, onCancel }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
+  function validatePrice(val) {
+    const num = parseFloat(val)
+    if (isNaN(num)) return 'Please enter a valid price.'
+    if (num > 0 && num < 3) return 'Paid listings must be at least $3.00. Set price to $0 to list for free.'
+    return null
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
+
+    const priceError = validatePrice(price)
+    if (priceError) { setError(priceError); return }
+
     setLoading(true)
 
     try {
@@ -84,6 +96,9 @@ export default function ListingForm({ listing, onSave, onCancel }) {
     setLoading(false)
   }
 
+  const priceNum = parseFloat(price)
+  const priceInvalid = priceNum > 0 && priceNum < 3
+
   return (
     <div className="cpc-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
       <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.3rem', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
@@ -119,8 +134,27 @@ export default function ListingForm({ listing, onSave, onCancel }) {
           </div>
 
           <div>
-            <label className="form-label">Price (USD) — enter 0 for free</label>
-            <input className="form-input" type="number" min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" required />
+            <label className="form-label">Price (USD)</label>
+            <input
+              className="form-input"
+              type="number"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              placeholder="0.00"
+              required
+              style={{ borderColor: priceInvalid ? '#f87171' : undefined }}
+            />
+            {priceInvalid ? (
+              <p style={{ color: '#f87171', fontSize: '.78rem', marginTop: '4px' }}>
+                Paid listings must be at least $3.00. Set to $0 to list for free.
+              </p>
+            ) : (
+              <p style={{ color: 'var(--muted)', fontSize: '.78rem', marginTop: '4px' }}>
+                Enter $0 for a free listing, or $3.00 minimum for paid.
+              </p>
+            )}
           </div>
 
           <div>
@@ -139,7 +173,7 @@ export default function ListingForm({ listing, onSave, onCancel }) {
         {error && <p className="auth-error">{error}</p>}
 
         <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-          <button type="submit" className="btn btn-green" disabled={loading}>
+          <button type="submit" className="btn btn-green" disabled={loading || priceInvalid}>
             {loading ? 'Saving...' : listing ? 'Save Changes →' : 'Publish Listing →'}
           </button>
           <button type="button" className="btn btn-ghost" onClick={onCancel}>Cancel</button>
