@@ -5,33 +5,30 @@ import { supabase } from '../lib/supabase'
 import ListingForm from '../components/ListingForm'
 import Avatar from '../components/Avatar'
 import NavMessagesLink from '../components/NavMessagesLink'
+import SellerCompleteness from '../components/SellerCompleteness'
 
 function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState(profile?.avatar_url || null)
 
- async function handleUpload(e) {
-  const file = e.target.files[0]
-  if (!file) return
-  setUploading(true)
-  const ext = file.name.split('.').pop()
-  const path = profile.id + '/avatar.' + ext
-  console.log('Uploading to path:', path)
-  const { error: uploadError } = await supabase.storage
-    .from('avatars')
-    .upload(path, file, { upsert: true })
-  console.log('Upload error:', uploadError)
-  if (!uploadError) {
-    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
-    console.log('Public URL:', publicUrl)
-    const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
-    console.log('Update error:', updateError)
-    const bustUrl = publicUrl + '?t=' + Date.now()
-    setPreviewUrl(bustUrl)
-    onUpdate(bustUrl)
+  async function handleUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploading(true)
+    const ext = file.name.split('.').pop()
+    const path = profile.id + '/avatar.' + ext
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true })
+    if (!uploadError) {
+      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
+      const bustUrl = publicUrl + '?t=' + Date.now()
+      setPreviewUrl(bustUrl)
+      onUpdate(bustUrl)
+    }
+    setUploading(false)
   }
-  setUploading(false)
-}
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
@@ -243,7 +240,6 @@ export default function SellerDashboard() {
 
       <div className="dash-body">
 
-        {/* Not connected — prompt to connect */}
         {!stripeConnected && (
           <div className="cpc-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderColor: 'var(--green-border)', background: 'var(--green-dim)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
@@ -256,7 +252,6 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        {/* Connected but onboarding incomplete — warn seller */}
         {stripeIncomplete && (
           <div style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
@@ -274,7 +269,6 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        {/* Connected and fully active — show status + disconnect option */}
         {stripeFullyActive && (
           <div style={{ background: 'var(--green-dim)', border: '1px solid var(--green-border)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div style={{ color: 'var(--green)', fontSize: '.9rem' }}>
@@ -302,6 +296,8 @@ export default function SellerDashboard() {
             Stripe connection incomplete. Please try again.
           </div>
         )}
+
+        <SellerCompleteness profile={profile} listings={listings} />
 
         <BioEditor profile={profile} setProfile={setProfile} />
 

@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
 import NavMessagesLink from '../components/NavMessagesLink'
 import MobileNav from '../components/MobileNav'
+import SellerCompleteness from '../components/SellerCompleteness'
 
 function OnboardingGuide({ role }) {
   const navigate = useNavigate()
@@ -34,11 +36,7 @@ function OnboardingGuide({ role }) {
             Your <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Onboarding</em> Guide
           </h2>
         </div>
-        <button
-          className="btn btn-ghost"
-          style={{ padding: '6px 14px', fontSize: '12px', opacity: 0.6 }}
-          onClick={() => setDismissed(true)}
-        >
+        <button className="btn btn-ghost" style={{ padding: '6px 14px', fontSize: '12px', opacity: 0.6 }} onClick={() => setDismissed(true)}>
           Dismiss
         </button>
       </div>
@@ -60,11 +58,7 @@ function OnboardingGuide({ role }) {
                   </div>
                 </div>
                 <p style={{ color: 'var(--muted)', fontSize: '.82rem', lineHeight: 1.5, margin: 0 }}>{step.desc}</p>
-                <button
-                  className="btn btn-ghost"
-                  style={{ padding: '6px 12px', fontSize: '12px', marginTop: '4px', alignSelf: 'flex-start' }}
-                  onClick={step.action}
-                >
+                <button className="btn btn-ghost" style={{ padding: '6px 12px', fontSize: '12px', marginTop: '4px', alignSelf: 'flex-start' }} onClick={step.action}>
                   {step.cta} →
                 </button>
               </div>
@@ -90,11 +84,7 @@ function OnboardingGuide({ role }) {
                   </div>
                 </div>
                 <p style={{ color: 'var(--muted)', fontSize: '.82rem', lineHeight: 1.5, margin: 0 }}>{step.desc}</p>
-                <button
-                  className="btn btn-ghost"
-                  style={{ padding: '6px 12px', fontSize: '12px', marginTop: '4px', alignSelf: 'flex-start' }}
-                  onClick={step.action}
-                >
+                <button className="btn btn-ghost" style={{ padding: '6px 12px', fontSize: '12px', marginTop: '4px', alignSelf: 'flex-start' }} onClick={step.action}>
                   {step.cta} →
                 </button>
               </div>
@@ -113,14 +103,27 @@ function OnboardingGuide({ role }) {
 export default function Dashboard() {
   const { user, profile, signOut } = useAuth()
   const navigate = useNavigate()
+  const [listings, setListings] = useState([])
+
+  const isSeller = profile?.role === 'seller' || profile?.role === 'both'
+  const isBuyer = profile?.role === 'buyer' || profile?.role === 'both'
+
+  useEffect(() => {
+    if (isSeller) fetchListings()
+  }, [isSeller])
+
+  async function fetchListings() {
+    const { data } = await supabase
+      .from('listings')
+      .select('id, thumbnail_url')
+      .eq('seller_id', profile.id)
+    if (data) setListings(data)
+  }
 
   async function handleSignOut() {
     await signOut()
     navigate('/auth')
   }
-
-  const isSeller = profile?.role === 'seller' || profile?.role === 'both'
-  const isBuyer = profile?.role === 'buyer' || profile?.role === 'both'
 
   return (
     <div className="page-body">
@@ -133,8 +136,8 @@ export default function Dashboard() {
           <li><a onClick={() => navigate('/feed')}>Feed</a></li>
           <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
           <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+          {isBuyer && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+          {isSeller && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
           {profile?.is_admin && <li><a onClick={() => navigate('/admin')}>Admin</a></li>}
           <NavMessagesLink />
           <MobileNav />
@@ -153,6 +156,10 @@ export default function Dashboard() {
 
       <div className="dash-body">
         <OnboardingGuide role={profile?.role} />
+
+        {isSeller && (
+          <SellerCompleteness profile={profile} listings={listings} />
+        )}
 
         <div className="section-label">Quick Actions</div>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
