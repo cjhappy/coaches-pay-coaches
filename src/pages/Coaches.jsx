@@ -82,28 +82,29 @@ export default function Coaches() {
   return (
     <div className="page-body">
       <Helmet>
-  <title>Meet the Coaches — Coaches Pay Coaches</title>
-  <meta name="description" content="Browse coach profiles from real youth sports coaches across every sport. Follow coaches and discover their resources." />
-  <meta property="og:title" content="Meet the Coaches — Coaches Pay Coaches" />
-  <meta property="og:url" content="https://coachespaycoaches.org/coaches" />
-</Helmet>
+        <title>Meet the Coaches — Coaches Pay Coaches</title>
+        <meta name="description" content="Browse coach profiles from real youth sports coaches across every sport. Follow coaches and discover their resources." />
+        <meta property="og:title" content="Meet the Coaches — Coaches Pay Coaches" />
+        <meta property="og:url" content="https://coachespaycoaches.org/coaches" />
+      </Helmet>
+
       <nav className="cpc-nav">
         <a className="cpc-logo" onClick={() => navigate('/')}>
           <div className="logo-badge">CPC</div>
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
-       <ul className="nav-links">
-        <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-  <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
-  <li><a onClick={() => navigate('/coaches')} className="active">Coaches</a></li>
-  {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-  {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
- <NavMessagesLink />
-  {user
-    ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-    : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
-  }
-</ul>
+        <ul className="nav-links">
+          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
+          <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
+          <li><a onClick={() => navigate('/coaches')} className="active">Coaches</a></li>
+          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
+          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
+          <NavMessagesLink />
+          {user
+            ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+            : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
+          }
+        </ul>
       </nav>
 
       <div style={{ background: 'var(--navy-mid)', borderBottom: '1px solid var(--border)', padding: '3rem 5% 2rem' }}>
@@ -126,7 +127,6 @@ export default function Coaches() {
 
       <div style={{ padding: '2rem 5%' }}>
 
-        {/* Filter bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           {user && (
             <button
@@ -149,7 +149,6 @@ export default function Coaches() {
           </div>
         </div>
 
-        {/* Sport pills */}
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '2rem' }}>
           {SPORTS.map(s => (
             <button
@@ -191,9 +190,22 @@ export default function Coaches() {
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <Avatar url={coach.avatar_url} name={coach.full_name} size={60} radius={14} />
-                  <div>
-                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem', textTransform: 'uppercase', marginBottom: '4px' }}>
-                      {coach.full_name}
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem', textTransform: 'uppercase' }}>
+                        {coach.full_name}
+                      </div>
+                      {coach.verified && (
+                        <span style={{
+                          display: 'inline-flex', alignItems: 'center',
+                          background: 'rgba(46,204,113,0.12)', border: '1px solid var(--green-border)',
+                          color: 'var(--green)', fontSize: '9px', fontWeight: 700,
+                          padding: '2px 7px', borderRadius: '100px', letterSpacing: '.06em',
+                          textTransform: 'uppercase', whiteSpace: 'nowrap', flexShrink: 0
+                        }}>
+                          ✓ Verified
+                        </span>
+                      )}
                     </div>
                     <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                       {coach.sports.slice(0, 3).map(s => <span key={s} className="tag" style={{ fontSize: '.7rem' }}>{s}</span>)}
