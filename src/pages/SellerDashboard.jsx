@@ -122,9 +122,21 @@ export default function SellerDashboard() {
   useEffect(() => {
     fetchListings()
     fetchSales()
-    if (searchParams.get('stripe') === 'success') setStripeStatus('success')
+    if (searchParams.get('stripe') === 'success') {
+      setStripeStatus('success')
+      refreshProfile()
+    }
     if (searchParams.get('stripe') === 'refresh') setStripeStatus('refresh')
   }, [])
+
+  async function refreshProfile() {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', profile.id)
+      .single()
+    if (!error && data) setProfile(data)
+  }
 
   async function fetchListings() {
     const { data, error } = await supabase

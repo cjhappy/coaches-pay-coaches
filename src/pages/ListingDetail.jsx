@@ -59,6 +59,7 @@ export default function ListingDetail() {
   const [hasPurchased, setHasPurchased] = useState(false)
   const [hasReviewed, setHasReviewed] = useState(false)
   const [showReviewForm, setShowReviewForm] = useState(false)
+  const [refundConsent, setRefundConsent] = useState(false)
 
   useEffect(() => { fetchListing() }, [id])
 
@@ -114,6 +115,7 @@ export default function ListingDetail() {
 
   async function handlePurchase() {
     if (!user) { navigate('/auth'); return }
+    if (!refundConsent) { setError('Please confirm you have read and agree to the no-refund policy.'); return }
     setPurchasing(true)
     setError(null)
     try {
@@ -307,13 +309,55 @@ export default function ListingDetail() {
                 <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px', padding: '1rem', color: '#f87171', fontSize: '.85rem', textAlign: 'center' }}>
                   Seller has not set up payments yet.
                 </div>
-              ) : (
-                <button className="btn btn-green" style={{ width: '100%', justifyContent: 'center' }} onClick={handlePurchase} disabled={purchasing}>
-                  {purchasing ? 'Redirecting...' : 'Purchase $' + Number(listing.price).toFixed(2)}
+              ) : hasPurchased ? (
+                <button className="btn btn-green" style={{ width: '100%', justifyContent: 'center' }} onClick={handleDownload}>
+                  Download Again
                 </button>
+              ) : (
+                <>
+                  {/* Seller protection notice */}
+                  <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.15)', borderRadius: '8px', padding: '0.9rem 1rem', marginBottom: '1rem' }}>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.78rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'rgba(56,189,248,0.9)', marginBottom: '4px' }}>
+                      🔒 Seller Protected Marketplace
+                    </div>
+                    <p style={{ color: 'var(--muted)', fontSize: '.78rem', lineHeight: 1.5, margin: 0 }}>
+                      All sales are final. Digital files cannot be returned once delivered. Coaches on this platform have invested real time and expertise into their work.
+                    </p>
+                  </div>
+
+                  {/* Consent checkbox */}
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '1rem' }}>
+                    <input
+                      type="checkbox"
+                      checked={refundConsent}
+                      onChange={e => { setRefundConsent(e.target.checked); setError(null) }}
+                      style={{ marginTop: '3px', accentColor: 'var(--green)', flexShrink: 0, width: '15px', height: '15px', cursor: 'pointer' }}
+                    />
+                    <span style={{ color: 'var(--muted)', fontSize: '.78rem', lineHeight: 1.5 }}>
+                      I understand that all sales are final. I have reviewed the listing and agree to the{' '}
+                      <a
+                        onClick={e => { e.preventDefault(); window.open('/refunds', '_blank') }}
+                        href="/refunds"
+                        style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}
+                      >
+                        no-refund policy
+                      </a>
+                      .
+                    </span>
+                  </label>
+
+                  <button
+                    className="btn btn-green"
+                    style={{ width: '100%', justifyContent: 'center', opacity: refundConsent ? 1 : 0.45, cursor: refundConsent ? 'pointer' : 'not-allowed' }}
+                    onClick={handlePurchase}
+                    disabled={purchasing}
+                  >
+                    {purchasing ? 'Redirecting...' : 'Purchase $' + Number(listing.price).toFixed(2)}
+                  </button>
+                </>
               )}
 
-              {error && <p className="auth-error">{error}</p>}
+              {error && <p className="auth-error" style={{ marginTop: '0.75rem' }}>{error}</p>}
 
               {!isOwnListing && (
                 <MessageButton
