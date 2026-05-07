@@ -55,6 +55,20 @@ function ErrorBox({ message }) {
   )
 }
 
+function VerifiedBadge() {
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: '4px',
+      background: 'rgba(46,204,113,0.12)', border: '1px solid var(--green-border)',
+      color: 'var(--green)', fontSize: '10px', fontWeight: 700,
+      padding: '2px 8px', borderRadius: '100px', letterSpacing: '.06em',
+      textTransform: 'uppercase', whiteSpace: 'nowrap'
+    }}>
+      ✓ Verified
+    </span>
+  )
+}
+
 export default function ListingDetail() {
   const { id } = useParams()
   const { user, profile, signOut } = useAuth()
@@ -72,16 +86,16 @@ export default function ListingDetail() {
 
   useEffect(() => {
     fetchListing()
-    // Show message if buyer cancelled out of Stripe checkout
     if (new URLSearchParams(window.location.search).get('cancelled') === 'true') {
       setError('Checkout was cancelled. No charge was made.')
     }
   }, [id])
 
   async function fetchListing() {
+    // fetch verified from profiles too
     const { data, error } = await supabase
       .from('listings')
-      .select('*, profiles(full_name, stripe_account_id, avatar_url)')
+      .select('*, profiles(full_name, stripe_account_id, avatar_url, verified)')
       .eq('id', id)
       .single()
     if (!error) {
@@ -121,7 +135,7 @@ export default function ListingDetail() {
   async function fetchRelated(currentListing) {
     const { data } = await supabase
       .from('listings')
-      .select('*, profiles(full_name)')
+      .select('*, profiles(full_name, verified)')
       .eq('sport', currentListing.sport)
       .neq('id', currentListing.id)
       .limit(3)
@@ -132,7 +146,6 @@ export default function ListingDetail() {
     if (!user) { navigate('/auth'); return }
     if (!refundConsent) { setError('Please confirm you have read and agree to the no-refund policy.'); return }
 
-    // Pre-flight checks
     if (!listing.profiles?.stripe_account_id) {
       setError('This seller has not set up payments yet. Please check back later.')
       return
@@ -258,13 +271,16 @@ export default function ListingDetail() {
             )}
 
             {listing.profiles?.full_name && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer' }} onClick={() => navigate('/coach/' + listing.seller_id)}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer', flexWrap: 'wrap' }} onClick={() => navigate('/coach/' + listing.seller_id)}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '11px', color: 'var(--navy)', flexShrink: 0 }}>
                   {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
                 <div>
                   <div style={{ color: 'var(--muted)', fontSize: '.75rem' }}>Posted by</div>
-                  <div style={{ color: 'var(--green)', fontSize: '.9rem', fontWeight: 600, textDecoration: 'underline' }}>{listing.profiles.full_name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ color: 'var(--green)', fontSize: '.9rem', fontWeight: 600, textDecoration: 'underline' }}>{listing.profiles.full_name}</div>
+                    {listing.profiles?.verified && <VerifiedBadge />}
+                  </div>
                 </div>
               </div>
             )}
@@ -356,7 +372,6 @@ export default function ListingDetail() {
                 </button>
               ) : (
                 <>
-                  {/* Seller protection notice */}
                   <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.15)', borderRadius: '8px', padding: '0.9rem 1rem', marginBottom: '1rem' }}>
                     <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.78rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'rgba(56,189,248,0.9)', marginBottom: '4px' }}>
                       🔒 Seller Protected Marketplace
@@ -366,7 +381,6 @@ export default function ListingDetail() {
                     </p>
                   </div>
 
-                  {/* Consent checkbox */}
                   <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', marginBottom: '1rem' }}>
                     <input
                       type="checkbox"
@@ -376,15 +390,9 @@ export default function ListingDetail() {
                     />
                     <span style={{ color: 'var(--muted)', fontSize: '.78rem', lineHeight: 1.5 }}>
                       I understand that all sales are final. I have reviewed the listing and agree to the{' '}
-                      <a
-                        href="/refunds"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}
-                      >
+                      <a href="/refunds" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}>
                         no-refund policy
-                      </a>
-                      .
+                      </a>.
                     </span>
                   </label>
 
@@ -434,9 +442,14 @@ export default function ListingDetail() {
                     <span className="tag">{r.category}</span>
                   </div>
                   <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '4px', lineHeight: 1.2 }}>{r.title}</div>
-                  {r.profiles?.full_name && (
-                    <div style={{ color: 'var(--muted)', fontSize: '.78rem', marginBottom: '8px' }}>by {r.profiles.full_name}</div>
-                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                    {r.profiles?.full_name && (
+                      <div style={{ color: 'var(--muted)', fontSize: '.78rem' }}>by {r.profiles.full_name}</div>
+                    )}
+                    {r.profiles?.verified && (
+                      <span style={{ background: 'rgba(46,204,113,0.12)', border: '1px solid var(--green-border)', color: 'var(--green)', fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '100px', letterSpacing: '.05em' }}>✓</span>
+                    )}
+                  </div>
                   <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem' }}>
                     {r.price === 0 ? 'FREE' : '$' + Number(r.price).toFixed(2)}
                   </div>
