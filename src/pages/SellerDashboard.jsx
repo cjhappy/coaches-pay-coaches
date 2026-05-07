@@ -27,8 +27,8 @@ function AvatarUploader({ profile, onUpdate }) {
     const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)
     console.log('Update error:', updateError)
     const bustUrl = publicUrl + '?t=' + Date.now()
-setPreviewUrl(bustUrl)
-onUpdate(bustUrl)
+    setPreviewUrl(bustUrl)
+    onUpdate(bustUrl)
   }
   setUploading(false)
 }
@@ -70,7 +70,6 @@ function BioEditor({ profile, setProfile }) {
       <AvatarUploader
         profile={profile}
         onUpdate={(url) => setProfile(prev => ({ ...prev, avatar_url: url }))}
-        
       />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editing ? '1rem' : '0' }}>
         <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>Your Bio</div>
@@ -116,6 +115,7 @@ export default function SellerDashboard() {
   const [showForm, setShowForm] = useState(false)
   const [editListing, setEditListing] = useState(null)
   const [stripeLoading, setStripeLoading] = useState(false)
+  const [disconnectLoading, setDisconnectLoading] = useState(false)
   const [stripeStatus, setStripeStatus] = useState(null)
   const [activeTab, setActiveTab] = useState('listings')
 
@@ -169,12 +169,40 @@ export default function SellerDashboard() {
     setStripeLoading(false)
   }
 
+  async function handleDisconnectStripe() {
+    if (!confirm('Are you sure you want to disconnect Stripe? You won\'t be able to receive payouts until you reconnect.')) return
+    setDisconnectLoading(true)
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          stripe_account_id: null,
+          stripe_charges_enabled: false,
+          stripe_payouts_enabled: false,
+        })
+        .eq('id', profile.id)
+      if (error) throw error
+      setProfile(prev => ({
+        ...prev,
+        stripe_account_id: null,
+        stripe_charges_enabled: false,
+        stripe_payouts_enabled: false,
+      }))
+      setStripeStatus(null)
+    } catch (err) {
+      alert('Failed to disconnect Stripe: ' + err.message)
+    }
+    setDisconnectLoading(false)
+  }
+
   async function handleSignOut() {
     await signOut()
     navigate('/auth')
   }
 
   const stripeConnected = !!profile?.stripe_account_id
+  const stripeFullyActive = stripeConnected && profile?.stripe_charges_enabled && profile?.stripe_payouts_enabled
+  const stripeIncomplete = stripeConnected && !stripeFullyActive
   const totalEarnings = sales.reduce((sum, s) => sum + Number(s.amount_seller), 0)
   const totalRevenue = sales.reduce((sum, s) => sum + Number(s.amount_total), 0)
 
@@ -202,6 +230,8 @@ export default function SellerDashboard() {
       </div>
 
       <div className="dash-body">
+
+        {/* Not connected — prompt to connect */}
         {!stripeConnected && (
           <div className="cpc-card" style={{ padding: '1.5rem', marginBottom: '2rem', borderColor: 'var(--green-border)', background: 'var(--green-dim)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
             <div>
@@ -210,6 +240,41 @@ export default function SellerDashboard() {
             </div>
             <button className="btn btn-green" onClick={handleConnectStripe} disabled={stripeLoading}>
               {stripeLoading ? 'Connecting...' : 'Connect Stripe'}
+            </button>
+          </div>
+        )}
+
+        {/* Connected but onboarding incomplete — warn seller */}
+        {stripeIncomplete && (
+          <div style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+            <div>
+              <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', color: '#fbbf24', marginBottom: '4px' }}>⚠ Stripe Setup Incomplete</div>
+              <p style={{ color: 'var(--muted)', fontSize: '.85rem', margin: 0 }}>
+                Your Stripe account isn't fully set up yet.{' '}
+                {!profile?.stripe_charges_enabled && 'Charges are not enabled. '}
+                {!profile?.stripe_payouts_enabled && 'Payouts are not enabled. '}
+                Complete your Stripe onboarding to start receiving payments.
+              </p>
+            </div>
+            <button className="btn" style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.25)', whiteSpace: 'nowrap' }} onClick={handleConnectStripe} disabled={stripeLoading}>
+              {stripeLoading ? 'Loading...' : 'Finish Setup'}
+            </button>
+          </div>
+        )}
+
+        {/* Connected and fully active — show status + disconnect option */}
+        {stripeFullyActive && (
+          <div style={{ background: 'var(--green-dim)', border: '1px solid var(--green-border)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+            <div style={{ color: 'var(--green)', fontSize: '.9rem' }}>
+              ✓ Stripe connected — payouts active
+            </div>
+            <button
+              className="btn"
+              style={{ background: 'rgba(248,113,113,0.08)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)', fontSize: '12px', padding: '6px 14px' }}
+              onClick={handleDisconnectStripe}
+              disabled={disconnectLoading}
+            >
+              {disconnectLoading ? 'Disconnecting...' : 'Disconnect Stripe'}
             </button>
           </div>
         )}
