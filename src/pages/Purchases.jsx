@@ -27,12 +27,22 @@ export default function Purchases() {
     setLoading(false)
   }
 
+  // Use live listing data if available, fall back to snapshot
+  function getTitle(purchase) { return purchase.listings?.title || purchase.listing_title || 'Deleted Resource' }
+  function getSport(purchase) { return purchase.listings?.sport || purchase.listing_sport || null }
+  function getCategory(purchase) { return purchase.listings?.category || purchase.listing_category || null }
+  function getThumbnail(purchase) { return purchase.listings?.thumbnail_url || purchase.listing_thumbnail_url || null }
+  function getFileName(purchase) { return purchase.listings?.file_name || purchase.listing_file_name || null }
+  function getFileUrl(purchase) { return purchase.listings?.file_url || purchase.listing_file_url || null }
+
   async function handleDownload(purchase) {
+    const fileUrl = getFileUrl(purchase)
+    if (!fileUrl) { setError('File is no longer available.'); return }
     setDownloadingId(purchase.id)
     setError(null)
     const { data, error } = await supabase.storage
       .from('listings-files')
-      .createSignedUrl(purchase.listings.file_url, 60)
+      .createSignedUrl(fileUrl, 60)
     if (error) {
       setError('Could not generate download link.')
     } else {
@@ -53,14 +63,14 @@ export default function Purchases() {
           <div className="logo-badge">CPC</div>
           <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
         </a>
-       <ul className="nav-links">
-        <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-  <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
-  <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-  <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-  <NavMessagesLink />
-  <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-</ul>
+        <ul className="nav-links">
+          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
+          <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
+          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
+          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
+          <NavMessagesLink />
+          <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+        </ul>
       </nav>
 
       <div className="dash-header">
@@ -70,7 +80,6 @@ export default function Purchases() {
       </div>
 
       <div className="dash-body">
-
         {justPurchased && (
           <div style={{ background: 'var(--green-dim)', border: '1px solid var(--green-border)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', color: 'var(--green)', fontSize: '.9rem' }}>
             ✅ Purchase successful! Your resource is ready to download below.
@@ -92,28 +101,27 @@ export default function Purchases() {
             {purchases.map(purchase => (
               <div key={purchase.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
 
-                {purchase.listings?.thumbnail_url ? (
-                  <img
-                    src={purchase.listings.thumbnail_url}
-                    alt={purchase.listings.title}
-                    style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }}
-                  />
+                {getThumbnail(purchase) ? (
+                  <img src={getThumbnail(purchase)} alt={getTitle(purchase)} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
                 ) : (
-                  <div style={{ width: '80px', height: '80px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', flexShrink: 0 }}>
-                    📋
-                  </div>
+                  <div style={{ width: '80px', height: '80px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', flexShrink: 0 }}>📋</div>
                 )}
 
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1.05rem', textTransform: 'uppercase', marginBottom: '4px' }}>
-                    {purchase.listings?.title}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1.05rem', textTransform: 'uppercase' }}>
+                      {getTitle(purchase)}
+                    </div>
+                    {!purchase.listings && (
+                      <span style={{ fontSize: '10px', color: 'var(--muted)', border: '1px solid var(--border)', padding: '2px 6px', borderRadius: '100px' }}>Removed</span>
+                    )}
                   </div>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '6px' }}>
-                    <span className="tag">{purchase.listings?.sport}</span>
-                    <span className="tag">{purchase.listings?.category}</span>
+                    {getSport(purchase) && <span className="tag">{getSport(purchase)}</span>}
+                    {getCategory(purchase) && <span className="tag">{getCategory(purchase)}</span>}
                   </div>
                   <div style={{ color: 'var(--muted)', fontSize: '.8rem' }}>
-                    {purchase.listings?.file_name} · Purchased {new Date(purchase.created_at).toLocaleDateString()}
+                    {getFileName(purchase) && `${getFileName(purchase)} · `}Purchased {new Date(purchase.created_at).toLocaleDateString()}
                   </div>
                 </div>
 
@@ -125,7 +133,7 @@ export default function Purchases() {
                     className="btn btn-green"
                     style={{ padding: '8px 18px', fontSize: '13px' }}
                     onClick={() => handleDownload(purchase)}
-                    disabled={downloadingId === purchase.id}
+                    disabled={downloadingId === purchase.id || !getFileUrl(purchase)}
                   >
                     {downloadingId === purchase.id ? 'Generating...' : 'Download →'}
                   </button>
