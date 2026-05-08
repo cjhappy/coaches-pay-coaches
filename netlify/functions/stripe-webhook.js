@@ -57,6 +57,13 @@ exports.handler = async (event) => {
       const session = stripeEvent.data.object
       const { listing_id, buyer_id, seller_id, amount_total, amount_seller, amount_platform } = session.metadata
 
+      // Fetch listing snapshot before inserting purchase
+      const { data: listing } = await supabase
+        .from('listings')
+        .select('title, sport, category, thumbnail_url, file_name, file_url')
+        .eq('id', listing_id)
+        .single()
+
       await supabase.from('purchases').insert({
         buyer_id,
         listing_id,
@@ -65,14 +72,15 @@ exports.handler = async (event) => {
         amount_seller: parseFloat(amount_seller),
         amount_platform: parseFloat(amount_platform),
         stripe_session_id: session.id,
-        status: 'completed'
+        status: 'completed',
+        // Snapshot of listing at time of purchase
+        listing_title: listing?.title || null,
+        listing_sport: listing?.sport || null,
+        listing_category: listing?.category || null,
+        listing_thumbnail_url: listing?.thumbnail_url || null,
+        listing_file_name: listing?.file_name || null,
+        listing_file_url: listing?.file_url || null,
       })
-
-      const { data: listing } = await supabase
-        .from('listings')
-        .select('title')
-        .eq('id', listing_id)
-        .single()
 
       const { data: buyer } = await supabase
         .from('profiles')
