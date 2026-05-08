@@ -156,10 +156,14 @@ export default function SellerDashboard() {
   }
 
   async function deleteListing(id) {
-    if (!confirm('Delete this listing?')) return
-    await supabase.from('listings').delete().eq('id', id)
-    setListings(prev => prev.filter(l => l.id !== id))
+  if (!confirm('Delete this listing?')) return
+  const { error } = await supabase.from('listings').delete().eq('id', id)
+  if (error) {
+    alert('Delete failed: ' + error.message)
+    return
   }
+  setListings(prev => prev.filter(l => l.id !== id))
+}
 
   async function handleConnectStripe() {
     setStripeLoading(true)
