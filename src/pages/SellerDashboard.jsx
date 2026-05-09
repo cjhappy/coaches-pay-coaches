@@ -287,7 +287,7 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        <SellerCompleteness profile={profile} listings={listings} />
+        <SellerCompleteness profile={profile} listings={listings} onConnectStripe={handleConnectStripe} />
         <BioEditor profile={profile} setProfile={setProfile} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>

@@ -1,7 +1,6 @@
-// SellerCompleteness.jsx — drop this in src/components/
 import { useNavigate } from 'react-router-dom'
 
-export default function SellerCompleteness({ profile, listings }) {
+export default function SellerCompleteness({ profile, listings, onConnectStripe }) {
   const navigate = useNavigate()
 
   const checks = [
@@ -20,13 +19,13 @@ export default function SellerCompleteness({ profile, listings }) {
     {
       label: 'Stripe connected',
       done: !!profile?.stripe_account_id,
-      action: () => navigate('/seller'),
+      action: () => onConnectStripe ? onConnectStripe() : navigate('/seller'),
       cta: 'Connect Stripe',
     },
     {
       label: 'Stripe fully active (charges & payouts enabled)',
       done: !!profile?.stripe_charges_enabled && !!profile?.stripe_payouts_enabled,
-      action: () => navigate('/seller'),
+      action: () => onConnectStripe ? onConnectStripe() : navigate('/seller'),
       cta: 'Finish Setup',
     },
     {
@@ -64,7 +63,6 @@ export default function SellerCompleteness({ profile, listings }) {
         </div>
       </div>
 
-      {/* Progress bar */}
       <div style={{ height: '6px', background: 'var(--border)', borderRadius: '100px', marginBottom: '1.5rem', overflow: 'hidden' }}>
         <div style={{
           height: '100%',
@@ -75,7 +73,6 @@ export default function SellerCompleteness({ profile, listings }) {
         }} />
       </div>
 
-      {/* Checklist */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
         {checks.map((check, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', padding: '10px 14px', borderRadius: '8px', background: check.done ? 'rgba(46,204,113,0.04)' : 'var(--navy)', border: `1px solid ${check.done ? 'var(--green-border)' : 'var(--border)'}` }}>
