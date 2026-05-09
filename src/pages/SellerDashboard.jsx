@@ -156,27 +156,29 @@ export default function SellerDashboard() {
   }
 
   async function deleteListing(id) {
-  if (!confirm('Delete this listing?')) return
-  const { error } = await supabase.from('listings').delete().eq('id', id)
-  if (error) {
-    alert('Delete failed: ' + error.message)
-    return
+    if (!confirm('Delete this listing?')) return
+    const { error } = await supabase.from('listings').delete().eq('id', id)
+    if (error) { alert('Delete failed: ' + error.message); return }
+    setListings(prev => prev.filter(l => l.id !== id))
   }
-  setListings(prev => prev.filter(l => l.id !== id))
-}
 
   async function handleConnectStripe() {
+    console.log('handleConnectStripe called')
     setStripeLoading(true)
     try {
+      console.log('fetching stripe-connect, userId:', user.id)
       const res = await fetch('/.netlify/functions/stripe-connect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, returnUrl: window.location.origin })
       })
+      console.log('response status:', res.status)
       const data = await res.json()
+      console.log('response data:', data)
       if (data.error) throw new Error(data.error)
       window.location.href = data.url
     } catch (err) {
+      console.log('error:', err.message)
       alert(err.message)
     }
     setStripeLoading(false)
@@ -188,19 +190,10 @@ export default function SellerDashboard() {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({
-          stripe_account_id: null,
-          stripe_charges_enabled: false,
-          stripe_payouts_enabled: false,
-        })
+        .update({ stripe_account_id: null, stripe_charges_enabled: false, stripe_payouts_enabled: false })
         .eq('id', profile.id)
       if (error) throw error
-      setProfile(prev => ({
-        ...prev,
-        stripe_account_id: null,
-        stripe_charges_enabled: false,
-        stripe_payouts_enabled: false,
-      }))
+      setProfile(prev => ({ ...prev, stripe_account_id: null, stripe_charges_enabled: false, stripe_payouts_enabled: false }))
       setStripeStatus(null)
     } catch (err) {
       alert('Failed to disconnect Stripe: ' + err.message)
@@ -275,15 +268,8 @@ export default function SellerDashboard() {
 
         {stripeFullyActive && (
           <div style={{ background: 'var(--green-dim)', border: '1px solid var(--green-border)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-            <div style={{ color: 'var(--green)', fontSize: '.9rem' }}>
-              ✓ Stripe connected — payouts active
-            </div>
-            <button
-              className="btn"
-              style={{ background: 'rgba(248,113,113,0.08)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)', fontSize: '12px', padding: '6px 14px' }}
-              onClick={handleDisconnectStripe}
-              disabled={disconnectLoading}
-            >
+            <div style={{ color: 'var(--green)', fontSize: '.9rem' }}>✓ Stripe connected — payouts active</div>
+            <button className="btn" style={{ background: 'rgba(248,113,113,0.08)', color: '#f87171', border: '1px solid rgba(248,113,113,0.2)', fontSize: '12px', padding: '6px 14px' }} onClick={handleDisconnectStripe} disabled={disconnectLoading}>
               {disconnectLoading ? 'Disconnecting...' : 'Disconnect Stripe'}
             </button>
           </div>
@@ -302,7 +288,6 @@ export default function SellerDashboard() {
         )}
 
         <SellerCompleteness profile={profile} listings={listings} />
-
         <BioEditor profile={profile} setProfile={setProfile} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
