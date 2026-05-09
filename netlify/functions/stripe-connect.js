@@ -18,15 +18,29 @@ exports.handler = async (event) => {
   try {
     const { userId, returnUrl } = JSON.parse(event.body)
 
-    const account = await stripe.accounts.create({ type: 'express' })
-
-    await supabase
+    // Check if seller already has a Stripe account
+    const { data: profile } = await supabase
       .from('profiles')
-      .update({ stripe_account_id: account.id })
+      .select('stripe_account_id')
       .eq('id', userId)
+      .single()
 
+    let accountId = profile?.stripe_account_id
+
+    // Only create a new account if they don't have one yet
+    if (!accountId) {
+      const account = await stripe.accounts.create({ type: 'express' })
+      accountId = account.id
+
+      await supabase
+        .from('profiles')
+        .update({ stripe_account_id: accountId })
+        .eq('id', userId)
+    }
+
+    // Generate onboarding link for existing or new account
     const accountLink = await stripe.accountLinks.create({
-      account: account.id,
+      account: accountId,
       refresh_url: `${returnUrl}/seller?stripe=refresh`,
       return_url: `${returnUrl}/seller?stripe=success`,
       type: 'account_onboarding',
