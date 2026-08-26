@@ -17,8 +17,9 @@ export default function MobileNav() {
       left: 0,
       right: 0,
       height: '64px',
-      background: '#0b1622',
-      borderTop: '1px solid rgba(255,255,255,0.07)',
+      background: '#0D3247',
+      borderTop: '2px solid #0D3247',
+      boxShadow: '0 -2px 12px rgba(13,50,71,0.15)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-around',
@@ -63,17 +64,17 @@ function NavItem({ label, onClick, active, badge }) {
         width: '28px',
         height: '3px',
         borderRadius: '2px',
-        background: active ? '#2ecc71' : 'transparent',
+        background: active ? '#FDFB54' : 'transparent',
         marginBottom: '2px',
         transition: 'background .2s'
       }} />
       <span style={{
         fontSize: '11px',
-        fontFamily: 'Barlow Condensed, sans-serif',
+        fontFamily: "'Archivo Condensed', sans-serif",
         fontWeight: active ? 800 : 600,
         textTransform: 'uppercase',
         letterSpacing: '.08em',
-        color: active ? '#2ecc71' : '#7a95ae',
+        color: active ? '#FDFB54' : '#9fb2bd',
         transition: 'color .2s'
       }}>{label}</span>
       {badge > 0 && (
@@ -81,8 +82,8 @@ function NavItem({ label, onClick, active, badge }) {
           position: 'absolute',
           top: '4px',
           right: 'calc(50% - 20px)',
-          background: '#2ecc71',
-          color: '#0b1622',
+          background: '#FDFB54',
+          color: '#0D3247',
           fontSize: '9px',
           fontWeight: 900,
           borderRadius: '100px',

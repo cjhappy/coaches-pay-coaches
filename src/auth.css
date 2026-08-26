@@ -26,7 +26,7 @@
 }
 
 .auth-logo {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-sub);
   font-size: 1.8rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -122,7 +122,7 @@ form input::placeholder {
   color: #fff;
   cursor: pointer;
   text-align: center;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-sub);
   font-size: 1.1rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -160,7 +160,7 @@ form input::placeholder {
   color: #0f1923;
   border: none;
   border-radius: 8px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-sub);
   font-size: 1.1rem;
   font-weight: 800;
   text-transform: uppercase;

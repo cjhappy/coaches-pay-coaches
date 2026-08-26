@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import NavMessagesLink from '../components/NavMessagesLink'
+import SiteNav from '../components/SiteNav'
 
 export default function Messages() {
   const { user, profile, signOut } = useAuth()
@@ -139,21 +139,7 @@ export default function Messages() {
 
   return (
     <div className="page-body">
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <div className="logo-badge">CPC</div>
-          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
-        </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          <NavMessagesLink />
-          <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-        </ul>
-      </nav>
+      <SiteNav active="messages" />
 
       <div style={{ height: 'calc(100vh - 66px)', overflow: 'hidden', display: 'flex' }}>
 
@@ -168,7 +154,7 @@ export default function Messages() {
           flexShrink: 0
         }}>
           <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)' }}>
-            <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>Messages</div>
+            <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>Messages</div>
           </div>
 
           {conversations.length === 0 ? (
@@ -186,11 +172,11 @@ export default function Messages() {
                   style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border)', cursor: 'pointer', background: isActive ? 'var(--navy-light)' : 'transparent', transition: 'background .15s' }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '14px', color: 'var(--navy)', flexShrink: 0 }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '14px', color: 'var(--navy)', flexShrink: 0 }}>
                       {getInitials(other?.full_name)}
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.95rem', textTransform: 'uppercase', marginBottom: '2px' }}>{other?.full_name}</div>
+                      <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.95rem', textTransform: 'uppercase', marginBottom: '2px' }}>{other?.full_name}</div>
                       {convo.listings?.title && (
                         <div style={{ color: 'var(--muted)', fontSize: '.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           re: {convo.listings.title}
@@ -211,16 +197,16 @@ export default function Messages() {
               {isMobile && (
                 <button
                   onClick={() => setShowChat(false)}
-                  style={{ background: 'transparent', border: 'none', color: 'var(--green)', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', paddingRight: '8px' }}
+                  style={{ background: 'transparent', border: 'none', color: 'var(--green)', cursor: 'pointer', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', paddingRight: '8px' }}
                 >
                   ← Back
                 </button>
               )}
-              <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '12px', color: 'var(--navy)' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '12px', color: 'var(--navy)' }}>
                 {getInitials(getOtherPerson(activeConvo)?.full_name)}
               </div>
               <div>
-                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>{getOtherPerson(activeConvo)?.full_name}</div>
+                <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>{getOtherPerson(activeConvo)?.full_name}</div>
                 {activeConvo.listings?.title && (
                   <div style={{ color: 'var(--muted)', fontSize: '.78rem' }}>re: {activeConvo.listings.title}</div>
                 )}

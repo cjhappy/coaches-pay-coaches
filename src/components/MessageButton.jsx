@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
-export default function MessageButton({ sellerId, listingId, listingTitle }) {
+export default function MessageButton({ sellerId, listingId, listingTitle, variant = 'ghost' }) {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
@@ -55,7 +55,7 @@ export default function MessageButton({ sellerId, listingId, listingTitle }) {
 
   return (
     <button
-      className="btn btn-ghost"
+      className={variant === 'ghost-dark' ? 'btn btn-ghost-dark' : 'btn btn-ghost'}
       style={{ padding: '10px 28px' }}
       onClick={handleMessage}
       disabled={loading}

@@ -101,7 +101,7 @@ export default function ListingForm({ listing, onSave, onCancel }) {
 
   return (
     <div className="cpc-card" style={{ padding: '2rem', marginBottom: '2rem' }}>
-      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.3rem', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
+      <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.3rem', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
         {listing ? 'Edit Listing' : 'New Listing'}
       </div>
       <form onSubmit={handleSubmit}>
@@ -144,14 +144,14 @@ export default function ListingForm({ listing, onSave, onCancel }) {
               onChange={e => setPrice(e.target.value)}
               placeholder="0.00"
               required
-              style={{ borderColor: priceInvalid ? '#f87171' : undefined }}
+              style={{ borderColor: priceInvalid ? '#b91c1c' : undefined }}
             />
             {priceInvalid ? (
-              <p style={{ color: '#f87171', fontSize: '.78rem', marginTop: '4px' }}>
+              <p style={{ color: '#b91c1c', fontSize: '.78rem', marginTop: '4px' }}>
                 Paid listings must be at least $3.00. Set to $0 to list for free.
               </p>
             ) : (
-              <p style={{ color: 'var(--muted)', fontSize: '.78rem', marginTop: '4px' }}>
+              <p style={{ color: 'var(--muted-on-cream)', fontSize: '.78rem', marginTop: '4px' }}>
                 Enter $0 for a free listing, or $3.00 minimum for paid.
               </p>
             )}
@@ -165,7 +165,7 @@ export default function ListingForm({ listing, onSave, onCancel }) {
           <div style={{ gridColumn: '1 / -1' }}>
             <label className="form-label">Resource File * {listing && '(leave empty to keep current file)'}</label>
             <input className="form-input" type="file" onChange={e => setFile(e.target.files[0])} required={!listing} />
-            {listing?.file_name && <p style={{ color: 'var(--muted)', fontSize: '.8rem', marginTop: '4px' }}>Current: {listing.file_name}</p>}
+            {listing?.file_name && <p style={{ color: 'var(--muted-on-cream)', fontSize: '.8rem', marginTop: '4px' }}>Current: {listing.file_name}</p>}
           </div>
 
         </div>
@@ -176,7 +176,7 @@ export default function ListingForm({ listing, onSave, onCancel }) {
           <button type="submit" className="btn btn-green" disabled={loading || priceInvalid}>
             {loading ? 'Saving...' : listing ? 'Save Changes →' : 'Publish Listing →'}
           </button>
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>Cancel</button>
+          <button type="button" className="btn btn-ghost-dark" onClick={onCancel}>Cancel</button>
         </div>
       </form>
     </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import SiteNav from '../components/SiteNav'
 
 export default function Admin() {
   const { user, profile, signOut } = useAuth()
@@ -89,7 +90,7 @@ export default function Admin() {
 
   const tabStyle = (tab) => ({
     padding: '8px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer',
-    fontFamily: 'Barlow, sans-serif', fontSize: '.9rem', fontWeight: 500,
+    fontFamily: 'var(--font-body)', fontSize: '.9rem', fontWeight: 500,
     transition: 'all .2s',
     background: activeTab === tab ? 'var(--green)' : 'transparent',
     color: activeTab === tab ? 'var(--navy)' : 'var(--muted)'
@@ -106,18 +107,7 @@ export default function Admin() {
 
   return (
     <div className="page-body">
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <div className="logo-badge">CPC</div>
-          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
-        </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-          <li><a onClick={() => navigate('/dashboard')}>Dashboard</a></li>
-          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-          <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-        </ul>
-      </nav>
+      <SiteNav active="admin" />
 
       <div className="dash-header">
         <div className="section-label">Admin</div>
@@ -131,22 +121,22 @@ export default function Admin() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1rem' }}>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Total Users</div>
-            <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>{stats.totalUsers}</div>
+            <div style={{ color: 'var(--white)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>{stats.totalUsers}</div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>{stats.totalSellers} sellers · {stats.totalBuyers} buyers</div>
           </div>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Total Listings</div>
-            <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>{stats.totalListings}</div>
+            <div style={{ color: 'var(--white)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>{stats.totalListings}</div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>{listings.filter(l => l.price === 0).length} free · {listings.filter(l => l.price > 0).length} paid</div>
           </div>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Total Sales</div>
-            <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>{stats.totalSales}</div>
+            <div style={{ color: 'var(--white)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>{stats.totalSales}</div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>avg ${stats.avgOrderValue.toFixed(2)} / order</div>
           </div>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Platform Revenue</div>
-            <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>${stats.totalRevenue.toFixed(2)}</div>
+            <div style={{ color: 'var(--green)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>${stats.totalRevenue.toFixed(2)}</div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>your cut after payouts</div>
           </div>
         </div>
@@ -155,26 +145,26 @@ export default function Admin() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Verified Sellers</div>
-            <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>{stats.verifiedSellers}</div>
+            <div style={{ color: 'var(--green)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>{stats.verifiedSellers}</div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>of {stats.totalSellers} sellers</div>
           </div>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Stripe Connected</div>
-            <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>
+            <div style={{ color: 'var(--white)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>
               {users.filter(u => u.stripe_account_id).length}
             </div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>sellers with Stripe</div>
           </div>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Listings w/ Thumbnail</div>
-            <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>
+            <div style={{ color: 'var(--white)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>
               {listings.filter(l => l.thumbnail_url).length}
             </div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>of {stats.totalListings} total</div>
           </div>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div style={{ color: 'var(--muted)', fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Gross Volume</div>
-            <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2rem' }}>
+            <div style={{ color: 'var(--white)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>
               ${completedPurchases.reduce((sum, p) => sum + Number(p.amount_total), 0).toFixed(2)}
             </div>
             <div style={{ color: 'var(--muted)', fontSize: '.75rem', marginTop: '4px' }}>total buyer spend</div>
@@ -202,14 +192,14 @@ export default function Admin() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
             {filteredUsers.map(u => (
               <div key={u.id} className="cpc-card" style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '12px', color: 'var(--navy)', flexShrink: 0 }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '12px', color: 'var(--navy)', flexShrink: 0 }}>
                   {u.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??'}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>{u.full_name}</div>
+                    <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase' }}>{u.full_name}</div>
                     {u.verified && (
-                      <span style={{ background: 'rgba(46,204,113,0.15)', border: '1px solid var(--green-border)', color: 'var(--green)', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '100px', letterSpacing: '.05em' }}>✓ VERIFIED</span>
+                      <span style={{ background: 'rgba(253,251,84,0.15)', border: '1px solid var(--green-border)', color: 'var(--green)', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '100px', letterSpacing: '.05em' }}>✓ VERIFIED</span>
                     )}
                     {u.is_admin && (
                       <span style={{ background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '100px', letterSpacing: '.05em' }}>ADMIN</span>
@@ -264,13 +254,13 @@ export default function Admin() {
                   <div style={{ width: '50px', height: '50px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>📋</div>
                 )}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '2px' }}>{listing.title}</div>
+                  <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '2px' }}>{listing.title}</div>
                   <div style={{ color: 'var(--muted)', fontSize: '.8rem' }}>
                     by {listing.profiles?.full_name} · {listing.sport} · {listing.category} · {new Date(listing.created_at).toLocaleDateString()}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <div style={{ color: listing.price === 0 ? 'var(--muted)' : 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem' }}>
+                  <div style={{ color: listing.price === 0 ? 'var(--muted)' : 'var(--green)', fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.1rem' }}>
                     {listing.price === 0 ? 'FREE' : '$' + Number(listing.price).toFixed(2)}
                   </div>
                   {!listing.thumbnail_url && (
@@ -300,22 +290,22 @@ export default function Admin() {
             ) : completedPurchases.map(purchase => (
               <div key={purchase.id} className="cpc-card" style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '2px' }}>{purchase.listings?.title}</div>
+                  <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '2px' }}>{purchase.listings?.title}</div>
                   <div style={{ color: 'var(--muted)', fontSize: '.8rem' }}>
                     Buyer: {purchase.profiles?.full_name} · {new Date(purchase.created_at).toLocaleDateString()}
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem' }}>${Number(purchase.amount_total).toFixed(2)}</div>
+                    <div style={{ color: 'var(--white)', fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.1rem' }}>${Number(purchase.amount_total).toFixed(2)}</div>
                     <div style={{ color: 'var(--muted)', fontSize: '.75rem' }}>total</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem' }}>${Number(purchase.amount_platform).toFixed(2)}</div>
+                    <div style={{ color: 'var(--green)', fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.1rem' }}>${Number(purchase.amount_platform).toFixed(2)}</div>
                     <div style={{ color: 'var(--muted)', fontSize: '.75rem' }}>your cut</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem' }}>${Number(purchase.amount_seller).toFixed(2)}</div>
+                    <div style={{ color: 'var(--muted)', fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.1rem' }}>${Number(purchase.amount_seller).toFixed(2)}</div>
                     <div style={{ color: 'var(--muted)', fontSize: '.75rem' }}>seller payout</div>
                   </div>
                 </div>

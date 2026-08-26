@@ -17,7 +17,7 @@ export default function Terms() {
       </nav>
 
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '3rem 5%' }}>
-        <h1 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(32px, 5vw, 52px)', textTransform: 'uppercase', marginBottom: '8px' }}>
+        <h1 style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: 'clamp(32px, 5vw, 52px)', textTransform: 'uppercase', marginBottom: '8px' }}>
           Terms of <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Service</em>
         </h1>
         <p style={{ color: 'var(--muted)', fontSize: '.9rem', marginBottom: '3rem' }}>Last updated: May 2025</p>
@@ -77,7 +77,7 @@ export default function Terms() {
           }
         ].map(section => (
           <div key={section.title} style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.2rem', textTransform: 'uppercase', color: 'var(--white)', marginBottom: '8px' }}>
+            <h2 style={{ fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.2rem', textTransform: 'uppercase', color: 'var(--white)', marginBottom: '8px' }}>
               {section.title}
             </h2>
             <p style={{ color: 'var(--muted)', lineHeight: 1.8, fontSize: '.95rem' }}>{section.body}</p>

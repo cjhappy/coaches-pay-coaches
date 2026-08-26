@@ -60,10 +60,7 @@ export default function AuthForm({ onSuccess }) {
   return (
     <div className="auth-wrapper">
       <div className="auth-card">
-        <div className="auth-logo">
-          <div className="badge">CPC</div>
-          COACHES <em>PAY</em> COACHES
-        </div>
+        <img src="/cpc-logo-primary.svg" alt="Coaches Pay Coaches" className="auth-logo-img" />
         <p className="auth-sub">
           {forgotPassword ? 'Reset your password.' : mode === 'login' ? 'Welcome back, Coach.' : 'Join the community.'}
         </p>

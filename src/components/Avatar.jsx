@@ -14,7 +14,7 @@ export default function Avatar({ url, name, size = 60, radius = 14 }) {
       width: size, height: size, borderRadius: radius,
       background: 'var(--green)', display: 'flex',
       alignItems: 'center', justifyContent: 'center',
-      fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900,
+      fontFamily: 'var(--font-sub)', fontWeight: 900,
       fontSize: size * 0.3, color: 'var(--navy)', flexShrink: 0
     }}>
       {initials}

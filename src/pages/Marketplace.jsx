@@ -3,13 +3,12 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Helmet } from 'react-helmet-async'
-import NavMessagesLink from '../components/NavMessagesLink'
-import MobileNav from '../components/MobileNav'
+import SiteNav from '../components/SiteNav'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['All', 'Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
 export default function Marketplace() {
-  const { user, profile, signOut } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [listings, setListings] = useState([])
   const [filtered, setFiltered] = useState([])
@@ -94,47 +93,27 @@ export default function Marketplace() {
     setFiltered(result)
   }
 
-  async function handleSignOut() {
-    await signOut()
-    navigate('/auth')
-  }
-
   return (
-    <div className="page-body">
+    <div className="page-body cream-page">
       <Helmet>
   <title>Browse Resources — Coaches Pay Coaches</title>
   <meta name="description" content="Browse coaching materials from real coaches — practice plans, drills, playbooks, season plans and more across every sport." />
   <meta property="og:title" content="Browse Resources — Coaches Pay Coaches" />
   <meta property="og:url" content="https://coachespaycoaches.org/marketplace" />
 </Helmet>
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <div className="logo-badge">CPC</div>
-          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
-        </a>
-       <ul className="nav-links">
-        <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-  <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
-  <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-  {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-  {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
- <NavMessagesLink />
- <MobileNav />
-  <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-        </ul>
-      </nav>
+      <SiteNav active="marketplace" />
 
-      <div style={{ background: 'var(--navy-mid)', borderBottom: '1px solid var(--border)', padding: '3rem 5% 2rem' }}>
-        <div className="section-label">Marketplace</div>
-        <h1 className="section-title">Browse <em>Resources</em></h1>
-        <p style={{ color: 'var(--muted)', maxWidth: '520px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+      <div style={{ background: 'var(--navy)', padding: '3rem 5% 2.5rem' }}>
+        <div className="section-label" style={{ color: 'var(--yellow)' }}>Marketplace</div>
+        <h1 className="section-title" style={{ color: 'var(--white)' }}>Browse <em>Resources</em></h1>
+        <p style={{ color: 'var(--off)', opacity: .85, maxWidth: '520px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
           Coaching materials from real coaches across every sport.
         </p>
         <div style={{ position: 'relative', maxWidth: '480px' }}>
           <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }}>🔍</span>
           <input
             className="form-input"
-            style={{ paddingLeft: '2.5rem' }}
+            style={{ paddingLeft: '2.5rem', background: 'var(--navy-light)', borderColor: 'var(--border)', color: 'var(--white)' }}
             placeholder="Search resources..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -171,19 +150,19 @@ export default function Marketplace() {
             <button
               onClick={() => setShowFollowing(!showFollowing)}
               style={{
-                padding: '10px 18px', borderRadius: '8px', border: '1px solid',
-                borderColor: showFollowing ? 'var(--green)' : 'var(--border)',
-                background: showFollowing ? 'var(--green-dim)' : 'transparent',
-                color: showFollowing ? 'var(--green)' : 'var(--muted)',
+                padding: '10px 18px', borderRadius: '8px', border: '1.5px solid',
+                borderColor: showFollowing ? 'var(--navy)' : 'var(--border-on-cream)',
+                background: showFollowing ? 'var(--yellow)' : 'transparent',
+                color: 'var(--navy)',
                 fontSize: '.85rem', fontWeight: 600, cursor: 'pointer',
-                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase',
+                fontFamily: 'var(--font-sub)', textTransform: 'uppercase',
                 letterSpacing: '.05em', transition: 'all .2s', whiteSpace: 'nowrap'
               }}
             >
               {showFollowing ? '✓ Following' : 'Following'}
             </button>
           )}
-          <div style={{ color: 'var(--muted)', fontSize: '.85rem', paddingBottom: '0.1rem' }}>
+          <div className="muted" style={{ fontSize: '.85rem', paddingBottom: '0.1rem' }}>
             {filtered.length} result{filtered.length !== 1 ? 's' : ''}
           </div>
         </div>
@@ -195,12 +174,12 @@ export default function Marketplace() {
               key={s}
               onClick={() => setSport(s)}
               style={{
-                padding: '6px 14px', borderRadius: '100px', border: '1px solid',
-                borderColor: sport === s ? 'var(--green)' : 'var(--border)',
-                background: sport === s ? 'var(--green-dim)' : 'transparent',
-                color: sport === s ? 'var(--green)' : 'var(--muted)',
+                padding: '6px 14px', borderRadius: '100px', border: '1.5px solid',
+                borderColor: sport === s ? 'var(--navy)' : 'var(--border-on-cream)',
+                background: sport === s ? 'var(--yellow)' : 'transparent',
+                color: 'var(--navy)',
                 fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all .2s',
-                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '.05em'
+                fontFamily: 'var(--font-sub)', textTransform: 'uppercase', letterSpacing: '.05em'
               }}
             >{s}</button>
           ))}
@@ -208,12 +187,12 @@ export default function Marketplace() {
 
         {/* Results */}
         {loading ? (
-          <p style={{ color: 'var(--muted)' }}>Loading...</p>
+          <p className="muted">Loading...</p>
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
             {showFollowing ? (
               <>
-                <p style={{ color: 'var(--muted)', fontSize: '1.1rem', marginBottom: '1rem' }}>
+                <p className="muted" style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>
                   No listings from coaches you follow yet.
                 </p>
                 <button className="btn btn-green" onClick={() => navigate('/coaches')}>
@@ -221,7 +200,7 @@ export default function Marketplace() {
                 </button>
               </>
             ) : (
-              <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>No resources found. Try adjusting your filters.</p>
+              <p className="muted" style={{ fontSize: '1.1rem' }}>No resources found. Try adjusting your filters.</p>
             )}
           </div>
         ) : (
@@ -242,27 +221,27 @@ function ListingCard({ listing, navigate }) {
       {listing.thumbnail_url ? (
         <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
       ) : (
-        <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', fontSize: '2.5rem' }}>📋</div>
+        <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', fontSize: '2.5rem' }}>📋</div>
       )}
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
           <span className="tag">{listing.sport}</span>
           <span className="tag">{listing.category}</span>
         </div>
-        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1.05rem', textTransform: 'uppercase', marginBottom: '6px', lineHeight: 1.2 }}>
+        <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1.05rem', textTransform: 'uppercase', marginBottom: '6px', lineHeight: 1.2, color: 'var(--navy)' }}>
           {listing.title}
         </div>
-        <p style={{ color: 'var(--muted)', fontSize: '.85rem', lineHeight: 1.6, marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+        <p className="muted" style={{ fontSize: '.85rem', lineHeight: 1.6, marginBottom: '10px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
           {listing.description}
         </p>
         {listing.reviewCount > 0 && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
             <div style={{ display: 'flex', gap: '1px' }}>
               {[1,2,3,4,5].map(star => (
-                <span key={star} style={{ fontSize: '13px', color: star <= Math.round(listing.avgRating) ? '#f59e0b' : 'var(--border)' }}>★</span>
+                <span key={star} style={{ fontSize: '13px', color: star <= Math.round(listing.avgRating) ? '#c8860a' : 'var(--border-on-cream)' }}>★</span>
               ))}
             </div>
-            <span style={{ color: 'var(--muted)', fontSize: '.75rem' }}>
+            <span className="muted" style={{ fontSize: '.75rem' }}>
               {listing.avgRating.toFixed(1)} ({listing.reviewCount})
             </span>
           </div>
@@ -272,17 +251,17 @@ function ListingCard({ listing, navigate }) {
             style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', cursor: 'pointer' }}
             onClick={(e) => { e.stopPropagation(); navigate('/coach/' + listing.seller_id) }}
           >
-            <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '9px', color: 'var(--navy)', flexShrink: 0 }}>
+            <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: 'var(--navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '9px', color: 'var(--yellow)', flexShrink: 0 }}>
               {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
             </div>
-            <span style={{ color: 'var(--green)', fontSize: '.8rem', fontWeight: 600, textDecoration: 'underline' }}>
+            <span style={{ color: 'var(--navy)', fontSize: '.8rem', fontWeight: 700, textDecoration: 'underline' }}>
               {listing.profiles.full_name}
             </span>
           </div>
         )}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
-        <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.25rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-on-cream)' }}>
+        <div style={{ color: 'var(--navy)', background: 'var(--yellow)', padding: '2px 10px', borderRadius: '5px', fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.1rem' }}>
           {listing.price === 0 ? 'FREE' : '$' + Number(listing.price).toFixed(2)}
         </div>
         <button className="btn btn-green" style={{ padding: '8px 18px', fontSize: '13px' }} onClick={() => navigate('/listing/' + listing.id)}>

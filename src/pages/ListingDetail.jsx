@@ -6,7 +6,7 @@ import StarRating from '../components/StarRating'
 import ReviewForm from '../components/ReviewForm'
 import MessageButton from '../components/MessageButton'
 import { Helmet } from 'react-helmet-async'
-import NavMessagesLink from '../components/NavMessagesLink'
+import SiteNav from '../components/SiteNav'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -18,7 +18,7 @@ function CopyLinkButton({ url }) {
   return (
     <button
       onClick={handleCopy}
-      style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.75rem 1rem', background: 'var(--navy)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--off)', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em', width: '100%', textAlign: 'left' }}
+      style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.75rem 1rem', background: 'var(--navy)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--off)', cursor: 'pointer', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em', width: '100%', textAlign: 'left' }}
     >
       {copied ? 'Copied!' : 'Copy Link'}
     </button>
@@ -30,14 +30,14 @@ function ShareCard({ url, title }) {
   const twitterUrl = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText) + '&url=' + encodeURIComponent(url) + '&hashtags=coaching,youthsports'
   return (
     <div className="cpc-card" style={{ padding: '1.25rem' }}>
-      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--muted)', marginBottom: '1rem' }}>
+      <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--muted-on-cream)', marginBottom: '1rem' }}>
         Share This Resource
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
-        <a href={twitterUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.75rem 1rem', background: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff', textDecoration: 'none', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+        <a href={twitterUrl} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.75rem 1rem', background: '#000', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff', textDecoration: 'none', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>
           X - Share on X
         </a>
-        <button onClick={() => { navigator.clipboard.writeText(url); alert('Link copied! Paste it in your Instagram bio, story, or DM.') }} style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.75rem 1rem', background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', border: 'none', borderRadius: '8px', color: '#fff', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em', width: '100%', textAlign: 'left' }}>
+        <button onClick={() => { navigator.clipboard.writeText(url); alert('Link copied! Paste it in your Instagram bio, story, or DM.') }} style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '.75rem 1rem', background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', border: 'none', borderRadius: '8px', color: '#fff', cursor: 'pointer', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', letterSpacing: '.05em', width: '100%', textAlign: 'left' }}>
           Copy Link for Instagram
         </button>
         <CopyLinkButton url={url} />
@@ -50,7 +50,7 @@ function ErrorBox({ message }) {
   if (!message) return null
   return (
     <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px', padding: '0.75rem 1rem', marginTop: '0.75rem' }}>
-      <p style={{ color: '#f87171', fontSize: '.82rem', margin: 0, lineHeight: 1.5 }}>⚠ {message}</p>
+      <p style={{ color: '#b91c1c', fontSize: '.82rem', margin: 0, lineHeight: 1.5 }}>⚠ {message}</p>
     </div>
   )
 }
@@ -59,8 +59,8 @@ function VerifiedBadge() {
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', gap: '4px',
-      background: 'rgba(46,204,113,0.12)', border: '1px solid var(--green-border)',
-      color: 'var(--green)', fontSize: '10px', fontWeight: 700,
+      background: 'var(--yellow)', border: '1px solid var(--navy)',
+      color: 'var(--navy)', fontSize: '10px', fontWeight: 700,
       padding: '2px 8px', borderRadius: '100px', letterSpacing: '.06em',
       textTransform: 'uppercase', whiteSpace: 'nowrap'
     }}>
@@ -200,8 +200,8 @@ export default function ListingDetail() {
     navigate('/auth')
   }
 
-  if (loading) return <div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Loading...</div>
-  if (!listing) return <div className="page-body" style={{ padding: '4rem 5%', color: 'var(--muted)' }}>Listing not found.</div>
+  if (loading) return <div className="page-body cream-page" style={{ padding: '4rem 5%' }}><span className="muted">Loading...</span></div>
+  if (!listing) return <div className="page-body cream-page" style={{ padding: '4rem 5%' }}><span className="muted">Listing not found.</span></div>
 
   const sellerReady = !!listing.profiles?.stripe_account_id
   const isOwnListing = user?.id === listing.seller_id
@@ -209,7 +209,7 @@ export default function ListingDetail() {
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
 
   return (
-    <div className="page-body">
+    <div className="page-body cream-page">
       <Helmet>
         <title>{listing.title} — Coaches Pay Coaches</title>
         <meta name="description" content={listing.description?.slice(0, 155)} />
@@ -219,28 +219,10 @@ export default function ListingDetail() {
         <meta property="og:url" content={shareUrl} />
       </Helmet>
 
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <div className="logo-badge">CPC</div>
-          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
-        </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          <NavMessagesLink />
-          {user ? (
-            <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-          ) : (
-            <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
-          )}
-        </ul>
-      </nav>
+      <SiteNav active="marketplace" />
 
       <div style={{ padding: '2.5rem 5%', maxWidth: '900px', margin: '0 auto' }}>
-        <button className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '13px', marginBottom: '2rem' }} onClick={() => navigate('/marketplace')}>
+        <button className="btn btn-ghost-dark" style={{ padding: '8px 16px', fontSize: '13px', marginBottom: '2rem' }} onClick={() => navigate('/marketplace')}>
           Back
         </button>
 
@@ -249,7 +231,7 @@ export default function ListingDetail() {
             {listing.thumbnail_url ? (
               <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '260px', objectFit: 'cover', borderRadius: '12px', marginBottom: '1.5rem' }} />
             ) : (
-              <div style={{ width: '100%', height: '260px', borderRadius: '12px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', marginBottom: '1.5rem' }}>📋</div>
+              <div style={{ width: '100%', height: '260px', borderRadius: '12px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', marginBottom: '1.5rem' }}>📋</div>
             )}
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
@@ -257,14 +239,14 @@ export default function ListingDetail() {
               <span className="tag">{listing.category}</span>
             </div>
 
-            <h1 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(28px, 4vw, 42px)', textTransform: 'uppercase', lineHeight: 1, marginBottom: '1rem' }}>
+            <h1 style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: 'clamp(28px, 4vw, 42px)', textTransform: 'uppercase', lineHeight: 1, marginBottom: '1rem', color: 'var(--navy)' }}>
               {listing.title}
             </h1>
 
             {reviews.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                 <StarRating rating={Math.round(avgRating)} />
-                <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}>
+                <span className="muted" style={{ fontSize: '.85rem' }}>
                   {avgRating.toFixed(1)} ({reviews.length} review{reviews.length !== 1 ? 's' : ''})
                 </span>
               </div>
@@ -272,13 +254,13 @@ export default function ListingDetail() {
 
             {listing.profiles?.full_name && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer', flexWrap: 'wrap' }} onClick={() => navigate('/coach/' + listing.seller_id)}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '11px', color: 'var(--navy)', flexShrink: 0 }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '11px', color: 'var(--navy)', flexShrink: 0 }}>
                   {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
                 </div>
                 <div>
-                  <div style={{ color: 'var(--muted)', fontSize: '.75rem' }}>Posted by</div>
+                  <div className="muted" style={{ fontSize: '.75rem' }}>Posted by</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ color: 'var(--green)', fontSize: '.9rem', fontWeight: 600, textDecoration: 'underline' }}>{listing.profiles.full_name}</div>
+                    <div style={{ color: 'var(--navy)', fontSize: '.9rem', fontWeight: 700, textDecoration: 'underline' }}>{listing.profiles.full_name}</div>
                     {listing.profiles?.verified && <VerifiedBadge />}
                   </div>
                 </div>
@@ -286,7 +268,7 @@ export default function ListingDetail() {
             )}
 
             <div className="section-label">About this resource</div>
-            <p style={{ color: 'var(--off)', lineHeight: 1.8, fontSize: '.95rem', marginTop: '0.5rem' }}>
+            <p style={{ color: 'var(--navy)', lineHeight: 1.8, fontSize: '.95rem', marginTop: '0.5rem' }}>
               {listing.description}
             </p>
 
@@ -296,7 +278,7 @@ export default function ListingDetail() {
                   Reviews {reviews.length > 0 && '(' + reviews.length + ')'}
                 </div>
                 {hasPurchased && !hasReviewed && !isOwnListing && (
-                  <button className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => setShowReviewForm(!showReviewForm)}>
+                  <button className="btn btn-ghost-dark" style={{ padding: '8px 16px', fontSize: '13px' }} onClick={() => setShowReviewForm(!showReviewForm)}>
                     {showReviewForm ? 'Cancel' : 'Write a Review'}
                   </button>
                 )}
@@ -307,22 +289,22 @@ export default function ListingDetail() {
               )}
 
               {reviews.length === 0 ? (
-                <p style={{ color: 'var(--muted)', fontSize: '.9rem' }}>No reviews yet. Be the first to review this resource.</p>
+                <p className="muted" style={{ fontSize: '.9rem' }}>No reviews yet. Be the first to review this resource.</p>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {reviews.map(review => (
                     <div key={review.id} className="cpc-card" style={{ padding: '1.25rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '10px', color: 'var(--navy)' }}>
+                          <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '10px', color: 'var(--navy)' }}>
                             {review.profiles?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '??'}
                           </div>
-                          <span style={{ color: 'var(--off)', fontSize: '.9rem', fontWeight: 600 }}>{review.profiles?.full_name}</span>
+                          <span style={{ color: 'var(--navy)', fontSize: '.9rem', fontWeight: 700 }}>{review.profiles?.full_name}</span>
                         </div>
-                        <span style={{ color: 'var(--muted)', fontSize: '.78rem' }}>{new Date(review.created_at).toLocaleDateString()}</span>
+                        <span className="muted" style={{ fontSize: '.78rem' }}>{new Date(review.created_at).toLocaleDateString()}</span>
                       </div>
                       <StarRating rating={review.rating} size={16} />
-                      {review.review && <p style={{ color: 'var(--muted)', fontSize: '.88rem', lineHeight: 1.6, marginTop: '8px' }}>{review.review}</p>}
+                      {review.review && <p className="muted" style={{ fontSize: '.88rem', lineHeight: 1.6, marginTop: '8px' }}>{review.review}</p>}
                     </div>
                   ))}
                 </div>
@@ -332,30 +314,30 @@ export default function ListingDetail() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="cpc-card" style={{ padding: '1.75rem', position: 'sticky', top: '86px' }}>
-              <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '2.2rem', marginBottom: '0.25rem' }}>
+              <div style={{ color: 'var(--navy)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2.2rem', marginBottom: '0.25rem' }}>
                 {listing.price === 0 ? 'FREE' : '$' + Number(listing.price).toFixed(2)}
               </div>
-              <p style={{ color: 'var(--muted)', fontSize: '.85rem', marginBottom: '1.5rem' }}>
+              <p className="muted" style={{ fontSize: '.85rem', marginBottom: '1.5rem' }}>
                 {listing.price === 0 ? 'Download for free.' : 'One-time purchase. Instant access.'}
               </p>
 
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
+              <div style={{ borderTop: '1px solid var(--border-on-cream)', paddingTop: '1.25rem', marginBottom: '1.25rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}>File</span>
-                  <span style={{ color: 'var(--off)', fontSize: '.85rem' }}>{listing.file_name}</span>
+                  <span className="muted" style={{ fontSize: '.85rem' }}>File</span>
+                  <span style={{ color: 'var(--navy)', fontSize: '.85rem' }}>{listing.file_name}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}>Sport</span>
-                  <span style={{ color: 'var(--off)', fontSize: '.85rem' }}>{listing.sport}</span>
+                  <span className="muted" style={{ fontSize: '.85rem' }}>Sport</span>
+                  <span style={{ color: 'var(--navy)', fontSize: '.85rem' }}>{listing.sport}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span style={{ color: 'var(--muted)', fontSize: '.85rem' }}>Category</span>
-                  <span style={{ color: 'var(--off)', fontSize: '.85rem' }}>{listing.category}</span>
+                  <span className="muted" style={{ fontSize: '.85rem' }}>Category</span>
+                  <span style={{ color: 'var(--navy)', fontSize: '.85rem' }}>{listing.category}</span>
                 </div>
               </div>
 
               {isOwnListing ? (
-                <div style={{ background: 'var(--green-dim)', border: '1px solid var(--green-border)', borderRadius: '8px', padding: '1rem', color: 'var(--green)', fontSize: '.85rem', textAlign: 'center' }}>
+                <div style={{ background: 'var(--yellow-dim)', border: '1.5px solid var(--navy)', borderRadius: '8px', padding: '1rem', color: 'var(--navy)', fontWeight: 600, fontSize: '.85rem', textAlign: 'center' }}>
                   This is your listing.
                 </div>
               ) : listing.price === 0 ? (
@@ -363,7 +345,7 @@ export default function ListingDetail() {
                   Download Free
                 </button>
               ) : !sellerReady ? (
-                <div style={{ background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '8px', padding: '1rem', color: '#f87171', fontSize: '.85rem', textAlign: 'center' }}>
+                <div style={{ background: 'rgba(185,28,28,0.06)', border: '1px solid rgba(185,28,28,0.3)', borderRadius: '8px', padding: '1rem', color: '#b91c1c', fontWeight: 600, fontSize: '.85rem', textAlign: 'center' }}>
                   Seller has not set up payments yet.
                 </div>
               ) : hasPurchased ? (
@@ -372,11 +354,11 @@ export default function ListingDetail() {
                 </button>
               ) : (
                 <>
-                  <div style={{ background: 'rgba(56,189,248,0.06)', border: '1px solid rgba(56,189,248,0.15)', borderRadius: '8px', padding: '0.9rem 1rem', marginBottom: '1rem' }}>
-                    <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.78rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'rgba(56,189,248,0.9)', marginBottom: '4px' }}>
+                  <div style={{ background: 'rgba(55,109,127,0.08)', border: '1px solid rgba(55,109,127,0.3)', borderRadius: '8px', padding: '0.9rem 1rem', marginBottom: '1rem' }}>
+                    <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.78rem', textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--teal)', marginBottom: '4px' }}>
                       🔒 Seller Protected Marketplace
                     </div>
-                    <p style={{ color: 'var(--muted)', fontSize: '.78rem', lineHeight: 1.5, margin: 0 }}>
+                    <p className="muted" style={{ fontSize: '.78rem', lineHeight: 1.5, margin: 0 }}>
                       All sales are final. Digital files cannot be returned once delivered. Coaches on this platform have invested real time and expertise into their work.
                     </p>
                   </div>
@@ -388,9 +370,9 @@ export default function ListingDetail() {
                       onChange={e => { setRefundConsent(e.target.checked); setError(null) }}
                       style={{ marginTop: '3px', accentColor: 'var(--green)', flexShrink: 0, width: '15px', height: '15px', cursor: 'pointer' }}
                     />
-                    <span style={{ color: 'var(--muted)', fontSize: '.78rem', lineHeight: 1.5 }}>
+                    <span className="muted" style={{ fontSize: '.78rem', lineHeight: 1.5 }}>
                       I understand that all sales are final. I have reviewed the listing and agree to the{' '}
-                      <a href="/refunds" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'underline', cursor: 'pointer' }}>
+                      <a href="/refunds" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>
                         no-refund policy
                       </a>.
                     </span>
@@ -414,10 +396,11 @@ export default function ListingDetail() {
                   sellerId={listing.seller_id}
                   listingId={listing.id}
                   listingTitle={listing.title}
+                  variant="ghost-dark"
                 />
               )}
 
-              <p style={{ color: 'var(--muted)', fontSize: '.75rem', textAlign: 'center', marginTop: '1rem' }}>
+              <p className="muted" style={{ fontSize: '.75rem', textAlign: 'center', marginTop: '1rem' }}>
                 {listing.price === 0 ? 'No charges.' : 'Secure checkout powered by Stripe.'}
               </p>
             </div>
@@ -427,7 +410,7 @@ export default function ListingDetail() {
         </div>
 
         {related.length > 0 && (
-          <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border)', paddingTop: '2.5rem' }}>
+          <div style={{ marginTop: '3rem', borderTop: '1px solid var(--border-on-cream)', paddingTop: '2.5rem' }}>
             <div className="section-label" style={{ marginBottom: '1.5rem' }}>More {listing.sport} Resources</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
               {related.map(r => (
@@ -435,22 +418,22 @@ export default function ListingDetail() {
                   {r.thumbnail_url ? (
                     <img src={r.thumbnail_url} alt={r.title} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
                   ) : (
-                    <div style={{ width: '100%', height: '120px', borderRadius: '8px', background: 'var(--navy-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', marginBottom: '1rem' }}>📋</div>
+                    <div style={{ width: '100%', height: '120px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', marginBottom: '1rem' }}>📋</div>
                   )}
                   <div style={{ display: 'flex', gap: '6px', marginBottom: '6px' }}>
                     <span className="tag">{r.sport}</span>
                     <span className="tag">{r.category}</span>
                   </div>
-                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '4px', lineHeight: 1.2 }}>{r.title}</div>
+                  <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '4px', lineHeight: 1.2, color: 'var(--navy)' }}>{r.title}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                     {r.profiles?.full_name && (
-                      <div style={{ color: 'var(--muted)', fontSize: '.78rem' }}>by {r.profiles.full_name}</div>
+                      <div className="muted" style={{ fontSize: '.78rem' }}>by {r.profiles.full_name}</div>
                     )}
                     {r.profiles?.verified && (
-                      <span style={{ background: 'rgba(46,204,113,0.12)', border: '1px solid var(--green-border)', color: 'var(--green)', fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '100px', letterSpacing: '.05em' }}>✓</span>
+                      <span style={{ background: 'var(--yellow)', border: '1px solid var(--navy)', color: 'var(--navy)', fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '100px', letterSpacing: '.05em' }}>✓</span>
                     )}
                   </div>
-                  <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem' }}>
+                  <div style={{ color: 'var(--navy)', background: 'var(--yellow)', display: 'inline-block', padding: '1px 8px', borderRadius: '4px', fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1rem' }}>
                     {r.price === 0 ? 'FREE' : '$' + Number(r.price).toFixed(2)}
                   </div>
                 </div>

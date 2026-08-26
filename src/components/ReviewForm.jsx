@@ -32,7 +32,7 @@ export default function ReviewForm({ listing, onSubmit }) {
 
   return (
     <div className="cpc-card" style={{ padding: '1.5rem', marginTop: '2rem' }}>
-      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.1rem', textTransform: 'uppercase', marginBottom: '1rem' }}>
+      <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.1rem', textTransform: 'uppercase', marginBottom: '1rem', color: 'var(--navy)' }}>
         Leave a Review
       </div>
 
@@ -48,7 +48,7 @@ export default function ReviewForm({ listing, onSubmit }) {
                 onMouseLeave={() => setHover(0)}
                 style={{
                   fontSize: '28px',
-                  color: star <= (hover || rating) ? '#f59e0b' : 'var(--border)',
+                  color: star <= (hover || rating) ? '#c8860a' : 'var(--border-on-cream)',
                   cursor: 'pointer',
                   transition: 'color .15s'
                 }}

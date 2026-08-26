@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
-import NavMessagesLink from '../components/NavMessagesLink'
+import SiteNav from '../components/SiteNav'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 
@@ -80,7 +80,7 @@ export default function Coaches() {
   }
 
   return (
-    <div className="page-body">
+    <div className="page-body cream-page">
       <Helmet>
         <title>Meet the Coaches — Coaches Pay Coaches</title>
         <meta name="description" content="Browse coach profiles from real youth sports coaches across every sport. Follow coaches and discover their resources." />
@@ -88,36 +88,19 @@ export default function Coaches() {
         <meta property="og:url" content="https://coachespaycoaches.org/coaches" />
       </Helmet>
 
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <div className="logo-badge">CPC</div>
-          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
-        </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-          <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
-          <li><a onClick={() => navigate('/coaches')} className="active">Coaches</a></li>
-          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          <NavMessagesLink />
-          {user
-            ? <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-            : <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
-          }
-        </ul>
-      </nav>
+      <SiteNav active="coaches" />
 
-      <div style={{ background: 'var(--navy-mid)', borderBottom: '1px solid var(--border)', padding: '3rem 5% 2rem' }}>
+      <div style={{ background: 'var(--navy)', padding: '3rem 5% 2rem' }}>
         <div className="section-label">Community</div>
-        <h1 className="section-title">Meet the <em>Coaches</em></h1>
-        <p style={{ color: 'var(--muted)', maxWidth: '520px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+        <h1 className="section-title" style={{ color: 'var(--white)' }}>Meet the <em>Coaches</em></h1>
+        <p style={{ color: 'var(--off)', opacity: .85, maxWidth: '520px', lineHeight: 1.7, marginBottom: '1.5rem' }}>
           Real coaches. Real experience. Every sport. Browse profiles, explore their stores, and find resources that elevate your program.
         </p>
         <div style={{ position: 'relative', maxWidth: '480px' }}>
           <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--muted)' }}>🔍</span>
           <input
             className="form-input"
-            style={{ paddingLeft: '2.5rem' }}
+            style={{ paddingLeft: '2.5rem', background: 'var(--navy-light)', borderColor: 'var(--border)', color: 'var(--white)' }}
             placeholder="Search coaches by name or specialty..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -133,18 +116,18 @@ export default function Coaches() {
               onClick={() => setShowFollowing(!showFollowing)}
               style={{
                 padding: '8px 18px', borderRadius: '100px', border: '1px solid',
-                borderColor: showFollowing ? 'var(--green)' : 'var(--border)',
-                background: showFollowing ? 'var(--green-dim)' : 'transparent',
-                color: showFollowing ? 'var(--green)' : 'var(--muted)',
+                borderColor: showFollowing ? 'var(--navy)' : 'var(--border-on-cream)',
+                background: showFollowing ? 'var(--yellow)' : 'transparent',
+                color: 'var(--navy)',
                 fontSize: '.85rem', fontWeight: 600, cursor: 'pointer',
-                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase',
+                fontFamily: 'var(--font-sub)', textTransform: 'uppercase',
                 letterSpacing: '.05em', transition: 'all .2s'
               }}
             >
               {showFollowing ? '✓ Following' : 'Following'}
             </button>
           )}
-          <div style={{ color: 'var(--muted)', fontSize: '.85rem' }}>
+          <div className="muted" style={{ fontSize: '.85rem' }}>
             {filtered.length} coach{filtered.length !== 1 ? 'es' : ''}
           </div>
         </div>
@@ -156,21 +139,21 @@ export default function Coaches() {
               onClick={() => setSport(s)}
               style={{
                 padding: '6px 14px', borderRadius: '100px', border: '1px solid',
-                borderColor: sport === s ? 'var(--green)' : 'var(--border)',
-                background: sport === s ? 'var(--green-dim)' : 'transparent',
-                color: sport === s ? 'var(--green)' : 'var(--muted)',
+                borderColor: sport === s ? 'var(--navy)' : 'var(--border-on-cream)',
+                background: sport === s ? 'var(--yellow)' : 'transparent',
+                color: 'var(--navy)',
                 fontSize: '.8rem', fontWeight: 600, cursor: 'pointer', transition: 'all .2s',
-                fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '.05em'
+                fontFamily: 'var(--font-sub)', textTransform: 'uppercase', letterSpacing: '.05em'
               }}
             >{s}</button>
           ))}
         </div>
 
         {loading ? (
-          <p style={{ color: 'var(--muted)' }}>Loading coaches...</p>
+          <p className="muted">Loading coaches...</p>
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
-            <p style={{ color: 'var(--muted)', fontSize: '1.1rem' }}>
+            <p className="muted" style={{ fontSize: '1.1rem' }}>
               {showFollowing ? 'You are not following anyone yet.' : 'No coaches found.'}
             </p>
             {showFollowing && (
@@ -192,14 +175,14 @@ export default function Coaches() {
                   <Avatar url={coach.avatar_url} name={coach.full_name} size={60} radius={14} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '4px' }}>
-                      <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1.1rem', textTransform: 'uppercase' }}>
+                      <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.1rem', textTransform: 'uppercase', color: 'var(--navy)' }}>
                         {coach.full_name}
                       </div>
                       {coach.verified && (
                         <span style={{
                           display: 'inline-flex', alignItems: 'center',
-                          background: 'rgba(46,204,113,0.12)', border: '1px solid var(--green-border)',
-                          color: 'var(--green)', fontSize: '9px', fontWeight: 700,
+                          background: 'var(--yellow)', border: '1px solid var(--navy)',
+                          color: 'var(--navy)', fontSize: '9px', fontWeight: 700,
                           padding: '2px 7px', borderRadius: '100px', letterSpacing: '.06em',
                           textTransform: 'uppercase', whiteSpace: 'nowrap', flexShrink: 0
                         }}>
@@ -214,20 +197,20 @@ export default function Coaches() {
                 </div>
 
                 {coach.bio && (
-                  <p style={{ color: 'var(--muted)', fontSize: '.88rem', lineHeight: 1.65, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                  <p className="muted" style={{ fontSize: '.88rem', lineHeight: 1.65, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                     {coach.bio}
                   </p>
                 )}
 
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--border-on-cream)' }}>
                   <div style={{ display: 'flex', gap: '1.25rem' }}>
                     <div>
-                      <div style={{ color: 'var(--green)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.2rem', lineHeight: 1 }}>{coach.listings.length}</div>
-                      <div style={{ color: 'var(--muted)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Resources</div>
+                      <div style={{ color: 'var(--navy)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.2rem', lineHeight: 1 }}>{coach.listings.length}</div>
+                      <div className="muted" style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Resources</div>
                     </div>
                     <div>
-                      <div style={{ color: 'var(--white)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: '1.2rem', lineHeight: 1 }}>{coach.followerCount}</div>
-                      <div style={{ color: 'var(--muted)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Followers</div>
+                      <div style={{ color: 'var(--navy)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.2rem', lineHeight: 1 }}>{coach.followerCount}</div>
+                      <div className="muted" style={{ fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.05em' }}>Followers</div>
                     </div>
                   </div>
                   <button

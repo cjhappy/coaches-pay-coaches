@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
-import NavMessagesLink from '../components/NavMessagesLink'
+import SiteNav from '../components/SiteNav'
 
 function PostCard({ post, currentUser, onDelete }) {
   const navigate = useNavigate()
@@ -47,23 +47,23 @@ function PostCard({ post, currentUser, onDelete }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               <span
                 onClick={() => navigate('/coach/' + post.author_id)}
-                style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--white)' }}
+                style={{ fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', cursor: 'pointer', color: 'var(--navy)' }}
               >
                 {post.profiles?.full_name}
               </span>
-              <span style={{ color: 'var(--muted)', fontSize: '.78rem' }}>{timeAgo(post.created_at)}</span>
+              <span className="muted" style={{ fontSize: '.78rem' }}>{timeAgo(post.created_at)}</span>
             </div>
             {currentUser?.id === post.author_id && (
               <button
                 onClick={() => onDelete(post.id)}
-                style={{ background: 'transparent', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '.8rem', padding: '2px 6px' }}
+                style={{ background: 'transparent', border: 'none', color: 'var(--muted-on-cream)', cursor: 'pointer', fontSize: '.8rem', padding: '2px 6px' }}
               >
                 Delete
               </button>
             )}
           </div>
 
-          <p style={{ color: 'var(--off)', fontSize: '.95rem', lineHeight: 1.7, marginBottom: '1rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+          <p style={{ color: 'var(--navy)', fontSize: '.95rem', lineHeight: 1.7, marginBottom: '1rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
             {post.content}
           </p>
 
@@ -71,15 +71,15 @@ function PostCard({ post, currentUser, onDelete }) {
             <img src={post.image_url} alt="post" style={{ width: '100%', borderRadius: '10px', marginBottom: '1rem', maxHeight: '400px', objectFit: 'cover' }} />
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-on-cream)' }}>
             <button
               onClick={handleLike}
               disabled={likeLoading}
               style={{
                 background: 'transparent', border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: '6px',
-                color: liked ? '#f43f5e' : 'var(--muted)',
-                fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+                color: liked ? '#f43f5e' : 'var(--muted-on-cream)',
+                fontFamily: 'var(--font-sub)', fontWeight: 700,
                 fontSize: '.9rem', transition: 'color .2s', padding: 0
               }}
             >
@@ -93,7 +93,7 @@ function PostCard({ post, currentUser, onDelete }) {
               style={{
                 background: 'transparent', border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: '6px',
-                color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif',
+                color: 'var(--muted-on-cream)', fontFamily: 'var(--font-sub)',
                 fontWeight: 700, fontSize: '.9rem', padding: 0
               }}
             >
@@ -226,47 +226,29 @@ export default function Feed() {
     : posts
 
   return (
-    <div className="page-body">
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <div className="logo-badge">CPC</div>
-          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
-        </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/feed')}>Feed</a></li>
-          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-          {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-          <NavMessagesLink />
-          {user ? (
-            <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
-          ) : (
-            <li><a className="nav-cta" onClick={() => navigate('/auth')}>Get Started</a></li>
-          )}
-        </ul>
-      </nav>
+    <div className="page-body cream-page">
+      <SiteNav active="feed" />
 
       <div style={{ maxWidth: '680px', margin: '0 auto', padding: '2rem 5%' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <div className="section-label" style={{ marginBottom: '4px' }}>Community</div>
-            <h1 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 900, fontSize: 'clamp(24px, 4vw, 36px)', textTransform: 'uppercase', lineHeight: 1 }}>
-              The <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Feed</em>
+            <h1 style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: 'clamp(24px, 4vw, 36px)', textTransform: 'uppercase', lineHeight: 1, color: 'var(--navy)' }}>
+              The <em style={{ color: 'var(--navy)', fontStyle: 'normal', background: 'var(--yellow)', padding: '0 8px' }}>Feed</em>
             </h1>
           </div>
 
           {user && (
-            <div style={{ display: 'flex', gap: '4px', background: 'var(--navy-card)', borderRadius: '8px', padding: '4px' }}>
+            <div style={{ display: 'flex', gap: '4px', background: 'var(--cream-card)', border: '1.5px solid var(--border-on-cream)', borderRadius: '8px', padding: '4px' }}>
               <button
                 onClick={() => setFilter('all')}
-                style={{ padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', background: filter === 'all' ? 'var(--green)' : 'transparent', color: filter === 'all' ? 'var(--navy)' : 'var(--muted)', transition: 'all .2s' }}
+                style={{ padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', background: filter === 'all' ? 'var(--navy)' : 'transparent', color: filter === 'all' ? 'var(--yellow)' : 'var(--muted-on-cream)', transition: 'all .2s' }}
               >
                 All
               </button>
               <button
                 onClick={() => setFilter('following')}
-                style={{ padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', background: filter === 'following' ? 'var(--green)' : 'transparent', color: filter === 'following' ? 'var(--navy)' : 'var(--muted)', transition: 'all .2s' }}
+                style={{ padding: '6px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.85rem', textTransform: 'uppercase', background: filter === 'following' ? 'var(--navy)' : 'transparent', color: filter === 'following' ? 'var(--yellow)' : 'var(--muted-on-cream)', transition: 'all .2s' }}
               >
                 Following
               </button>
@@ -277,10 +259,10 @@ export default function Feed() {
         {user && <CreatePost onPost={handleNewPost} profile={profile} />}
 
         {loading ? (
-          <p style={{ color: 'var(--muted)', textAlign: 'center', padding: '2rem' }}>Loading...</p>
+          <p className="muted" style={{ textAlign: 'center', padding: '2rem' }}>Loading...</p>
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
-            <p style={{ color: 'var(--muted)', fontSize: '1rem', marginBottom: '1rem' }}>
+            <p className="muted" style={{ fontSize: '1rem', marginBottom: '1rem' }}>
               {filter === 'following' ? 'No posts from coaches you follow yet.' : 'No posts yet. Be the first to post!'}
             </p>
             {filter === 'following' && (

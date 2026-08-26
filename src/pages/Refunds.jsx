@@ -27,14 +27,14 @@ export default function RefundPolicy() {
       <div className="dash-body" style={{ maxWidth: '720px' }}>
 
         <div className="cpc-card" style={{ padding: '1.75rem', marginBottom: '1.5rem', borderColor: 'rgba(248,113,113,0.2)', background: 'rgba(248,113,113,0.05)' }}>
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', color: '#f87171', marginBottom: '8px' }}>All Sales Are Final</div>
+          <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', color: '#f87171', marginBottom: '8px' }}>All Sales Are Final</div>
           <p style={{ color: 'var(--off)', fontSize: '.92rem', lineHeight: 1.7, margin: 0 }}>
             Due to the digital nature of all products sold on Coaches Pay Coaches, all purchases are final and non-refundable. Once a file has been delivered, we are unable to offer refunds, exchanges, or credits under any circumstances.
           </p>
         </div>
 
         <div className="cpc-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Why We Have This Policy</div>
+          <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Why We Have This Policy</div>
           <p style={{ color: 'var(--off)', fontSize: '.92rem', lineHeight: 1.7, marginBottom: '12px' }}>
             Coaches Pay Coaches is a marketplace for digital coaching resources — playbooks, film breakdowns, training plans, and other downloadable materials. Unlike physical goods, digital files are delivered instantly and cannot be returned once accessed.
           </p>
@@ -44,7 +44,7 @@ export default function RefundPolicy() {
         </div>
 
         <div className="cpc-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>What This Policy Covers</div>
+          <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>What This Policy Covers</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {[
               'Downloadable files including PDFs, videos, audio, spreadsheets, and any other digital formats',
@@ -62,7 +62,7 @@ export default function RefundPolicy() {
         </div>
 
         <div className="cpc-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Exceptions</div>
+          <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Exceptions</div>
           <p style={{ color: 'var(--off)', fontSize: '.92rem', lineHeight: 1.7, marginBottom: '12px' }}>
             We will review refund requests only in the following limited circumstances:
           </p>
@@ -84,7 +84,7 @@ export default function RefundPolicy() {
         </div>
 
         <div className="cpc-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Chargebacks</div>
+          <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Chargebacks</div>
           <p style={{ color: 'var(--off)', fontSize: '.92rem', lineHeight: 1.7, marginBottom: '12px' }}>
             By completing a purchase on Coaches Pay Coaches, you agree to this refund policy and acknowledge that initiating a chargeback outside of this process is a violation of our Terms of Service.
           </p>
@@ -94,7 +94,7 @@ export default function RefundPolicy() {
         </div>
 
         <div className="cpc-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
-          <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Contact</div>
+          <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Contact</div>
           <p style={{ color: 'var(--off)', fontSize: '.92rem', lineHeight: 1.7, margin: 0 }}>
             If you have questions about this policy before making a purchase, reach out at <a href="mailto:christopherhappy05@gmail.com" style={{ color: 'var(--green)', textDecoration: 'none' }}>christopherhappy05@gmail.com</a>. We're happy to help you make an informed decision before you buy.
           </p>
