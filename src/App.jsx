@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import AuthForm from './components/AuthForm'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -16,8 +16,16 @@ import Terms from './pages/Terms'
 import Privacy from './pages/Privacy'
 import Messages from './pages/Messages'
 import MobileNav from './components/MobileNav'
+import SiteFooter from './components/SiteFooter'
 import Feed from './pages/Feed'
 import RefundPolicy from './pages/Refunds'
+import AccountSettings from './pages/AccountSettings'
+
+function AppFooter() {
+  const location = useLocation()
+  if (location.pathname === '/') return null
+  return <SiteFooter />
+}
 
 function App() {
   const { user, loading } = useAuth()
@@ -42,8 +50,10 @@ function App() {
         <Route path="/purchases" element={<ProtectedRoute><Purchases /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <AppFooter />
       <MobileNav />
     </BrowserRouter>
   )

@@ -64,8 +64,8 @@ export default function Home() {
             <li><a onClick={() => navigate('/auth')} className="nav-cta">Get Started →</a></li>
           )}
         </ul>
-        <button className="hamburger-btn" onClick={() => navigate(user ? '/dashboard' : '/auth')} aria-label="Menu">
-          <span /><span /><span />
+        <button className="mobile-nav-cta" onClick={() => navigate(user ? '/dashboard' : '/auth')}>
+          {user ? 'Dashboard' : 'Get Started'}
         </button>
       </nav>
 
@@ -260,7 +260,7 @@ export default function Home() {
 
       {/* FOOTER */}
       <footer style={{ background: 'var(--navy)', padding: '3rem 5% 1.5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+        <div className="footer-inner" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
           <div>
             <img src="/cpc-logo-secondary.svg" alt="Coaches Pay Coaches" style={{ height: '54px', width: 'auto', marginBottom: '14px' }} />
             <p style={{ color: 'var(--off)', fontSize: '.88rem', lineHeight: 1.6, maxWidth: '280px', opacity: .8 }}>The resource hub for coaches, trainers, and sports professionals. Learn, share, and get paid for what you know.</p>

@@ -1,26 +1,18 @@
 import { useNavigate } from 'react-router-dom'
+import SiteNav from '../components/SiteNav'
 
 export default function Terms() {
   const navigate = useNavigate()
 
   return (
-    <div className="page-body">
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <div className="logo-badge">CPC</div>
-          <div className="logo-text">COACHES <em>PAY</em> COACHES</div>
-        </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
-          <li><a onClick={() => navigate('/auth')} className="nav-cta">Get Started →</a></li>
-        </ul>
-      </nav>
+    <div className="page-body cream-page">
+      <SiteNav />
 
       <div style={{ maxWidth: '760px', margin: '0 auto', padding: '3rem 5%' }}>
         <h1 style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: 'clamp(32px, 5vw, 52px)', textTransform: 'uppercase', marginBottom: '8px' }}>
-          Terms of <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Service</em>
+          Terms of <em style={{ color: 'var(--navy)', background: 'var(--yellow)', fontStyle: 'normal', padding: '0 10px' }}>Service</em>
         </h1>
-        <p style={{ color: 'var(--muted)', fontSize: '.9rem', marginBottom: '3rem' }}>Last updated: May 2025</p>
+        <p className="muted" style={{ fontSize: '.9rem', marginBottom: '3rem' }}>Last updated: May 2025</p>
 
         {[
           {
@@ -77,20 +69,13 @@ export default function Terms() {
           }
         ].map(section => (
           <div key={section.title} style={{ marginBottom: '2rem' }}>
-            <h2 style={{ fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.2rem', textTransform: 'uppercase', color: 'var(--white)', marginBottom: '8px' }}>
+            <h2 style={{ fontFamily: 'var(--font-sub)', fontWeight: 800, fontSize: '1.2rem', textTransform: 'uppercase', color: 'var(--navy)', marginBottom: '8px' }}>
               {section.title}
             </h2>
-            <p style={{ color: 'var(--muted)', lineHeight: 1.8, fontSize: '.95rem' }}>{section.body}</p>
+            <p className="muted" style={{ lineHeight: 1.8, fontSize: '.95rem' }}>{section.body}</p>
           </div>
         ))}
       </div>
-
-      <footer style={{ background: 'var(--navy-mid)', borderTop: '1px solid var(--border)', padding: '2rem 5%', textAlign: 'center' }}>
-        <p style={{ color: 'var(--muted)', fontSize: '.85rem' }}>
-          © 2025 <em style={{ color: 'var(--green)', fontStyle: 'normal' }}>Coaches Pay Coaches</em> ·
-          <a onClick={() => navigate('/privacy')} style={{ color: 'var(--muted)', marginLeft: '8px', cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</a>
-        </p>
-      </footer>
     </div>
   )
 }

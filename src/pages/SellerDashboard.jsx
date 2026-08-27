@@ -277,7 +277,7 @@ export default function SellerDashboard() {
         <SellerCompleteness profile={profile} listings={listings} onConnectStripe={handleConnectStripe} />
         <BioEditor profile={profile} setProfile={setProfile} />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>
             <div className="muted" style={{ fontSize: '.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: '8px' }}>Total Earnings</div>
             <div style={{ color: 'var(--navy)', background: 'var(--yellow)', display: 'inline-block', padding: '0 8px', borderRadius: '4px', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2rem' }}>${totalEarnings.toFixed(2)}</div>
