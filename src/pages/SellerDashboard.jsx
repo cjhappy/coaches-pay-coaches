@@ -10,10 +10,26 @@ import SiteNav from '../components/SiteNav'
 function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)
   const [previewUrl, setPreviewUrl] = useState(profile?.avatar_url || null)
+  const [error, setError] = useState(null)
+
+  const MAX_SIZE_MB = 5
 
   async function handleUpload(e) {
     const file = e.target.files[0]
     if (!file) return
+    setError(null)
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file (JPG, PNG, GIF, etc.).')
+      e.target.value = ''
+      return
+    }
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setError(`Image must be under ${MAX_SIZE_MB}MB.`)
+      e.target.value = ''
+      return
+    }
+
     setUploading(true)
     const ext = file.name.split('.').pop()
     const path = profile.id + '/avatar.' + ext
@@ -26,22 +42,28 @@ function AvatarUploader({ profile, onUpdate }) {
       const bustUrl = publicUrl + '?t=' + Date.now()
       setPreviewUrl(bustUrl)
       onUpdate(bustUrl)
+    } else {
+      setError('Upload failed. Please try again.')
     }
     setUploading(false)
   }
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-      <Avatar url={previewUrl} name={profile?.full_name} size={80} radius={16} />
-      <div>
-        <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.9rem', textTransform: 'uppercase', marginBottom: '6px', color: 'var(--navy)' }}>Profile Photo</div>
-        <label style={{ cursor: 'pointer' }}>
-          <span className="btn btn-ghost-dark" style={{ padding: '8px 16px', fontSize: '12px', pointerEvents: 'none' }}>
-            {uploading ? 'Uploading...' : 'Upload Photo'}
-          </span>
-          <input type="file" accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
-        </label>
+    <div style={{ marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <Avatar url={previewUrl} name={profile?.full_name} size={80} radius={16} />
+        <div>
+          <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.9rem', textTransform: 'uppercase', marginBottom: '6px', color: 'var(--navy)' }}>Profile Photo</div>
+          <label style={{ cursor: 'pointer' }}>
+            <span className="btn btn-ghost-dark" style={{ padding: '8px 16px', fontSize: '12px', pointerEvents: 'none' }}>
+              {uploading ? 'Uploading...' : 'Upload Photo'}
+            </span>
+            <input type="file" accept="image/*" onChange={handleUpload} style={{ display: 'none' }} />
+          </label>
+          <div className="muted" style={{ fontSize: '.72rem', marginTop: '6px' }}>JPG, PNG, or GIF · up to {MAX_SIZE_MB}MB</div>
+        </div>
       </div>
+      {error && <p className="auth-error" style={{ marginTop: '8px', marginBottom: 0 }}>{error}</p>}
     </div>
   )
 }
@@ -51,11 +73,12 @@ function BioEditor({ profile, setProfile }) {
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  const wordCount = bio.trim() === '' ? 0 : bio.trim().split(/\s+/).length
-  const overLimit = wordCount > 150
+  const BIO_LIMIT = 250
+  const charCount = bio.length
+  const overLimit = charCount > BIO_LIMIT
 
   async function saveBio() {
-    if (overLimit) return
+    if (overLimit || charCount === 0) return
     setSaving(true)
     await supabase.from('profiles').update({ bio }).eq('id', profile.id)
     setSaving(false)
@@ -79,14 +102,15 @@ function BioEditor({ profile, setProfile }) {
           <textarea
             className="form-input"
             value={bio}
-            onChange={e => setBio(e.target.value)}
+            onChange={e => setBio(e.target.value.slice(0, BIO_LIMIT))}
+            maxLength={BIO_LIMIT}
             rows={3}
             placeholder="Tell buyers about your coaching background, experience, and specialties..."
             style={{ resize: 'vertical', marginBottom: '0.5rem', borderColor: overLimit ? '#b91c1c' : undefined }}
           />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
             <span style={{ fontSize: '.78rem', color: overLimit ? '#b91c1c' : 'var(--muted-on-cream)' }}>
-              {wordCount}/150 words {overLimit && '— over limit'}
+              {charCount}/{BIO_LIMIT} characters {overLimit && '— over limit'}
             </span>
           </div>
           <button className="btn btn-green" style={{ padding: '8px 20px', fontSize: '13px', opacity: overLimit ? 0.5 : 1 }} onClick={saveBio} disabled={saving || overLimit}>

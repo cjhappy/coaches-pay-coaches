@@ -76,7 +76,7 @@ export default function AuthForm({ onSuccess }) {
           {mode === 'signup' && !forgotPassword && (
             <>
               <label>Full Name
-                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" required />
+                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your name" maxLength={80} required />
               </label>
 
               <label style={{ marginBottom: '.5rem' }}>I want to... (select all that apply)</label>

@@ -5,6 +5,12 @@ import { supabase } from '../lib/supabase'
 const SPORTS = ['Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
 
+const TITLE_LIMIT = 100
+const DESCRIPTION_LIMIT = 1000
+const THUMBNAIL_MAX_MB = 5
+const FILE_MAX_MB = 100
+const BLOCKED_EXTENSIONS = ['exe', 'bat', 'cmd', 'sh', 'app', 'msi', 'scr', 'com', 'vbs', 'js', 'jar', 'apk', 'dmg']
+
 export default function ListingForm({ listing, onSave, onCancel }) {
   const { user } = useAuth()
   const [title, setTitle] = useState(listing?.title || '')
@@ -22,6 +28,41 @@ export default function ListingForm({ listing, onSave, onCancel }) {
     if (isNaN(num)) return 'Please enter a valid price.'
     if (num > 0 && num < 3) return 'Paid listings must be at least $3.00. Set price to $0 to list for free.'
     return null
+  }
+
+  function handleThumbnailChange(e) {
+    const f = e.target.files[0]
+    if (!f) return
+    if (!f.type.startsWith('image/')) {
+      setError('Thumbnail must be an image file.')
+      e.target.value = ''
+      return
+    }
+    if (f.size > THUMBNAIL_MAX_MB * 1024 * 1024) {
+      setError(`Thumbnail must be under ${THUMBNAIL_MAX_MB}MB.`)
+      e.target.value = ''
+      return
+    }
+    setError(null)
+    setThumbnail(f)
+  }
+
+  function handleFileChange(e) {
+    const f = e.target.files[0]
+    if (!f) return
+    const ext = f.name.split('.').pop().toLowerCase()
+    if (BLOCKED_EXTENSIONS.includes(ext)) {
+      setError('That file type is not allowed for security reasons. Upload a document, PDF, image, video, or archive instead.')
+      e.target.value = ''
+      return
+    }
+    if (f.size > FILE_MAX_MB * 1024 * 1024) {
+      setError(`File must be under ${FILE_MAX_MB}MB.`)
+      e.target.value = ''
+      return
+    }
+    setError(null)
+    setFile(f)
   }
 
   async function handleSubmit(e) {
@@ -109,12 +150,14 @@ export default function ListingForm({ listing, onSave, onCancel }) {
 
           <div style={{ gridColumn: '1 / -1' }}>
             <label className="form-label">Title *</label>
-            <input className="form-input" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Motion Offense System for Youth Basketball" required />
+            <input className="form-input" value={title} onChange={e => setTitle(e.target.value.slice(0, TITLE_LIMIT))} maxLength={TITLE_LIMIT} placeholder="e.g. Motion Offense System for Youth Basketball" required />
+            <p className="muted" style={{ fontSize: '.75rem', marginTop: '4px' }}>{title.length}/{TITLE_LIMIT}</p>
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>
             <label className="form-label">Description *</label>
-            <textarea className="form-input" value={description} onChange={e => setDescription(e.target.value)} placeholder="Describe what coaches get from this resource..." required rows={4} style={{ resize: 'vertical' }} />
+            <textarea className="form-input" value={description} onChange={e => setDescription(e.target.value.slice(0, DESCRIPTION_LIMIT))} maxLength={DESCRIPTION_LIMIT} placeholder="Describe what coaches get from this resource..." required rows={4} style={{ resize: 'vertical' }} />
+            <p className="muted" style={{ fontSize: '.75rem', marginTop: '4px' }}>{description.length}/{DESCRIPTION_LIMIT}</p>
           </div>
 
           <div>
@@ -159,12 +202,14 @@ export default function ListingForm({ listing, onSave, onCancel }) {
 
           <div>
             <label className="form-label">Thumbnail Image (optional)</label>
-            <input className="form-input" type="file" accept="image/*" onChange={e => setThumbnail(e.target.files[0])} />
+            <input className="form-input" type="file" accept="image/*" onChange={handleThumbnailChange} />
+            <p className="muted" style={{ fontSize: '.75rem', marginTop: '4px' }}>Up to {THUMBNAIL_MAX_MB}MB</p>
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>
             <label className="form-label">Resource File * {listing && '(leave empty to keep current file)'}</label>
-            <input className="form-input" type="file" onChange={e => setFile(e.target.files[0])} required={!listing} />
+            <input className="form-input" type="file" onChange={handleFileChange} required={!listing} />
+            <p className="muted" style={{ fontSize: '.75rem', marginTop: '4px' }}>Up to {FILE_MAX_MB}MB — documents, PDFs, images, videos, and archives only</p>
             {listing?.file_name && <p style={{ color: 'var(--muted-on-cream)', fontSize: '.8rem', marginTop: '4px' }}>Current: {listing.file_name}</p>}
           </div>
 
