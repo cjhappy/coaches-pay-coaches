@@ -97,7 +97,10 @@ exports.handler = async (event) => {
       if (listing && buyer && seller) {
         await fetch(`${process.env.SITE_URL}/.netlify/functions/send-email`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-internal-secret': process.env.INTERNAL_FUNCTION_SECRET
+          },
           body: JSON.stringify({
             type: 'sale',
             data: {

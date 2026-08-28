@@ -2,16 +2,19 @@ const { Resend } = require('resend')
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// This function is only ever called server-to-server, by our own stripe-webhook
+// function — never directly from the browser. INTERNAL_FUNCTION_SECRET is a
+// shared secret only our own functions know, so a stranger can't call this
+// endpoint directly to send arbitrary emails from our domain.
 exports.handler = async (event) => {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Content-Type': 'application/json'
-  }
-
-  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' }
+  const headers = { 'Content-Type': 'application/json' }
 
   try {
+    const internalSecret = event.headers['x-internal-secret']
+    if (!internalSecret || internalSecret !== process.env.INTERNAL_FUNCTION_SECRET) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: 'Unauthorized' }) }
+    }
+
     const { type, data } = JSON.parse(event.body)
 
     if (type === 'sale') {

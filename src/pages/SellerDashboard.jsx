@@ -167,9 +167,13 @@ export default function SellerDashboard() {
     setStripeLoading(true)
     try {
       console.log('fetching stripe-connect, userId:', user.id)
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch('/.netlify/functions/stripe-connect', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
         body: JSON.stringify({ userId: user.id, returnUrl: window.location.origin })
       })
       console.log('response status:', res.status)

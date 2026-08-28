@@ -1,27 +1,49 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 const { createClient } = require('@supabase/supabase-js')
 
-const supabase = createClient(
+const supabaseAdmin = createClient(
   process.env.VITE_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_KEY
 )
 
+// Used only to verify the caller's identity from their access token.
+// Uses the anon key on purpose — auth.getUser() doesn't need elevated privileges.
+const supabaseAuth = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_ANON_KEY
+)
+
 const PLATFORM_PERCENT = 0.12
 const TRANSACTION_FEE = 0.99
+const ALLOWED_ORIGIN = process.env.SITE_URL || 'https://coachespaycoaches.org'
 
 exports.handler = async (event) => {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Content-Type': 'application/json'
   }
 
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' }
 
   try {
-    const { listingId, buyerId, returnUrl } = JSON.parse(event.body)
+    // 1. Verify the request carries a valid, logged-in Supabase session
+    const authHeader = event.headers.authorization || event.headers.Authorization
+    const token = authHeader?.replace('Bearer ', '')
+    if (!token) throw new Error('Not authenticated')
 
-    const { data: listing, error } = await supabase
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token)
+    if (authError || !user) throw new Error('Not authenticated')
+
+    const { listingId, buyerId } = JSON.parse(event.body)
+
+    // 2. The caller can only ever check out as themselves
+    if (buyerId !== user.id) throw new Error('You can only purchase on your own behalf')
+
+    // 3. Never trust a client-supplied redirect origin — always use our own known site URL
+    const returnUrl = ALLOWED_ORIGIN
+
+    const { data: listing, error } = await supabaseAdmin
       .from('listings')
       .select('*, profiles(stripe_account_id, full_name)')
       .eq('id', listingId)

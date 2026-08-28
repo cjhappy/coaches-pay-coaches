@@ -163,9 +163,13 @@ export default function ListingDetail() {
     setError(null)
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch('/.netlify/functions/create-checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
         body: JSON.stringify({ listingId: listing.id, buyerId: profile.id, returnUrl: window.location.origin })
       })
       const data = await res.json()
