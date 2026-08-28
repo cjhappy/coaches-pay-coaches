@@ -7,6 +7,7 @@ import ReviewForm from '../components/ReviewForm'
 import MessageButton from '../components/MessageButton'
 import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
+import ReportButton from '../components/ReportButton'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -243,9 +244,19 @@ export default function ListingDetail() {
               <span className="tag">{listing.category}</span>
             </div>
 
-            <h1 style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: 'clamp(28px, 4vw, 42px)', textTransform: 'uppercase', lineHeight: 1, marginBottom: '1rem', color: 'var(--navy)' }}>
-              {listing.title}
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', marginBottom: '1rem' }}>
+              <h1 style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: 'clamp(28px, 4vw, 42px)', textTransform: 'uppercase', lineHeight: 1, color: 'var(--navy)', margin: 0 }}>
+                {listing.title}
+              </h1>
+              {!isOwnListing && (
+                <ReportButton
+                  contentType="listing"
+                  contentId={listing.id}
+                  reportedUserId={listing.seller_id}
+                  contentSnapshot={listing.title}
+                />
+              )}
+            </div>
 
             {reviews.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>

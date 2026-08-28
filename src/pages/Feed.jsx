@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
 import SiteNav from '../components/SiteNav'
+import ReportButton from '../components/ReportButton'
 
 function PostCard({ post, currentUser, onDelete }) {
   const navigate = useNavigate()
@@ -60,6 +61,14 @@ function PostCard({ post, currentUser, onDelete }) {
               >
                 Delete
               </button>
+            )}
+            {currentUser && currentUser.id !== post.author_id && (
+              <ReportButton
+                contentType="post"
+                contentId={post.id}
+                reportedUserId={post.author_id}
+                contentSnapshot={post.content}
+              />
             )}
           </div>
 

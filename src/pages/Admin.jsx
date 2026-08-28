@@ -11,6 +11,7 @@ export default function Admin() {
   const [users, setUsers] = useState([])
   const [listings, setListings] = useState([])
   const [purchases, setPurchases] = useState([])
+  const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [stats, setStats] = useState({
@@ -24,19 +25,22 @@ export default function Admin() {
   }, [profile])
 
   async function fetchAll() {
-    const [usersRes, listingsRes, purchasesRes] = await Promise.all([
+    const [usersRes, listingsRes, purchasesRes, reportsRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('listings').select('*, profiles(full_name)').order('created_at', { ascending: false }),
-      supabase.from('purchases').select('*, listings(title, price), profiles!purchases_buyer_id_fkey(full_name)').order('created_at', { ascending: false })
+      supabase.from('purchases').select('*, listings(title, price), profiles!purchases_buyer_id_fkey(full_name)').order('created_at', { ascending: false }),
+      supabase.from('reports').select('*, reporter:profiles!reports_reporter_id_fkey(full_name), reported:profiles!reports_reported_user_id_fkey(full_name)').order('created_at', { ascending: false })
     ])
 
     const usersData = usersRes.data || []
     const listingsData = listingsRes.data || []
     const purchasesData = purchasesRes.data || []
+    const reportsData = reportsRes.data || []
 
     setUsers(usersData)
     setListings(listingsData)
     setPurchases(purchasesData)
+    setReports(reportsData)
 
     const completed = purchasesData.filter(p => p.status === 'completed')
     const totalRevenue = completed.reduce((sum, p) => sum + Number(p.amount_platform), 0)
@@ -81,6 +85,24 @@ export default function Admin() {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, verified: !currentValue } : u))
   }
 
+  async function dismissReport(reportId) {
+    await supabase.from('reports').update({ status: 'dismissed' }).eq('id', reportId)
+    setReports(prev => prev.map(r => r.id === reportId ? { ...r, status: 'dismissed' } : r))
+  }
+
+  async function deleteReportedContent(report) {
+    if (!confirm(`Delete this ${report.content_type} and mark the report resolved? This cannot be undone.`)) return
+
+    const tableByType = { post: 'posts', listing: 'listings', message: 'messages' }
+    const table = tableByType[report.content_type]
+    if (table) {
+      await supabase.from(table).delete().eq('id', report.content_id)
+    }
+    await supabase.from('reports').update({ status: 'resolved' }).eq('id', report.id)
+    setReports(prev => prev.map(r => r.id === report.id ? { ...r, status: 'resolved' } : r))
+    if (report.content_type === 'listing') setListings(prev => prev.filter(l => l.id !== report.content_id))
+  }
+
   async function handleSignOut() {
     await signOut()
     navigate('/auth')
@@ -97,6 +119,7 @@ export default function Admin() {
   })
 
   const completedPurchases = purchases.filter(p => p.status === 'completed')
+  const pendingReports = reports.filter(r => r.status === 'pending')
 
   const filteredUsers = users.filter(u =>
     !search || u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase())
@@ -185,6 +208,12 @@ export default function Admin() {
           <button onClick={() => setActiveTab('users')} style={tabStyle('users')}>Users ({filteredUsers.length})</button>
           <button onClick={() => setActiveTab('listings')} style={tabStyle('listings')}>Listings ({filteredListings.length})</button>
           <button onClick={() => setActiveTab('sales')} style={tabStyle('sales')}>Sales ({completedPurchases.length})</button>
+          <button onClick={() => setActiveTab('moderation')} style={{ ...tabStyle('moderation'), position: 'relative' }}>
+            Moderation ({pendingReports.length})
+            {pendingReports.length > 0 && activeTab !== 'moderation' && (
+              <span style={{ position: 'absolute', top: '-4px', right: '-4px', width: '9px', height: '9px', borderRadius: '50%', background: '#b91c1c' }} />
+            )}
+          </button>
         </div>
 
         {/* Users Tab */}
@@ -311,6 +340,64 @@ export default function Admin() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Moderation Tab */}
+        {activeTab === 'moderation' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+            {reports.length === 0 ? (
+              <div className="cpc-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
+                <p className="muted">No reports filed yet.</p>
+              </div>
+            ) : (
+              [...pendingReports, ...reports.filter(r => r.status !== 'pending')].map(report => (
+                <div key={report.id} className="cpc-card" style={{ padding: '1.25rem', opacity: report.status === 'pending' ? 1 : 0.55 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <span className="tag" style={{ textTransform: 'uppercase' }}>{report.content_type}</span>
+                      <span style={{
+                        fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '100px', textTransform: 'uppercase',
+                        background: report.status === 'pending' ? 'rgba(180,120,10,0.1)' : report.status === 'resolved' ? 'rgba(26,122,62,0.1)' : 'var(--cream-card)',
+                        color: report.status === 'pending' ? '#8a5a09' : report.status === 'resolved' ? '#1a7a3e' : 'var(--muted-on-cream)',
+                        border: report.status === 'pending' ? '1px solid rgba(180,120,10,0.35)' : report.status === 'resolved' ? '1px solid rgba(26,122,62,0.3)' : '1px solid var(--border-on-cream)'
+                      }}>
+                        {report.status}
+                      </span>
+                    </div>
+                    <span className="muted" style={{ fontSize: '.78rem' }}>{new Date(report.created_at).toLocaleDateString()}</span>
+                  </div>
+
+                  <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.85rem', color: 'var(--navy)', marginBottom: '4px' }}>
+                    Reason: {report.reason || '—'}
+                  </div>
+                  {report.content_snapshot && (
+                    <div style={{ background: 'var(--cream-card)', border: '1px solid var(--border-on-cream)', borderRadius: '8px', padding: '10px 14px', margin: '8px 0', color: 'var(--navy)', fontSize: '.85rem', lineHeight: 1.5 }}>
+                      "{report.content_snapshot}"
+                    </div>
+                  )}
+                  <div className="muted" style={{ fontSize: '.78rem', marginBottom: report.status === 'pending' ? '12px' : 0 }}>
+                    Reported by {report.reporter?.full_name || 'Unknown'}
+                    {report.reported?.full_name && <> · About {report.reported.full_name}</>}
+                  </div>
+
+                  {report.status === 'pending' && (
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button
+                        className="btn"
+                        style={{ padding: '6px 14px', fontSize: '12px', background: '#fff', color: '#b91c1c', border: '1.5px solid #b91c1c' }}
+                        onClick={() => deleteReportedContent(report)}
+                      >
+                        Delete Content
+                      </button>
+                      <button className="btn btn-ghost-dark" style={{ padding: '6px 14px', fontSize: '12px' }} onClick={() => dismissReport(report.id)}>
+                        Dismiss
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>

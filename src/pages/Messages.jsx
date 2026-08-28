@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import SiteNav from '../components/SiteNav'
+import ReportButton from '../components/ReportButton'
 
 export default function Messages() {
   const { user, profile, signOut } = useAuth()
@@ -239,7 +240,16 @@ export default function Messages() {
                         border: isMe ? 'none' : '1px solid var(--border)'
                       }}>
                         {msg.content}
-                        <div style={{ fontSize: '.7rem', opacity: 0.6, marginTop: '4px', textAlign: 'right' }}>
+                        <div style={{ fontSize: '.7rem', opacity: 0.6, marginTop: '4px', textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+                          {!isMe && (
+                            <ReportButton
+                              contentType="message"
+                              contentId={msg.id}
+                              reportedUserId={msg.sender_id}
+                              contentSnapshot={msg.content}
+                              dark
+                            />
+                          )}
                           {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
