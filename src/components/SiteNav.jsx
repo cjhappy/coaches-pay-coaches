@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useUnreadMessages } from '../hooks/useUnreadMessages'
 import Avatar from './Avatar'
+import NotificationBell from './NotificationBell'
 
 export default function SiteNav({ active }) {
   const navigate = useNavigate()
@@ -28,6 +29,7 @@ export default function SiteNav({ active }) {
     { label: 'Dashboard', path: '/dashboard', show: true, key: 'dashboard' },
     { label: 'My Store', path: '/seller', show: profile?.role === 'seller' || profile?.role === 'both', key: 'seller' },
     { label: 'My Library', path: '/purchases', show: profile?.role === 'buyer' || profile?.role === 'both', key: 'purchases' },
+    { label: 'Saved', path: '/saved', show: true, key: 'saved' },
     { label: 'Messages', path: '/messages', show: true, key: 'messages', badge: unreadCount },
     { label: 'Account Settings', path: '/settings', show: true, key: 'settings' },
     { label: 'Admin', path: '/admin', show: !!profile?.is_admin, key: 'admin', admin: true },
@@ -46,7 +48,9 @@ export default function SiteNav({ active }) {
         <li><a className={active === 'feed' ? 'active' : ''} onClick={() => go('/feed')}>Feed</a></li>
 
         {user ? (
-          <li style={{ position: 'relative' }}>
+          <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <NotificationBell />
+            <div style={{ position: 'relative' }}>
             <a
               onClick={() => setAccountOpen(v => !v)}
               style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 1 }}
@@ -72,6 +76,7 @@ export default function SiteNav({ active }) {
                 </div>
               </>
             )}
+            </div>
           </li>
         ) : (
           <li><a className="nav-cta" onClick={() => go('/auth')}>Get Started</a></li>

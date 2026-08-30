@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
 import ErrorState from '../components/ErrorState'
+import SaveButton from '../components/SaveButton'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['All', 'Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
@@ -232,7 +233,10 @@ export default function Marketplace() {
 
 function ListingCard({ listing, navigate }) {
   return (
-    <div className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+    <div className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+      <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem', zIndex: 2 }}>
+        <SaveButton listingId={listing.id} size="small" />
+      </div>
       {listing.thumbnail_url ? (
         <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
       ) : (

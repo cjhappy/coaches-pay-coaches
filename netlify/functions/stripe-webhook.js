@@ -95,6 +95,17 @@ exports.handler = async (event) => {
         .single()
 
       if (listing && buyer && seller) {
+        // In-app notification for the seller, alongside the email below.
+        // Uses the service-role client, so this runs regardless of RLS.
+        await supabase.from('notifications').insert({
+          user_id: seller_id,
+          type: 'sale',
+          actor_id: buyer_id,
+          actor_name: buyer.full_name,
+          content_id: listing_id,
+          content_title: listing.title,
+        })
+
         await fetch(`${process.env.SITE_URL}/.netlify/functions/send-email`, {
           method: 'POST',
           headers: {

@@ -29,6 +29,32 @@ export default function AuthForm({ onSuccess }) {
     return 'buyer'
   }
 
+  // If they arrived via a referral link (?ref=CODE), link the new account
+  // to whoever referred them. This runs after signup, fire-and-forget —
+  // referral tracking is a nice-to-have and should never block or fail the
+  // actual signup if something goes wrong here. A short delay gives the
+  // database trigger that creates the profile row time to finish first.
+  async function attributeReferral(newUserId) {
+    if (!newUserId) return
+    const refCode = new URLSearchParams(window.location.search).get('ref')
+    if (!refCode) return
+
+    setTimeout(async () => {
+      try {
+        const { data: referrer } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('referral_code', refCode)
+          .maybeSingle()
+        if (referrer && referrer.id !== newUserId) {
+          await supabase.from('profiles').update({ referred_by: referrer.id }).eq('id', newUserId)
+        }
+      } catch (err) {
+        console.error('Referral attribution failed:', err.message)
+      }
+    }, 1500)
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
@@ -46,9 +72,12 @@ export default function AuthForm({ onSuccess }) {
     }
 
     if (mode === 'signup') {
-      const { error } = await signUp({ email, password, fullName, role: getRole() })
+      const { data, error } = await signUp({ email, password, fullName, role: getRole() })
       if (error) setError(error.message)
-      else setMessage('Check your email to confirm your account!')
+      else {
+        setMessage('Check your email to confirm your account!')
+        attributeReferral(data?.user?.id)
+      }
     } else {
       const { error } = await signIn({ email, password, rememberMe })
       if (error) setError(error.message)

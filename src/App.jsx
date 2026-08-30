@@ -17,9 +17,11 @@ import Privacy from './pages/Privacy'
 import Messages from './pages/Messages'
 import MobileNav from './components/MobileNav'
 import SiteFooter from './components/SiteFooter'
+import Analytics from './components/Analytics'
 import Feed from './pages/Feed'
 import RefundPolicy from './pages/Refunds'
 import AccountSettings from './pages/AccountSettings'
+import Saved from './pages/Saved'
 
 function AppFooter() {
   const location = useLocation()
@@ -51,10 +53,12 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><AccountSettings /></ProtectedRoute>} />
+        <Route path="/saved" element={<ProtectedRoute><Saved /></ProtectedRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <AppFooter />
       <MobileNav />
+      <Analytics />
     </BrowserRouter>
   )
 }

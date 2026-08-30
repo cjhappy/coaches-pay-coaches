@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import StarRating from './StarRating'
+import { notify } from '../lib/notify'
 
 export default function ReviewForm({ listing, onSubmit }) {
   const { user, profile } = useAuth()
@@ -26,7 +27,10 @@ export default function ReviewForm({ listing, onSubmit }) {
     })
 
     if (insertError) setError(insertError.message)
-    else onSubmit()
+    else {
+      notify({ userId: listing.seller_id, type: 'review', actorId: user.id, actorName: profile?.full_name, contentId: listing.id, contentTitle: listing.title })
+      onSubmit()
+    }
     setLoading(false)
   }
 

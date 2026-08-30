@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet-async'
 import MessageButton from '../components/MessageButton'
 import SiteNav from '../components/SiteNav'
 import ErrorState from '../components/ErrorState'
+import { notify } from '../lib/notify'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -108,7 +109,7 @@ function CoachReviews({ sellerId }) {
 
 export default function CoachProfile() {
   const { id } = useParams()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const [coach, setCoach] = useState(null)
   const [listings, setListings] = useState([])
@@ -175,6 +176,7 @@ export default function CoachProfile() {
       await supabase.from('followers').insert({ follower_id: user.id, following_id: id })
       setIsFollowing(true)
       setFollowerCount(prev => prev + 1)
+      notify({ userId: id, type: 'follow', actorId: user.id, actorName: profile?.full_name })
     }
     setFollowLoading(false)
   }

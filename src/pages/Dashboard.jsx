@@ -3,6 +3,8 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import SellerCompleteness from '../components/SellerCompleteness'
+import BuyerCompleteness from '../components/BuyerCompleteness'
+import ReferralCard from '../components/ReferralCard'
 import SiteNav from '../components/SiteNav'
 
 function OnboardingGuide({ role }) {
@@ -139,6 +141,11 @@ export default function Dashboard() {
         {isSeller && (
           <SellerCompleteness profile={profile} listings={listings} />
         )}
+        {isBuyer && (
+          <BuyerCompleteness profile={profile} />
+        )}
+
+        <ReferralCard profile={profile} />
 
         <div className="section-label">Quick Actions</div>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>

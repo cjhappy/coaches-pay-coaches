@@ -8,6 +8,7 @@ import MessageButton from '../components/MessageButton'
 import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
 import ReportButton from '../components/ReportButton'
+import SaveButton from '../components/SaveButton'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -249,12 +250,15 @@ export default function ListingDetail() {
                 {listing.title}
               </h1>
               {!isOwnListing && (
-                <ReportButton
-                  contentType="listing"
-                  contentId={listing.id}
-                  reportedUserId={listing.seller_id}
-                  contentSnapshot={listing.title}
-                />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+                  <SaveButton listingId={listing.id} />
+                  <ReportButton
+                    contentType="listing"
+                    contentId={listing.id}
+                    reportedUserId={listing.seller_id}
+                    contentSnapshot={listing.title}
+                  />
+                </div>
               )}
             </div>
 
