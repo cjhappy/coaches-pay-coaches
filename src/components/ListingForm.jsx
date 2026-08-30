@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
+import { compressImage } from '../lib/imageCompress'
 
 const SPORTS = ['Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
@@ -30,7 +31,7 @@ export default function ListingForm({ listing, onSave, onCancel }) {
     return null
   }
 
-  function handleThumbnailChange(e) {
+  async function handleThumbnailChange(e) {
     const f = e.target.files[0]
     if (!f) return
     if (!f.type.startsWith('image/')) {
@@ -44,7 +45,8 @@ export default function ListingForm({ listing, onSave, onCancel }) {
       return
     }
     setError(null)
-    setThumbnail(f)
+    const compressed = await compressImage(f, { maxDimension: 800, quality: 0.82 })
+    setThumbnail(compressed)
   }
 
   function handleFileChange(e) {

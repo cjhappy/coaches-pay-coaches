@@ -170,8 +170,10 @@ export default function Feed() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [followingIds, setFollowingIds] = useState([])
+  const [visibleCount, setVisibleCount] = useState(15)
 
   useEffect(() => { fetchPosts() }, [])
+  useEffect(() => { setVisibleCount(15) }, [filter])
 
   async function fetchPosts() {
     const { data: postsData } = await supabase
@@ -279,14 +281,23 @@ export default function Feed() {
             )}
           </div>
         ) : (
-          filtered.map(post => (
-            <PostCard
-              key={post.id}
-              post={post}
-              currentUser={user}
-              onDelete={handleDelete}
-            />
-          ))
+          <>
+            {filtered.slice(0, visibleCount).map(post => (
+              <PostCard
+                key={post.id}
+                post={post}
+                currentUser={user}
+                onDelete={handleDelete}
+              />
+            ))}
+            {filtered.length > visibleCount && (
+              <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                <button className="btn btn-ghost-dark" onClick={() => setVisibleCount(c => c + 15)}>
+                  Load More ({filtered.length - visibleCount} more)
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

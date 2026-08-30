@@ -6,6 +6,7 @@ import ListingForm from '../components/ListingForm'
 import Avatar from '../components/Avatar'
 import SellerCompleteness from '../components/SellerCompleteness'
 import SiteNav from '../components/SiteNav'
+import { compressImage } from '../lib/imageCompress'
 
 function AvatarUploader({ profile, onUpdate }) {
   const [uploading, setUploading] = useState(false)
@@ -31,11 +32,12 @@ function AvatarUploader({ profile, onUpdate }) {
     }
 
     setUploading(true)
-    const ext = file.name.split('.').pop()
+    const compressed = await compressImage(file, { maxDimension: 500, quality: 0.85 })
+    const ext = compressed.name.split('.').pop()
     const path = profile.id + '/avatar.' + ext
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(path, file, { upsert: true })
+      .upload(path, compressed, { upsert: true })
     if (!uploadError) {
       const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
       await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id)

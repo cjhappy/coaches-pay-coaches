@@ -18,9 +18,10 @@ export default function Coaches() {
   const [sport, setSport] = useState('All')
   const [showFollowing, setShowFollowing] = useState(false)
   const [followingIds, setFollowingIds] = useState([])
+  const [visibleCount, setVisibleCount] = useState(24)
 
   useEffect(() => { fetchCoaches() }, [])
-  useEffect(() => { applyFilters() }, [coaches, search, sport, showFollowing, followingIds])
+  useEffect(() => { applyFilters(); setVisibleCount(24) }, [coaches, search, sport, showFollowing, followingIds])
 
   async function fetchCoaches() {
     const { data: sellers } = await supabase
@@ -164,7 +165,7 @@ export default function Coaches() {
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
-            {filtered.map(coach => (
+            {filtered.slice(0, visibleCount).map(coach => (
               <div
                 key={coach.id}
                 className="cpc-card"
@@ -223,6 +224,14 @@ export default function Coaches() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {filtered.length > visibleCount && (
+          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <button className="btn btn-ghost-dark" onClick={() => setVisibleCount(c => c + 24)}>
+              Load More ({filtered.length - visibleCount} more)
+            </button>
           </div>
         )}
       </div>

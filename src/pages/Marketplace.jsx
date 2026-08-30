@@ -19,9 +19,10 @@ export default function Marketplace() {
   const [sort, setSort] = useState('newest')
   const [showFollowing, setShowFollowing] = useState(false)
   const [followingIds, setFollowingIds] = useState([])
+  const [visibleCount, setVisibleCount] = useState(24)
 
   useEffect(() => { fetchListings() }, [])
-  useEffect(() => { applyFilters() }, [listings, sport, category, search, sort, showFollowing, followingIds])
+  useEffect(() => { applyFilters(); setVisibleCount(24) }, [listings, sport, category, search, sort, showFollowing, followingIds])
 
  async function fetchListings() {
   const { data: listingsData, error } = await supabase
@@ -204,11 +205,20 @@ export default function Marketplace() {
             )}
           </div>
         ) : (
-          <div className="dash-grid">
-            {filtered.map(listing => (
-              <ListingCard key={listing.id} listing={listing} navigate={navigate} />
-            ))}
-          </div>
+          <>
+            <div className="dash-grid">
+              {filtered.slice(0, visibleCount).map(listing => (
+                <ListingCard key={listing.id} listing={listing} navigate={navigate} />
+              ))}
+            </div>
+            {filtered.length > visibleCount && (
+              <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                <button className="btn btn-ghost-dark" onClick={() => setVisibleCount(c => c + 24)}>
+                  Load More ({filtered.length - visibleCount} more)
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
