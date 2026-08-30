@@ -149,10 +149,12 @@ body {
 .mobile-menu {
   position: fixed;
   top: 72px;
-  left: 0; right: 0;
+  right: 0;
+  width: min(340px, 92vw);
   background: var(--cream);
+  border-left: 2px solid var(--navy);
   border-bottom: 2px solid var(--navy);
-  box-shadow: 0 12px 24px rgba(13,50,71,0.2);
+  box-shadow: -6px 12px 24px rgba(13,50,71,0.2);
   z-index: 500;
   display: flex;
   flex-direction: column;
@@ -557,13 +559,19 @@ select.form-input option { background: var(--navy-card); }
   .footer-inner { grid-template-columns: 1fr 1fr !important; }
 }
 
-@media (max-width: 640px) {
+/* Nav switches to the hamburger menu well before the full item list
+   (up to 9 items: Feed, Browse, Coaches, My Store, My Library, Messages,
+   Dashboard, Settings, Admin, Sign Out) would run out of room. This is
+   deliberately much wider than a typical "mobile" breakpoint — it also
+   covers tablets, split-screen windows, and smaller laptops. */
+@media (max-width: 1100px) {
   .nav-links { display: none !important; }
   .hamburger-btn { display: flex !important; }
   .mobile-nav-cta { display: block !important; }
   .cpc-nav { padding: 0 4%; }
-  .logo-text { font-size: 13px; }
-  .logo-badge { width: 36px; height: 36px; font-size: 12px; }
+}
+
+@media (max-width: 640px) {
   .dash-header { padding: 1.5rem 4%; }
   .dash-body { padding: 1.5rem 4%; }
   .dash-grid { grid-template-columns: 1fr; }
