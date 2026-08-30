@@ -231,11 +231,17 @@ export default function SellerDashboard() {
     if (!confirm('Are you sure you want to disconnect Stripe? You won\'t be able to receive payouts until you reconnect.')) return
     setDisconnectLoading(true)
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ stripe_account_id: null, stripe_charges_enabled: false, stripe_payouts_enabled: false })
-        .eq('id', profile.id)
-      if (error) throw error
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/.netlify/functions/stripe-disconnect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ userId: user.id })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Disconnect failed')
       setProfile(prev => ({ ...prev, stripe_account_id: null, stripe_charges_enabled: false, stripe_payouts_enabled: false }))
       setStripeStatus(null)
     } catch (err) {
