@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
 import SiteNav from '../components/SiteNav'
+import ErrorState from '../components/ErrorState'
 import ReportButton from '../components/ReportButton'
 
 function PostCard({ post, currentUser, onDelete }) {
@@ -171,18 +172,20 @@ export default function Feed() {
   const [filter, setFilter] = useState('all')
   const [followingIds, setFollowingIds] = useState([])
   const [visibleCount, setVisibleCount] = useState(15)
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => { fetchPosts() }, [])
   useEffect(() => { setVisibleCount(15) }, [filter])
 
   async function fetchPosts() {
-    const { data: postsData } = await supabase
+    setFetchError(false)
+    const { data: postsData, error } = await supabase
       .from('posts')
       .select('*, profiles(full_name, avatar_url)')
       .order('created_at', { ascending: false })
       .limit(50)
 
-    if (!postsData) { setLoading(false); return }
+    if (error || !postsData) { setLoading(false); setFetchError(true); return }
 
     const postIds = postsData.map(p => p.id)
     const { data: likesData } = await supabase
@@ -271,6 +274,8 @@ export default function Feed() {
 
         {loading ? (
           <p className="muted" style={{ textAlign: 'center', padding: '2rem' }}>Loading...</p>
+        ) : fetchError ? (
+          <ErrorState message="We couldn't load the feed right now." onRetry={fetchPosts} />
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
             <p className="muted" style={{ fontSize: '1rem', marginBottom: '1rem' }}>

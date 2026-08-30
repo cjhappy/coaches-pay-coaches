@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
+import ErrorState from '../components/ErrorState'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 
@@ -19,18 +20,20 @@ export default function Coaches() {
   const [showFollowing, setShowFollowing] = useState(false)
   const [followingIds, setFollowingIds] = useState([])
   const [visibleCount, setVisibleCount] = useState(24)
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => { fetchCoaches() }, [])
   useEffect(() => { applyFilters(); setVisibleCount(24) }, [coaches, search, sport, showFollowing, followingIds])
 
   async function fetchCoaches() {
-    const { data: sellers } = await supabase
+    setFetchError(false)
+    const { data: sellers, error } = await supabase
       .from('profiles')
       .select('*')
       .in('role', ['seller', 'both'])
       .order('created_at', { ascending: false })
 
-    if (!sellers) { setLoading(false); return }
+    if (error || !sellers) { setLoading(false); setFetchError(true); return }
 
     const coachesWithStats = await Promise.all(sellers.map(async seller => {
       const { data: listings } = await supabase
@@ -152,6 +155,8 @@ export default function Coaches() {
 
         {loading ? (
           <p className="muted">Loading coaches...</p>
+        ) : fetchError ? (
+          <ErrorState message="We couldn't load coaches right now." onRetry={fetchCoaches} />
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
             <p className="muted" style={{ fontSize: '1.1rem' }}>

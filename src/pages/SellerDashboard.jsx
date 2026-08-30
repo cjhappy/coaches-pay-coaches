@@ -204,10 +204,8 @@ export default function SellerDashboard() {
   }
 
   async function handleConnectStripe() {
-    console.log('handleConnectStripe called')
     setStripeLoading(true)
     try {
-      console.log('fetching stripe-connect, userId:', user.id)
       const { data: { session } } = await supabase.auth.getSession()
       const res = await fetch('/.netlify/functions/stripe-connect', {
         method: 'POST',
@@ -217,13 +215,10 @@ export default function SellerDashboard() {
         },
         body: JSON.stringify({ userId: user.id, returnUrl: window.location.origin })
       })
-      console.log('response status:', res.status)
       const data = await res.json()
-      console.log('response data:', data)
       if (data.error) throw new Error(data.error)
       window.location.href = data.url
     } catch (err) {
-      console.log('error:', err.message)
       alert(err.message)
     }
     setStripeLoading(false)

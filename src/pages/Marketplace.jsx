@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
+import ErrorState from '../components/ErrorState'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['All', 'Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
@@ -20,17 +21,19 @@ export default function Marketplace() {
   const [showFollowing, setShowFollowing] = useState(false)
   const [followingIds, setFollowingIds] = useState([])
   const [visibleCount, setVisibleCount] = useState(24)
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => { fetchListings() }, [])
   useEffect(() => { applyFilters(); setVisibleCount(24) }, [listings, sport, category, search, sort, showFollowing, followingIds])
 
  async function fetchListings() {
+  setFetchError(false)
   const { data: listingsData, error } = await supabase
     .from('listings')
     .select('*')
     .order('created_at', { ascending: false })
 
-  if (error || !listingsData) { setLoading(false); return }
+  if (error || !listingsData) { setLoading(false); setFetchError(true); return }
 
   const sellerIds = [...new Set(listingsData.map(l => l.seller_id))]
   const listingIds = listingsData.map(l => l.id)
@@ -189,6 +192,8 @@ export default function Marketplace() {
         {/* Results */}
         {loading ? (
           <p className="muted">Loading...</p>
+        ) : fetchError ? (
+          <ErrorState message="We couldn't load the marketplace right now." onRetry={fetchListings} />
         ) : filtered.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
             {showFollowing ? (

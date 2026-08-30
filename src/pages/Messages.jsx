@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import SiteNav from '../components/SiteNav'
 import ReportButton from '../components/ReportButton'
+import ErrorState from '../components/ErrorState'
 
 export default function Messages() {
   const { user, profile, signOut } = useAuth()
@@ -16,6 +17,7 @@ export default function Messages() {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [showChat, setShowChat] = useState(false)
+  const [fetchError, setFetchError] = useState(false)
   const messagesEndRef = useRef(null)
   const isMobile = window.innerWidth <= 768
 
@@ -51,12 +53,14 @@ export default function Messages() {
   }, [messages])
 
   async function fetchConversations() {
-    const { data } = await supabase
+    setFetchError(false)
+    const { data, error } = await supabase
       .from('conversations')
       .select('*, buyer:profiles!conversations_buyer_id_fkey(id, full_name, avatar_url), seller:profiles!conversations_seller_id_fkey(id, full_name, avatar_url), listings(id, title, thumbnail_url)')
       .or('buyer_id.eq.' + user.id + ',seller_id.eq.' + user.id)
       .order('updated_at', { ascending: false })
 
+    if (error) { setFetchError(true); setLoading(false); return }
     setConversations(data || [])
 
     const convoId = searchParams.get('convo')
@@ -158,7 +162,11 @@ export default function Messages() {
             <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.2rem', textTransform: 'uppercase' }}>Messages</div>
           </div>
 
-          {conversations.length === 0 ? (
+          {fetchError ? (
+            <div style={{ padding: '1.5rem' }}>
+              <ErrorState message="We couldn't load your messages right now." onRetry={fetchConversations} dark />
+            </div>
+          ) : conversations.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted)', fontSize: '.9rem' }}>
               No conversations yet. Message a coach from their profile or a listing page.
             </div>

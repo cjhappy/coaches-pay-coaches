@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar'
 import { Helmet } from 'react-helmet-async'
 import MessageButton from '../components/MessageButton'
 import SiteNav from '../components/SiteNav'
+import ErrorState from '../components/ErrorState'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -116,16 +117,19 @@ export default function CoachProfile() {
   const [followingCount, setFollowingCount] = useState(0)
   const [isFollowing, setIsFollowing] = useState(false)
   const [followLoading, setFollowLoading] = useState(false)
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => { fetchCoach() }, [id])
 
   async function fetchCoach() {
+    setFetchError(false)
     const { data: coachData, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', id)
       .single()
-    if (error || !coachData) { setLoading(false); return }
+    if (error) { setLoading(false); setFetchError(true); return }
+    if (!coachData) { setLoading(false); return }
     setCoach(coachData)
 
     const { data: listingsData } = await supabase
@@ -176,6 +180,14 @@ export default function CoachProfile() {
   }
 
   if (loading) return <div className="page-body cream-page" style={{ padding: '4rem 5%' }}><span className="muted">Loading...</span></div>
+  if (fetchError) return (
+    <div className="page-body cream-page">
+      <SiteNav active="coaches" />
+      <div style={{ padding: '4rem 5%' }}>
+        <ErrorState message="We couldn't load this coach's profile right now." onRetry={fetchCoach} />
+      </div>
+    </div>
+  )
   if (!coach) return <div className="page-body cream-page" style={{ padding: '4rem 5%' }}><span className="muted">Coach not found.</span></div>
 
   const sports = [...new Set(listings.map(l => l.sport))]

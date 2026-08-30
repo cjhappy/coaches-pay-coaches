@@ -112,10 +112,11 @@ export default function Dashboard() {
   }, [isSeller])
 
   async function fetchListings() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('listings')
       .select('id, thumbnail_url')
       .eq('seller_id', profile.id)
+    if (error) { console.error('Failed to load listings for dashboard:', error.message); return }
     if (data) setListings(data)
   }
 

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import SiteNav from '../components/SiteNav'
+import ErrorState from '../components/ErrorState'
 
 export default function Admin() {
   const { user, profile, signOut } = useAuth()
@@ -13,6 +14,7 @@ export default function Admin() {
   const [purchases, setPurchases] = useState([])
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
+  const [fetchError, setFetchError] = useState(false)
   const [search, setSearch] = useState('')
   const [stats, setStats] = useState({
     totalUsers: 0, totalListings: 0, totalRevenue: 0, totalSales: 0,
@@ -25,12 +27,19 @@ export default function Admin() {
   }, [profile])
 
   async function fetchAll() {
+    setFetchError(false)
     const [usersRes, listingsRes, purchasesRes, reportsRes] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('listings').select('*, profiles(full_name)').order('created_at', { ascending: false }),
       supabase.from('purchases').select('*, listings(title, price), profiles!purchases_buyer_id_fkey(full_name)').order('created_at', { ascending: false }),
       supabase.from('reports').select('*, reporter:profiles!reports_reporter_id_fkey(full_name), reported:profiles!reports_reported_user_id_fkey(full_name)').order('created_at', { ascending: false })
     ])
+
+    if (usersRes.error || listingsRes.error || purchasesRes.error || reportsRes.error) {
+      setFetchError(true)
+      setLoading(false)
+      return
+    }
 
     const usersData = usersRes.data || []
     const listingsData = listingsRes.data || []
@@ -109,6 +118,14 @@ export default function Admin() {
   }
 
   if (loading || !profile?.is_admin) return <div className="page-body cream-page" style={{ padding: '4rem 5%' }}><span className="muted">Loading...</span></div>
+  if (fetchError) return (
+    <div className="page-body">
+      <SiteNav active="admin" />
+      <div style={{ padding: '4rem 5%' }}>
+        <ErrorState message="We couldn't load the admin dashboard right now." onRetry={fetchAll} dark />
+      </div>
+    </div>
+  )
 
   const tabStyle = (tab) => ({
     padding: '8px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer',
