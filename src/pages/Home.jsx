@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { Helmet } from 'react-helmet-async'
+import SiteNav from '../components/SiteNav'
 
 /* ── Hand-drawn "whiteboard play" doodles ──
    The brand guide's signature motif: chalk-style arrows, circles, and X's,
@@ -28,13 +29,10 @@ function PlayDoodle({ className = '', style = {}, flip = false }) {
   )
 }
 
-function LogoLockup({ height = 44 }) {
-  return <img src="/cpc-logo-primary.svg" alt="Coaches Pay Coaches" style={{ height, width: 'auto', display: 'block' }} />
-}
 
 export default function Home() {
   const navigate = useNavigate()
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
 
   return (
     <div style={{ background: 'var(--cream)', minHeight: '100vh', overflowX: 'hidden' }}>
@@ -47,27 +45,7 @@ export default function Home() {
       </Helmet>
 
       {/* NAV */}
-      <nav className="cpc-nav">
-        <a className="cpc-logo" onClick={() => navigate('/')}>
-          <LogoLockup height={44} />
-        </a>
-        <ul className="nav-links">
-          <li><a onClick={() => navigate('/marketplace')}>Browse</a></li>
-          <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
-          {user ? (
-            <>
-              {(profile?.role === 'seller' || profile?.role === 'both') && <li><a onClick={() => navigate('/seller')}>My Store</a></li>}
-              {(profile?.role === 'buyer' || profile?.role === 'both') && <li><a onClick={() => navigate('/purchases')}>My Library</a></li>}
-              <li><a onClick={() => navigate('/dashboard')} className="nav-cta">Dashboard →</a></li>
-            </>
-          ) : (
-            <li><a onClick={() => navigate('/auth')} className="nav-cta">Get Started →</a></li>
-          )}
-        </ul>
-        <button className="mobile-nav-cta" onClick={() => navigate(user ? '/dashboard' : '/auth')}>
-          {user ? 'Dashboard' : 'Get Started'}
-        </button>
-      </nav>
+      <SiteNav />
 
       <style>{`
         @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }

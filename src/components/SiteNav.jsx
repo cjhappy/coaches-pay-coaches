@@ -1,23 +1,37 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import NavMessagesLink from './NavMessagesLink'
+import { useUnreadMessages } from '../hooks/useUnreadMessages'
+import Avatar from './Avatar'
 
 export default function SiteNav({ active }) {
   const navigate = useNavigate()
   const { user, profile, signOut } = useAuth()
+  const unreadCount = useUnreadMessages()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
 
   async function handleSignOut() {
     setMenuOpen(false)
+    setAccountOpen(false)
     await signOut()
     navigate('/auth')
   }
 
   function go(path) {
     setMenuOpen(false)
+    setAccountOpen(false)
     navigate(path)
   }
+
+  const accountItems = [
+    { label: 'Dashboard', path: '/dashboard', show: true, key: 'dashboard' },
+    { label: 'My Store', path: '/seller', show: profile?.role === 'seller' || profile?.role === 'both', key: 'seller' },
+    { label: 'My Library', path: '/purchases', show: profile?.role === 'buyer' || profile?.role === 'both', key: 'purchases' },
+    { label: 'Messages', path: '/messages', show: true, key: 'messages', badge: unreadCount },
+    { label: 'Account Settings', path: '/settings', show: true, key: 'settings' },
+    { label: 'Admin', path: '/admin', show: !!profile?.is_admin, key: 'admin', admin: true },
+  ].filter(i => i.show)
 
   return (
     <nav className="cpc-nav">
@@ -25,33 +39,47 @@ export default function SiteNav({ active }) {
         <img src="/cpc-logo-primary.svg" alt="Coaches Pay Coaches" style={{ height: 44, width: 'auto', display: 'block' }} />
       </a>
 
+      {/* Desktop: primary content links, always visible */}
       <ul className="nav-links">
-        <li><a className={active === 'feed' ? 'active' : ''} onClick={() => go('/feed')}>Feed</a></li>
         <li><a className={active === 'marketplace' ? 'active' : ''} onClick={() => go('/marketplace')}>Browse</a></li>
         <li><a className={active === 'coaches' ? 'active' : ''} onClick={() => go('/coaches')}>Coaches</a></li>
-        {user && (profile?.role === 'seller' || profile?.role === 'both') && (
-          <li><a className={active === 'seller' ? 'active' : ''} onClick={() => go('/seller')}>My Store</a></li>
-        )}
-        {user && (profile?.role === 'buyer' || profile?.role === 'both') && (
-          <li><a className={active === 'purchases' ? 'active' : ''} onClick={() => go('/purchases')}>My Library</a></li>
-        )}
-        {user && <NavMessagesLink />}
-        {user && <li><a className={active === 'dashboard' ? 'active' : ''} onClick={() => go('/dashboard')}>Dashboard</a></li>}
-        {user && <li><a className={active === 'settings' ? 'active' : ''} onClick={() => go('/settings')}>Settings</a></li>}
-        {profile?.is_admin && <li><a className={active === 'admin' ? 'active' : ''} onClick={() => go('/admin')}>Admin</a></li>}
+        <li><a className={active === 'feed' ? 'active' : ''} onClick={() => go('/feed')}>Feed</a></li>
+
         {user ? (
-          <li><a className="nav-cta" onClick={handleSignOut}>Sign Out</a></li>
+          <li style={{ position: 'relative' }}>
+            <a
+              onClick={() => setAccountOpen(v => !v)}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', opacity: 1 }}
+            >
+              <Avatar url={profile?.avatar_url} name={profile?.full_name} size={30} radius={8} />
+              {unreadCount > 0 && (
+                <span style={{ position: 'absolute', top: '-2px', right: '-2px', width: '9px', height: '9px', borderRadius: '50%', background: '#b91c1c', border: '2px solid var(--cream)' }} />
+              )}
+            </a>
+            {accountOpen && (
+              <>
+                <div className="account-menu-backdrop" onClick={() => setAccountOpen(false)} />
+                <div className="account-menu">
+                  <div className="account-menu-name">{profile?.full_name}</div>
+                  {accountItems.map(item => (
+                    <a key={item.key} className={item.admin ? 'account-menu-admin' : ''} onClick={() => go(item.path)}>
+                      {item.label}
+                      {item.badge > 0 && <span className="account-menu-badge">{item.badge > 9 ? '9+' : item.badge}</span>}
+                    </a>
+                  ))}
+                  <div className="account-menu-divider" />
+                  <a onClick={handleSignOut}>Sign Out</a>
+                </div>
+              </>
+            )}
+          </li>
         ) : (
           <li><a className="nav-cta" onClick={() => go('/auth')}>Get Started</a></li>
         )}
       </ul>
 
-      <button
-        className="hamburger-btn"
-        onClick={() => setMenuOpen(v => !v)}
-        aria-label="Menu"
-        aria-expanded={menuOpen}
-      >
+      {/* Mobile / narrow window: hamburger with everything grouped */}
+      <button className="hamburger-btn" onClick={() => setMenuOpen(v => !v)} aria-label="Menu" aria-expanded={menuOpen}>
         <span style={menuOpen ? { transform: 'translateY(7px) rotate(45deg)' } : undefined} />
         <span style={menuOpen ? { opacity: 0 } : undefined} />
         <span style={menuOpen ? { transform: 'translateY(-7px) rotate(-45deg)' } : undefined} />
@@ -61,23 +89,24 @@ export default function SiteNav({ active }) {
         <>
           <div className="mobile-menu-backdrop" onClick={() => setMenuOpen(false)} />
           <div className="mobile-menu">
-            <a className={active === 'feed' ? 'active' : ''} onClick={() => go('/feed')}>Feed</a>
             <a className={active === 'marketplace' ? 'active' : ''} onClick={() => go('/marketplace')}>Browse</a>
             <a className={active === 'coaches' ? 'active' : ''} onClick={() => go('/coaches')}>Coaches</a>
-            {user && (profile?.role === 'seller' || profile?.role === 'both') && (
-              <a className={active === 'seller' ? 'active' : ''} onClick={() => go('/seller')}>My Store</a>
+            <a className={active === 'feed' ? 'active' : ''} onClick={() => go('/feed')}>Feed</a>
+
+            {user && (
+              <>
+                <div className="mobile-menu-section">Account</div>
+                {accountItems.map(item => (
+                  <a key={item.key} className={item.admin ? 'mobile-menu-admin' : ''} onClick={() => go(item.path)}>
+                    {item.label}
+                    {item.badge > 0 && <span className="account-menu-badge">{item.badge > 9 ? '9+' : item.badge}</span>}
+                  </a>
+                ))}
+                <div className="mobile-menu-divider" />
+                <a className="mobile-menu-cta" onClick={handleSignOut}>Sign Out</a>
+              </>
             )}
-            {user && (profile?.role === 'buyer' || profile?.role === 'both') && (
-              <a className={active === 'purchases' ? 'active' : ''} onClick={() => go('/purchases')}>My Library</a>
-            )}
-            {user && <a onClick={() => go('/messages')}>Messages</a>}
-            {user && <a className={active === 'dashboard' ? 'active' : ''} onClick={() => go('/dashboard')}>Dashboard</a>}
-            {user && <a className={active === 'settings' ? 'active' : ''} onClick={() => go('/settings')}>Account Settings</a>}
-            {profile?.is_admin && <a className="mobile-menu-admin" onClick={() => go('/admin')}>Admin</a>}
-            <div className="mobile-menu-divider" />
-            {user ? (
-              <a className="mobile-menu-cta" onClick={handleSignOut}>Sign Out</a>
-            ) : (
+            {!user && (
               <a className="mobile-menu-cta" onClick={() => go('/auth')}>Get Started →</a>
             )}
           </div>

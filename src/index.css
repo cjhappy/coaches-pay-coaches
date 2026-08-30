@@ -200,6 +200,66 @@ body {
   cursor: pointer;
 }
 
+/* ── DESKTOP ACCOUNT DROPDOWN ── */
+.account-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 490;
+}
+.account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 240px;
+  background: var(--cream);
+  border: 2px solid var(--navy);
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(13,50,71,0.2);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+}
+.account-menu-name {
+  font-family: var(--font-sub);
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--navy);
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid var(--border-on-cream);
+  margin-bottom: 4px;
+}
+.account-menu a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 10px;
+  border-radius: 6px;
+  color: var(--navy);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13.5px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.account-menu a:hover { background: rgba(13,50,71,0.06); }
+.account-menu-admin { color: #8a5a09 !important; }
+.account-menu-divider { height: 1px; background: var(--border-on-cream); margin: 6px 4px; }
+.account-menu-badge {
+  background: #b91c1c; color: #fff; font-size: 10px; font-weight: 800;
+  border-radius: 100px; padding: 1px 7px; line-height: 1.4;
+}
+
+.mobile-menu-section {
+  font-family: var(--font-sub);
+  font-weight: 700;
+  font-size: 10.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted-on-cream);
+  padding: 12px 4px 4px;
+}
+
 /* ── PAGE WRAPPER ── */
 .page-body { padding-top: 72px; min-height: 100vh; color: var(--off); background: var(--navy); }
 
@@ -559,12 +619,11 @@ select.form-input option { background: var(--navy-card); }
   .footer-inner { grid-template-columns: 1fr 1fr !important; }
 }
 
-/* Nav switches to the hamburger menu well before the full item list
-   (up to 9 items: Feed, Browse, Coaches, My Store, My Library, Messages,
-   Dashboard, Settings, Admin, Sign Out) would run out of room. This is
-   deliberately much wider than a typical "mobile" breakpoint — it also
-   covers tablets, split-screen windows, and smaller laptops. */
-@media (max-width: 1100px) {
+/* Nav now only holds 3 content links + one account/avatar trigger (or Sign
+   In), so it comfortably fits at much narrower widths than before the
+   simplification — this only needs to switch to the hamburger for genuinely
+   small windows and phones. */
+@media (max-width: 750px) {
   .nav-links { display: none !important; }
   .hamburger-btn { display: flex !important; }
   .mobile-nav-cta { display: block !important; }
