@@ -138,6 +138,7 @@ export default function SellerDashboard() {
   const [stripeLoading, setStripeLoading] = useState(false)
   const [disconnectLoading, setDisconnectLoading] = useState(false)
   const [stripeStatus, setStripeStatus] = useState(null)
+  const [checkingStripe, setCheckingStripe] = useState(false)
   const [activeTab, setActiveTab] = useState('listings')
 
   useEffect(() => {
@@ -145,7 +146,7 @@ export default function SellerDashboard() {
     fetchSales()
     if (searchParams.get('stripe') === 'success') {
       setStripeStatus('success')
-      refreshProfile()
+      pollProfileUntilReady()
     }
     if (searchParams.get('stripe') === 'refresh') setStripeStatus('refresh')
   }, [])
@@ -157,6 +158,20 @@ export default function SellerDashboard() {
       .eq('id', profile.id)
       .single()
     if (!error && data) setProfile(data)
+    return data
+  }
+
+  // Stripe's "account updated" webhook can arrive a few seconds after the
+  // redirect back to our site, so a single refresh right on load often
+  // catches stale data. Poll a few times to give the webhook time to land.
+  async function pollProfileUntilReady() {
+    setCheckingStripe(true)
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const data = await refreshProfile()
+      if (data?.stripe_charges_enabled && data?.stripe_payouts_enabled) { setCheckingStripe(false); return }
+      await new Promise(r => setTimeout(r, 2500))
+    }
+    setCheckingStripe(false)
   }
 
   async function fetchListings() {
@@ -269,14 +284,20 @@ export default function SellerDashboard() {
             <div>
               <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', color: '#8a5a09', marginBottom: '4px' }}>⚠ Stripe Setup Incomplete</div>
               <p style={{ color: 'var(--muted-on-cream)', fontSize: '.85rem', margin: 0 }}>
-                Your Stripe account isn't fully set up yet.{' '}
-                {!profile?.stripe_charges_enabled && 'Charges are not enabled. '}
-                {!profile?.stripe_payouts_enabled && 'Payouts are not enabled. '}
-                Complete your Stripe onboarding to start receiving payments.
+                {checkingStripe ? (
+                  'Just finished with Stripe? Checking your status now — this can take a few seconds…'
+                ) : (
+                  <>
+                    Your Stripe account isn't fully set up yet.{' '}
+                    {!profile?.stripe_charges_enabled && 'Charges are not enabled. '}
+                    {!profile?.stripe_payouts_enabled && 'Payouts are not enabled. '}
+                    Complete your Stripe onboarding to start receiving payments.
+                  </>
+                )}
               </p>
             </div>
-            <button className="btn" style={{ background: '#8a5a09', color: '#fff', border: '1.5px solid #8a5a09', whiteSpace: 'nowrap' }} onClick={handleConnectStripe} disabled={stripeLoading}>
-              {stripeLoading ? 'Loading...' : 'Finish Setup'}
+            <button className="btn" style={{ background: '#8a5a09', color: '#fff', border: '1.5px solid #8a5a09', whiteSpace: 'nowrap' }} onClick={handleConnectStripe} disabled={stripeLoading || checkingStripe}>
+              {checkingStripe ? 'Checking...' : stripeLoading ? 'Loading...' : 'Finish Setup'}
             </button>
           </div>
         )}
