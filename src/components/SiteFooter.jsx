@@ -12,6 +12,7 @@ export default function SiteFooter() {
         <span className="site-footer-copy">© {new Date().getFullYear()} Coaches Pay Coaches</span>
       </span>
       <span className="site-footer-links">
+        <a href="/onboarding-guide.pdf" download>Getting Started Guide</a>
         <a onClick={() => navigate('/terms')}>Terms</a>
         <a onClick={() => navigate('/privacy')}>Privacy</a>
         <a onClick={() => navigate('/refunds')}>Refunds</a>

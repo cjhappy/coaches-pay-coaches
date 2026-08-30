@@ -37,9 +37,19 @@ function OnboardingGuide({ role }) {
             Your <em style={{ color: 'var(--navy)', fontStyle: 'normal', background: 'var(--yellow)', padding: '0 8px' }}>Onboarding</em> Guide
           </h2>
         </div>
-        <button className="btn btn-ghost-dark" style={{ padding: '6px 14px', fontSize: '12px' }} onClick={() => setDismissed(true)}>
-          Dismiss
-        </button>
+        <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
+          <a
+            href="/onboarding-guide.pdf"
+            download
+            className="btn btn-green"
+            style={{ padding: '6px 14px', fontSize: '12px', textDecoration: 'none' }}
+          >
+            Download Guide (PDF) ↓
+          </a>
+          <button className="btn btn-ghost-dark" style={{ padding: '6px 14px', fontSize: '12px' }} onClick={() => setDismissed(true)}>
+            Dismiss
+          </button>
+        </div>
       </div>
 
       {isBuyer && (

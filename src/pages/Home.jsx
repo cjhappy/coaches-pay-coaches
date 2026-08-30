@@ -250,6 +250,7 @@ export default function Home() {
               <li><a onClick={() => navigate('/marketplace')}>Marketplace</a></li>
               <li><a onClick={() => navigate('/coaches')}>Coaches</a></li>
               <li><a onClick={() => navigate('/auth')}>Sign Up</a></li>
+              <li><a href="/onboarding-guide.pdf" download>Getting Started Guide</a></li>
             </ul>
           </div>
 
