@@ -311,9 +311,17 @@ export default function SellerDashboard() {
           </div>
         )}
 
-        {stripeConnected && stripeStatus === 'success' && (
+        {stripeFullyActive && stripeStatus === 'success' && (
           <div style={{ background: 'var(--yellow-dim)', border: '1.5px solid var(--navy)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', color: 'var(--navy)', fontWeight: 600, fontSize: '.9rem' }}>
             Stripe connected! Buyers can now purchase your listings.
+          </div>
+        )}
+
+        {!stripeFullyActive && stripeStatus === 'success' && (
+          <div style={{ background: 'var(--yellow-dim)', border: '1.5px solid var(--navy)', borderRadius: '10px', padding: '1rem 1.25rem', marginBottom: '1.5rem', color: 'var(--navy)', fontWeight: 600, fontSize: '.9rem' }}>
+            {checkingStripe
+              ? 'Stripe received your info — confirming your account is fully active…'
+              : "Stripe received your info, but your account isn't fully active yet. This can take Stripe a little time to finish — check back shortly, or see the notice below for what's still needed."}
           </div>
         )}
 
