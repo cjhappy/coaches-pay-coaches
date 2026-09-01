@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
+import { supabase } from '../lib/supabase'
 
 /* ── Hand-drawn "whiteboard play" doodles ──
    The brand guide's signature motif: chalk-style arrows, circles, and X's,
@@ -33,6 +35,14 @@ function PlayDoodle({ className = '', style = {}, flip = false }) {
 export default function Home() {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const [activeSports, setActiveSports] = useState([])
+
+  useEffect(() => {
+    supabase.from('listings').select('sport').then(({ data }) => {
+      if (!data) return
+      setActiveSports([...new Set(data.map(l => l.sport).filter(Boolean))])
+    })
+  }, [])
 
   return (
     <div style={{ background: 'var(--cream)', minHeight: '100vh', overflowX: 'hidden' }}>
@@ -105,7 +115,7 @@ export default function Home() {
         </p>
 
         <p className="hero-sub-el" style={{ fontSize: 'clamp(15px,1.8vw,18px)', color: 'var(--off)', maxWidth: '580px', margin: '0 auto 36px', lineHeight: 1.7, position: 'relative', zIndex: 2 }}>
-          Upload your practice plans, drills, and coaching content — or browse what other coaches have shared. From first-time parent coaches to seasoned pros, every sport, every level.
+          Upload your practice plans, drills, and other coaching content or browse what other coaches have shared. From first time parent coaches to seasoned pros. Every sport. Every level.
         </p>
 
         <div className="hero-btns-el" style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap', position: 'relative', zIndex: 2 }}>
@@ -134,16 +144,16 @@ export default function Home() {
       {/* WHY WE STARTED */}
       <section style={{ padding: '90px 5%', maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
         <div className="section-label section-label-on-cream">Why We Started</div>
-        <h2 className="section-title">Coaches deserve <em className="underline-scribble">credit</em> for the work</h2>
+        <h2 className="section-title">Coaching is a <em className="underline-scribble">community</em></h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', color: 'var(--muted-on-cream)', fontSize: '1.05rem', lineHeight: 1.8 }}>
           <p>
-            Coaching is one of the most demanding jobs in sports, and one of the least recognized. Coaches spend countless hours building practice plans, drawing up drills, and developing systems that shape young athletes — most of it never leaves a notebook.
+            Coaches spend countless hours building practice plans, drawing up drills, and developing systems that shape young athletes and most of it never leaves a notebook.
           </p>
           <p>
-            We built Coaches Pay Coaches so that knowledge doesn't stay stuck in one program. Share what you've built, learn from what other coaches have figured out, and get paid when someone finds your work useful.
+            We built Coaches Pay Coaches so that knowledge doesn't stay stuck in one program. Share what you've built, learn from what other coaches have figured out and get paid when someone finds your work useful.
           </p>
           <p style={{ color: 'var(--navy)', fontWeight: 500 }}>
-            Whether you're a youth coach with a practice system that works, a nutritionist with meal plans that fuel performance, or a sports psychologist with mental-game protocols — your knowledge has value here.
+            Whether you're a youth coach with a practice system that works, a nutritionist with meal plans that fuel performance, or a sports psychologist with mental-game protocols, your knowledge and collaboration has value here.
           </p>
         </div>
         <button className="btn btn-green" style={{ marginTop: '2rem' }} onClick={() => navigate(user ? '/marketplace' : '/auth')}>
@@ -175,6 +185,7 @@ export default function Home() {
       </section>
 
       {/* SPORTS */}
+      {activeSports.length > 0 && (
       <div style={{ background: 'var(--cream)', padding: '90px 5%' }}>
         <div className="section-label section-label-on-cream">Browse by Sport</div>
         <h2 className="section-title">Every sport. <em className="underline-scribble">Every level.</em></h2>
@@ -183,7 +194,7 @@ export default function Home() {
             { name: 'Basketball' }, { name: 'Soccer' }, { name: 'Football' }, { name: 'Baseball' },
             { name: 'Hockey' }, { name: 'Volleyball' }, { name: 'Lacrosse' }, { name: 'Tennis' },
             { name: 'Wrestling' }, { name: 'Golf' }, { name: 'Track & Field' }, { name: 'Swimming' },
-          ].map(sport => (
+          ].filter(sport => activeSports.includes(sport.name)).map(sport => (
             <div key={sport.name} className="sport-card" onClick={() => navigate('/marketplace')}>
               <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '15px', textTransform: 'uppercase', letterSpacing: '.3px' }}>{sport.name}</div>
             </div>
@@ -193,6 +204,7 @@ export default function Home() {
           <button className="btn btn-ghost-dark" onClick={() => navigate('/marketplace')}>View All Sports →</button>
         </div>
       </div>
+      )}
 
       {/* WHO IT'S FOR */}
       <section style={{ padding: '90px 5%', background: 'var(--white)' }}>
