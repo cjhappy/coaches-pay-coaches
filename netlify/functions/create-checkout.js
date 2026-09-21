@@ -13,7 +13,7 @@ const supabaseAuth = createClient(
   process.env.VITE_SUPABASE_ANON_KEY
 )
 
-const PLATFORM_PERCENT = 0.12
+const PLATFORM_PERCENT = 0.135
 const TRANSACTION_FEE = 0.99
 const ALLOWED_ORIGIN = process.env.SITE_URL || 'https://coachespaycoaches.org'
 
@@ -53,6 +53,30 @@ exports.handler = async (event) => {
 
     const sellerStripeId = listing.profiles?.stripe_account_id
     if (!sellerStripeId) throw new Error('Seller has not connected Stripe yet')
+
+    // Don't trust profiles.stripe_charges_enabled here — it's only ever
+    // updated by the account.updated webhook, and if that webhook is
+    // missing/misconfigured on the Stripe side the flag can be permanently
+    // stale even though the seller's account is actually fine. Check Stripe
+    // directly so a stale flag can never block (or wrongly allow) a sale,
+    // and opportunistically self-heal the stored flag while we're at it.
+    const sellerAccount = await stripe.accounts.retrieve(sellerStripeId)
+    if (!sellerAccount.charges_enabled) {
+      throw new Error('Seller has not finished Stripe onboarding yet')
+    }
+
+    if (
+      sellerAccount.charges_enabled !== listing.profiles?.stripe_charges_enabled ||
+      sellerAccount.payouts_enabled !== listing.profiles?.stripe_payouts_enabled
+    ) {
+      await supabaseAdmin
+        .from('profiles')
+        .update({
+          stripe_charges_enabled: sellerAccount.charges_enabled,
+          stripe_payouts_enabled: sellerAccount.payouts_enabled,
+        })
+        .eq('id', listing.seller_id)
+    }
 
     const priceInCents = Math.round(listing.price * 100)
     const platformFeeInCents = Math.round((listing.price * PLATFORM_PERCENT + TRANSACTION_FEE) * 100)

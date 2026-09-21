@@ -163,16 +163,42 @@ export default function SellerDashboard() {
     return data
   }
 
-  // Stripe's "account updated" webhook can arrive a few seconds after the
-  // redirect back to our site, so a single refresh right on load often
-  // catches stale data. Poll a few times to give the webhook time to land.
+  // Ask Stripe directly rather than waiting on the account.updated webhook
+  // to land — the webhook can be delayed, missed, or (if it's ever
+  // unsubscribed in the Stripe dashboard) never arrive at all, which used
+  // to leave sellers stuck looking "not connected" indefinitely even after
+  // finishing onboarding. This calls stripe-account-status, which reads
+  // live from Stripe and updates profiles itself, then we just reload.
   async function pollProfileUntilReady() {
     setCheckingStripe(true)
     for (let attempt = 0; attempt < 8; attempt++) {
+      await refreshStripeStatusOnce()
       const data = await refreshProfile()
       if (data?.stripe_charges_enabled && data?.stripe_payouts_enabled) { setCheckingStripe(false); return }
       await new Promise(r => setTimeout(r, 2500))
     }
+    setCheckingStripe(false)
+  }
+
+  async function refreshStripeStatusOnce() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      await fetch('/.netlify/functions/stripe-account-status', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${session?.access_token}` }
+      })
+    } catch (err) {
+      console.error('Stripe status refresh failed:', err.message)
+    }
+  }
+
+  // Manual one-shot refresh for a seller who got stuck looking
+  // "incomplete" before the live-status check existed — lets them fix it
+  // themselves without redoing Stripe onboarding.
+  async function handleManualStripeRefresh() {
+    setCheckingStripe(true)
+    await refreshStripeStatusOnce()
+    await refreshProfile()
     setCheckingStripe(false)
   }
 
@@ -299,9 +325,14 @@ export default function SellerDashboard() {
                 )}
               </p>
             </div>
-            <button className="btn" style={{ background: '#8a5a09', color: '#fff', border: '1.5px solid #8a5a09', whiteSpace: 'nowrap' }} onClick={handleConnectStripe} disabled={stripeLoading || checkingStripe}>
-              {checkingStripe ? 'Checking...' : stripeLoading ? 'Loading...' : 'Finish Setup'}
-            </button>
+            <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+              <button className="btn btn-ghost-dark" style={{ whiteSpace: 'nowrap' }} onClick={handleManualStripeRefresh} disabled={stripeLoading || checkingStripe}>
+                {checkingStripe ? 'Checking...' : 'Refresh Status'}
+              </button>
+              <button className="btn" style={{ background: '#8a5a09', color: '#fff', border: '1.5px solid #8a5a09', whiteSpace: 'nowrap' }} onClick={handleConnectStripe} disabled={stripeLoading || checkingStripe}>
+                {checkingStripe ? 'Checking...' : stripeLoading ? 'Loading...' : 'Finish Setup'}
+              </button>
+            </div>
           </div>
         )}
 

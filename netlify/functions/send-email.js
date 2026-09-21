@@ -17,6 +17,83 @@ exports.handler = async (event) => {
 
     const { type, data } = JSON.parse(event.body)
 
+    if (type === 'welcome') {
+      await resend.emails.send({
+        from: 'Coaches Pay Coaches <noreply@coachespaycoaches.org>',
+        to: data.sellerEmail,
+        subject: 'Welcome to Coaches Pay Coaches — let\'s get you set up 🏆',
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <body style="margin:0;padding:0;background:#0b1622;font-family:Arial,sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#0b1622;padding:40px 20px;">
+              <tr><td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#111f30;border:1px solid rgba(255,255,255,0.07);border-radius:16px;overflow:hidden;">
+                  <tr>
+                    <td style="background:#0b1622;padding:24px 40px;border-bottom:1px solid rgba(255,255,255,0.07);">
+                      <table cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td style="width:40px;height:40px;background:#2ecc71;border-radius:8px;text-align:center;vertical-align:middle;">
+                            <span style="font-weight:900;font-size:13px;color:#0b1622;">CPC</span>
+                          </td>
+                          <td style="padding-left:10px;">
+                            <span style="font-weight:800;font-size:15px;color:#ffffff;">COACHES <span style="color:#2ecc71;">PAY</span> COACHES</span>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:40px;">
+                      <p style="font-weight:900;font-size:28px;text-transform:uppercase;color:#ffffff;margin:0 0 8px;">Welcome, ${data.sellerName}! 🎉</p>
+                      <p style="color:#7a95ae;font-size:15px;line-height:1.7;margin:0 0 28px;">You're in. Here's how to start turning your coaching materials into income.</p>
+
+                      <table width="100%" cellpadding="0" cellspacing="0" style="background:#0b1622;border-radius:10px;padding:20px;margin-bottom:28px;">
+                        <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                          <span style="color:#2ecc71;font-weight:900;">1.</span>
+                          <span style="color:#ffffff;font-size:13px;"> &nbsp;Connect Stripe to get paid</span>
+                        </td></tr>
+                        <tr><td style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
+                          <span style="color:#2ecc71;font-weight:900;">2.</span>
+                          <span style="color:#ffffff;font-size:13px;"> &nbsp;Upload your first listing</span>
+                        </td></tr>
+                        <tr><td style="padding:8px 0;">
+                          <span style="color:#2ecc71;font-weight:900;">3.</span>
+                          <span style="color:#ffffff;font-size:13px;"> &nbsp;Share your listing link and start earning</span>
+                        </td></tr>
+                      </table>
+
+                      <p style="color:#7a95ae;font-size:13px;line-height:1.6;margin:0 0 20px;">We've attached our full onboarding guide — walk through it at your own pace, or jump straight into your store below.</p>
+
+                      <table cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td style="background:#2ecc71;border-radius:8px;">
+                            <a href="https://coachespaycoaches.org/seller" style="display:inline-block;padding:12px 28px;font-weight:800;font-size:14px;text-transform:uppercase;color:#0b1622;text-decoration:none;">
+                              Go To Your Store →
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="background:#0b1622;padding:18px 40px;border-top:1px solid rgba(255,255,255,0.07);">
+                      <p style="color:#7a95ae;font-size:12px;margin:0;">© 2026 Coaches Pay Coaches · <a href="https://coachespaycoaches.org" style="color:#2ecc71;text-decoration:none;">coachespaycoaches.org</a></p>
+                    </td>
+                  </tr>
+                </table>
+              </td></tr>
+            </table>
+          </body>
+          </html>
+        `,
+        attachments: [{
+          path: 'https://coachespaycoaches.org/onboarding-guide.pdf',
+          filename: 'CPC-Onboarding-Guide.pdf'
+        }]
+      })
+    }
+
     if (type === 'sale') {
       // Email to seller
       await resend.emails.send({

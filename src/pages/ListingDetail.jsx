@@ -179,7 +179,9 @@ export default function ListingDetail() {
       window.location.href = data.url
     } catch (err) {
       const msg = err.message || ''
-      if (msg.includes('stripe_account_id') || msg.includes('Stripe')) {
+      if (msg.includes('not finished Stripe onboarding') || msg.includes('not connected Stripe')) {
+        setError('This seller hasn\'t finished setting up payments yet. Please check back later.')
+      } else if (msg.includes('stripe_account_id') || msg.includes('Stripe')) {
         setError('Payment setup issue with this seller. Please try again later.')
       } else if (msg.includes('Listing not found')) {
         setError('This listing is no longer available.')

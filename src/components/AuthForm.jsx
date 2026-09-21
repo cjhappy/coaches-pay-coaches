@@ -52,6 +52,22 @@ export default function AuthForm({ onSuccess }) {
     }
   }
 
+  // Fire-and-forget, same pattern as attributeReferral above — never blocks
+  // or fails the signup itself. The function decides server-side whether
+  // this account is a seller and whether it's already been sent.
+  async function sendWelcomeEmail(newUserId) {
+    if (!newUserId) return
+    try {
+      await fetch('/.netlify/functions/send-welcome-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newUserId })
+      })
+    } catch (err) {
+      console.error('Welcome email trigger failed:', err.message)
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
@@ -74,6 +90,7 @@ export default function AuthForm({ onSuccess }) {
       else {
         setMessage('Check your email to confirm your account!')
         attributeReferral(data?.user?.id)
+        sendWelcomeEmail(data?.user?.id)
       }
     } else {
       const { error } = await signIn({ email, password, rememberMe })
