@@ -58,7 +58,7 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ sent: false }) }
     }
 
-    await fetch(`${ALLOWED_ORIGIN}/.netlify/functions/send-email`, {
+    const emailRes = await fetch(`${ALLOWED_ORIGIN}/.netlify/functions/send-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,6 +72,9 @@ exports.handler = async (event) => {
         }
       })
     })
+    if (!emailRes.ok) {
+      console.error('send-email (welcome) returned', emailRes.status, await emailRes.text())
+    }
 
     return { statusCode: 200, headers, body: JSON.stringify({ sent: true }) }
   } catch (err) {

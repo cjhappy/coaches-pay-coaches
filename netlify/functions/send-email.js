@@ -226,7 +226,15 @@ exports.handler = async (event) => {
     }
 
     if (type === 'sale') {
+      // Seller and buyer emails are independent — previously a single
+      // try/catch around both meant a failure sending to one address (e.g.
+      // Resend rejecting a malformed guest checkout email) silently killed
+      // the other send too, since the throw jumped straight to the outer
+      // catch before the second resend.emails.send() call ever ran.
+      const results = { seller: 'skipped', buyer: 'skipped' }
+
       // Email to seller
+      try {
       await resend.emails.send({
         from: 'Coaches Pay Coaches <noreply@coachespaycoaches.org>',
         to: data.sellerEmail,
@@ -285,7 +293,7 @@ exports.handler = async (event) => {
                   </tr>
                   <tr>
                     <td style="background:#0D3247;padding:18px 40px;border-top:1px solid rgba(255,255,255,0.07);">
-                      <p style="color:#7a95ae;font-size:12px;margin:0;">© 2025 Coaches Pay Coaches · <a href="https://coachespaycoaches.org" style="color:#FDFB54;text-decoration:none;">coachespaycoaches.org</a></p>
+                      <p style="color:#7a95ae;font-size:12px;margin:0;">© 2026 Coaches Pay Coaches · <a href="https://coachespaycoaches.org" style="color:#FDFB54;text-decoration:none;">coachespaycoaches.org</a></p>
                     </td>
                   </tr>
                 </table>
@@ -295,8 +303,14 @@ exports.handler = async (event) => {
           </html>
         `
       })
+      results.seller = 'sent'
+      } catch (err) {
+        results.seller = 'failed'
+        console.error('send-email (sale, seller leg) failed:', err.message)
+      }
 
       // Email to buyer
+      try {
       await resend.emails.send({
         from: 'Coaches Pay Coaches <noreply@coachespaycoaches.org>',
         to: data.buyerEmail,
@@ -357,7 +371,7 @@ exports.handler = async (event) => {
                   </tr>
                   <tr>
                     <td style="background:#0D3247;padding:18px 40px;border-top:1px solid rgba(255,255,255,0.07);">
-                      <p style="color:#7a95ae;font-size:12px;margin:0;">© 2025 Coaches Pay Coaches · <a href="https://coachespaycoaches.org" style="color:#FDFB54;text-decoration:none;">coachespaycoaches.org</a></p>
+                      <p style="color:#7a95ae;font-size:12px;margin:0;">© 2026 Coaches Pay Coaches · <a href="https://coachespaycoaches.org" style="color:#FDFB54;text-decoration:none;">coachespaycoaches.org</a></p>
                     </td>
                   </tr>
                 </table>
@@ -367,6 +381,13 @@ exports.handler = async (event) => {
           </html>
         `
       })
+      results.buyer = 'sent'
+      } catch (err) {
+        results.buyer = 'failed'
+        console.error('send-email (sale, buyer leg) failed:', err.message)
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ success: true, results }) }
     }
 
     return { statusCode: 200, headers, body: JSON.stringify({ success: true }) }

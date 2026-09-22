@@ -68,7 +68,7 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ sent: false }) }
     }
 
-    await fetch(`${ALLOWED_ORIGIN}/.netlify/functions/send-email`, {
+    const emailRes = await fetch(`${ALLOWED_ORIGIN}/.netlify/functions/send-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -85,6 +85,12 @@ exports.handler = async (event) => {
         }
       })
     })
+    // Without this check, a Resend failure (bad key, bad address, quota)
+    // inside send-email.js was completely invisible — the fetch itself
+    // still "succeeds" even when send-email.js returns a 500.
+    if (!emailRes.ok) {
+      console.error('send-email (comment) returned', emailRes.status, await emailRes.text())
+    }
 
     return { statusCode: 200, headers, body: JSON.stringify({ sent: true }) }
   } catch (err) {

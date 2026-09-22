@@ -142,27 +142,39 @@ exports.handler = async (event) => {
       }
 
       if (listing && seller && buyerEmail) {
-        await fetch(`${process.env.SITE_URL}/.netlify/functions/send-email`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-internal-secret': process.env.INTERNAL_FUNCTION_SECRET
-          },
-          body: JSON.stringify({
-            type: 'sale',
-            data: {
-              sellerEmail: seller.email,
-              sellerName: seller.full_name,
-              buyerEmail,
-              buyerName,
-              listingTitle: listing.title,
-              amountTotal: parseFloat(amount_total).toFixed(2),
-              amountSeller: parseFloat(amount_seller).toFixed(2),
-              buyerDownloadUrl,
-              isGuest,
-            }
+        // SITE_URL falling back here matters — without it, a missing env
+        // var turns this into a fetch to "undefined/.netlify/...", which
+        // throws and gets swallowed by the outer catch below with no
+        // useful trace of why sale emails stopped going out.
+        const siteUrl = process.env.SITE_URL || 'https://coachespaycoaches.org'
+        try {
+          const emailRes = await fetch(`${siteUrl}/.netlify/functions/send-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal-secret': process.env.INTERNAL_FUNCTION_SECRET
+            },
+            body: JSON.stringify({
+              type: 'sale',
+              data: {
+                sellerEmail: seller.email,
+                sellerName: seller.full_name,
+                buyerEmail,
+                buyerName,
+                listingTitle: listing.title,
+                amountTotal: parseFloat(amount_total).toFixed(2),
+                amountSeller: parseFloat(amount_seller).toFixed(2),
+                buyerDownloadUrl,
+                isGuest,
+              }
+            })
           })
-        })
+          if (!emailRes.ok) {
+            console.error('send-email (sale) returned', emailRes.status, await emailRes.text())
+          }
+        } catch (emailErr) {
+          console.error('send-email (sale) request failed:', emailErr.message)
+        }
       }
     }
 
@@ -214,26 +226,34 @@ exports.handler = async (event) => {
         const disputeAmount = (dispute.amount / 100).toFixed(2)
         const recipients = [process.env.ADMIN_EMAIL, seller?.email].filter(Boolean)
 
+        const siteUrl = process.env.SITE_URL || 'https://coachespaycoaches.org'
         for (const to of recipients) {
-          await fetch(`${process.env.SITE_URL}/.netlify/functions/send-email`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-internal-secret': process.env.INTERNAL_FUNCTION_SECRET
-            },
-            body: JSON.stringify({
-              type: 'dispute',
-              data: {
-                to,
-                isAdmin: to === process.env.ADMIN_EMAIL,
-                sellerName: seller?.full_name || 'Seller',
-                listingTitle: purchase.listing_title || 'a listing',
-                amount: disputeAmount,
-                reason: dispute.reason,
-                purchaseId: purchase.id,
-              }
+          try {
+            const emailRes = await fetch(`${siteUrl}/.netlify/functions/send-email`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-internal-secret': process.env.INTERNAL_FUNCTION_SECRET
+              },
+              body: JSON.stringify({
+                type: 'dispute',
+                data: {
+                  to,
+                  isAdmin: to === process.env.ADMIN_EMAIL,
+                  sellerName: seller?.full_name || 'Seller',
+                  listingTitle: purchase.listing_title || 'a listing',
+                  amount: disputeAmount,
+                  reason: dispute.reason,
+                  purchaseId: purchase.id,
+                }
+              })
             })
-          })
+            if (!emailRes.ok) {
+              console.error('send-email (dispute) returned', emailRes.status, await emailRes.text())
+            }
+          } catch (emailErr) {
+            console.error('send-email (dispute) request failed:', emailErr.message)
+          }
         }
       } else {
         console.error(`Dispute ${dispute.id} received for unknown payment_intent ${dispute.payment_intent}`)
