@@ -68,6 +68,21 @@ export default function AuthForm({ onSuccess }) {
     }
   }
 
+  // Also fire-and-forget — links any guest checkouts made with this same
+  // email to the new account, so they show up in My Library.
+  async function claimGuestPurchases(newUserId, newEmail) {
+    if (!newUserId || !newEmail) return
+    try {
+      await fetch('/.netlify/functions/claim-guest-purchases', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newUserId, email: newEmail })
+      })
+    } catch (err) {
+      console.error('Guest purchase claim failed:', err.message)
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
@@ -91,6 +106,7 @@ export default function AuthForm({ onSuccess }) {
         setMessage('Check your email to confirm your account!')
         attributeReferral(data?.user?.id)
         sendWelcomeEmail(data?.user?.id)
+        claimGuestPurchases(data?.user?.id, email)
       }
     } else {
       const { error } = await signIn({ email, password, rememberMe })

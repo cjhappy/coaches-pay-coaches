@@ -613,6 +613,14 @@ select.form-input option { background: var(--navy-card); }
 /* ── MOBILE ── */
 @media (max-width: 768px) {
   .listing-detail-grid { grid-template-columns: 1fr !important; }
+  /* The purchase card is sticky for the two-column desktop layout so it
+     stays visible while scrolling the description/reviews column. Once the
+     grid collapses to one column here, everything (including the Share
+     card) stacks in the same vertical flow, so a still-sticky purchase card
+     would float over whatever comes after it as you scroll — covering the
+     Share card. Sticky only makes sense with a second, independently
+     scrolling column, so drop it here. */
+  .listing-detail-sticky { position: static !important; top: auto !important; }
   .messages-grid { grid-template-columns: 1fr !important; }
   .coach-header-grid { flex-direction: column !important; }
   .admin-stats-grid { grid-template-columns: 1fr 1fr !important; }

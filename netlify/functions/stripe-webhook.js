@@ -55,7 +55,14 @@ exports.handler = async (event) => {
   try {
     if (stripeEvent.type === 'checkout.session.completed') {
       const session = stripeEvent.data.object
-      const { listing_id, buyer_id, seller_id, amount_total, amount_seller, amount_platform } = session.metadata
+      const { listing_id, buyer_id, seller_id, amount_total, amount_seller, amount_platform, is_guest } = session.metadata
+      const isGuest = is_guest === 'true' || !buyer_id
+
+      // Stripe Checkout always collects an email in payment mode, even for
+      // a guest with no account — that's the only contact info we have for
+      // them, so it's what the download link gets sent to.
+      const guestEmail = isGuest ? (session.customer_details?.email || session.customer_email || null) : null
+      const guestName = isGuest ? (session.customer_details?.name || 'Coach') : null
 
       // Fetch listing snapshot before inserting purchase
       const { data: listing } = await supabase
@@ -65,7 +72,8 @@ exports.handler = async (event) => {
         .single()
 
       await supabase.from('purchases').insert({
-        buyer_id,
+        buyer_id: isGuest ? null : buyer_id,
+        guest_email: guestEmail,
         listing_id,
         seller_id,
         amount_total: parseFloat(amount_total),
@@ -82,30 +90,53 @@ exports.handler = async (event) => {
         listing_file_url: listing?.file_url || null,
       })
 
-      const { data: buyer } = await supabase
-        .from('profiles')
-        .select('full_name, email')
-        .eq('id', buyer_id)
-        .single()
-
       const { data: seller } = await supabase
         .from('profiles')
         .select('full_name, email')
         .eq('id', seller_id)
         .single()
 
-      if (listing && buyer && seller) {
-        // In-app notification for the seller, alongside the email below.
-        // Uses the service-role client, so this runs regardless of RLS.
-        await supabase.from('notifications').insert({
-          user_id: seller_id,
-          type: 'sale',
-          actor_id: buyer_id,
-          actor_name: buyer.full_name,
-          content_id: listing_id,
-          content_title: listing.title,
-        })
+      let buyerName = guestName
+      let buyerEmail = guestEmail
 
+      if (!isGuest) {
+        const { data: buyer } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', buyer_id)
+          .single()
+
+        buyerName = buyer?.full_name
+        buyerEmail = buyer?.email
+
+        if (listing && buyer && seller) {
+          // In-app notification for the seller, alongside the email below.
+          // Uses the service-role client, so this runs regardless of RLS.
+          // (Guest buyers have no profile row to notify from, so this only
+          // applies to logged-in purchases.)
+          await supabase.from('notifications').insert({
+            user_id: seller_id,
+            type: 'sale',
+            actor_id: buyer_id,
+            actor_name: buyer.full_name,
+            content_id: listing_id,
+            content_title: listing.title,
+          })
+        }
+      }
+
+      // Guests have no library to log back into, so instead of pointing
+      // them at /purchases like the email does for logged-in buyers, hand
+      // them a direct signed download link good for 30 days.
+      let buyerDownloadUrl = null
+      if (isGuest && listing?.file_url) {
+        const { data: signed } = await supabase.storage
+          .from('listings-files')
+          .createSignedUrl(listing.file_url, 60 * 60 * 24 * 30)
+        buyerDownloadUrl = signed?.signedUrl || null
+      }
+
+      if (listing && seller && buyerEmail) {
         await fetch(`${process.env.SITE_URL}/.netlify/functions/send-email`, {
           method: 'POST',
           headers: {
@@ -117,11 +148,13 @@ exports.handler = async (event) => {
             data: {
               sellerEmail: seller.email,
               sellerName: seller.full_name,
-              buyerEmail: buyer.email,
-              buyerName: buyer.full_name,
+              buyerEmail,
+              buyerName,
               listingTitle: listing.title,
               amountTotal: parseFloat(amount_total).toFixed(2),
-              amountSeller: parseFloat(amount_seller).toFixed(2)
+              amountSeller: parseFloat(amount_seller).toFixed(2),
+              buyerDownloadUrl,
+              isGuest,
             }
           })
         })

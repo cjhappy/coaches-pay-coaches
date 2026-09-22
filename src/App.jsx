@@ -8,6 +8,7 @@ import SellerDashboard from './pages/SellerDashboard'
 import Marketplace from './pages/Marketplace'
 import ListingDetail from './pages/ListingDetail'
 import Purchases from './pages/Purchases'
+import CheckoutSuccess from './pages/CheckoutSuccess'
 import CoachProfile from './pages/CoachProfile'
 import Coaches from './pages/Coaches'
 import ResetPassword from './pages/ResetPassword'
@@ -45,6 +46,7 @@ function App() {
         <Route path="/feed" element={<Feed />} />
         <Route path="/marketplace" element={<Marketplace />} />
         <Route path="/listing/:id" element={<ListingDetail />} />
+        <Route path="/checkout-success" element={<CheckoutSuccess />} />
         <Route path="/coach/:id" element={<CoachProfile />} />
         <Route path="/coaches" element={<Coaches />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

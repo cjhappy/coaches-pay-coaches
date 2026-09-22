@@ -210,12 +210,18 @@ exports.handler = async (event) => {
                       <table cellpadding="0" cellspacing="0">
                         <tr>
                           <td style="background:#2ecc71;border-radius:8px;">
-                            <a href="https://coachespaycoaches.org/purchases" style="display:inline-block;padding:12px 28px;font-weight:800;font-size:14px;text-transform:uppercase;color:#0b1622;text-decoration:none;">
-                              Download Your Resource →
+                            <a href="${data.buyerDownloadUrl || 'https://coachespaycoaches.org/purchases'}" style="display:inline-block;padding:12px 28px;font-weight:800;font-size:14px;text-transform:uppercase;color:#0b1622;text-decoration:none;">
+                              ${data.buyerDownloadUrl ? 'Download Now →' : 'Download Your Resource →'}
                             </a>
                           </td>
                         </tr>
                       </table>
+
+                      ${data.isGuest ? `
+                      <p style="color:#7a95ae;font-size:12.5px;line-height:1.6;margin:22px 0 0;">
+                        This link works for 30 days. Want it saved somewhere permanent? <a href="https://coachespaycoaches.org/auth" style="color:#2ecc71;text-decoration:none;">Create a free account</a> with this same email and future purchases (and this one) will live in your library.
+                      </p>
+                      ` : ''}
                     </td>
                   </tr>
                   <tr>

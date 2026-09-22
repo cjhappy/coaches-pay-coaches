@@ -27,18 +27,26 @@ exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers, body: '' }
 
   try {
-    // 1. Verify the request carries a valid, logged-in Supabase session
+    // 1. If the request carries a Supabase session, verify it and check out
+    // as that user. If it doesn't, this is a guest checkout — allowed on
+    // purpose (no auth required), since anyone can browse and buy a
+    // listing without an account. Stripe Checkout collects the guest's
+    // email itself; we pick it up from the session in the webhook.
     const authHeader = event.headers.authorization || event.headers.Authorization
     const token = authHeader?.replace('Bearer ', '')
-    if (!token) throw new Error('Not authenticated')
+    let user = null
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token)
-    if (authError || !user) throw new Error('Not authenticated')
+    if (token) {
+      const { data, error: authError } = await supabaseAuth.auth.getUser(token)
+      if (authError || !data.user) throw new Error('Not authenticated')
+      user = data.user
+    }
 
     const { listingId, buyerId } = JSON.parse(event.body)
+    const isGuest = !user
 
-    // 2. The caller can only ever check out as themselves
-    if (buyerId !== user.id) throw new Error('You can only purchase on your own behalf')
+    // 2. If logged in, the caller can only ever check out as themselves
+    if (!isGuest && buyerId !== user.id) throw new Error('You can only purchase on your own behalf')
 
     // 3. Never trust a client-supplied redirect origin — always use our own known site URL
     const returnUrl = ALLOWED_ORIGIN
@@ -95,7 +103,12 @@ exports.handler = async (event) => {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${returnUrl}/purchases?success=true`,
+      // Stripe substitutes {CHECKOUT_SESSION_ID} itself — guests land on a
+      // public confirmation page (they have no session to view /purchases
+      // with), told to check their email for the download link.
+      success_url: isGuest
+        ? `${returnUrl}/checkout-success?session_id={CHECKOUT_SESSION_ID}`
+        : `${returnUrl}/purchases?success=true`,
       cancel_url: `${returnUrl}/listing/${listingId}?cancelled=true`,
       payment_intent_data: {
         application_fee_amount: platformFeeInCents,
@@ -103,7 +116,8 @@ exports.handler = async (event) => {
       },
       metadata: {
         listing_id: listingId,
-        buyer_id: buyerId,
+        buyer_id: isGuest ? '' : buyerId,
+        is_guest: isGuest ? 'true' : 'false',
         seller_id: listing.seller_id,
         amount_total: listing.price,
         amount_platform: (listing.price * PLATFORM_PERCENT + TRANSACTION_FEE).toFixed(2),

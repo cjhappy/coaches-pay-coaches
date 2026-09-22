@@ -6,6 +6,7 @@ const MESSAGES = {
   follow: (n) => `${n.actor_name || 'A coach'} started following you`,
   review: (n) => `${n.actor_name || 'A coach'} reviewed "${n.content_title || 'your listing'}"`,
   sale: (n) => `${n.actor_name || 'A coach'} purchased "${n.content_title || 'your listing'}"`,
+  comment: (n) => `${n.actor_name || 'A coach'} commented on "${n.content_title || 'your listing'}"`,
 }
 
 function timeAgo(dateStr) {
@@ -34,7 +35,7 @@ export default function NotificationBell() {
   function handleClick(n) {
     setOpen(false)
     if (n.type === 'follow') navigate('/coach/' + n.actor_id)
-    else if (n.type === 'review') navigate('/listing/' + n.content_id)
+    else if (n.type === 'review' || n.type === 'comment') navigate('/listing/' + n.content_id)
     else if (n.type === 'sale') navigate('/seller')
   }
 

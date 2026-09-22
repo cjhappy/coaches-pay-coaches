@@ -9,6 +9,7 @@ import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
 import ReportButton from '../components/ReportButton'
 import SaveButton from '../components/SaveButton'
+import CommentSection from '../components/CommentSection'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -145,7 +146,6 @@ export default function ListingDetail() {
   }
 
   async function handlePurchase() {
-    if (!user) { navigate('/auth'); return }
     if (!refundConsent) { setError('Please confirm you have read and agree to the no-refund policy.'); return }
 
     if (!listing.profiles?.stripe_account_id) {
@@ -170,9 +170,11 @@ export default function ListingDetail() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
+          // Omit Authorization entirely for guests — create-checkout treats
+          // a missing/no session as a guest checkout, not an error.
+          ...(session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {})
         },
-        body: JSON.stringify({ listingId: listing.id, buyerId: profile.id, returnUrl: window.location.origin })
+        body: JSON.stringify({ listingId: listing.id, buyerId: profile?.id, returnUrl: window.location.origin })
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
@@ -331,10 +333,12 @@ export default function ListingDetail() {
                 </div>
               )}
             </div>
+
+            <CommentSection listing={listing} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <div className="cpc-card" style={{ padding: '1.75rem', position: 'sticky', top: '86px' }}>
+            <div className="cpc-card listing-detail-sticky" style={{ padding: '1.75rem', position: 'sticky', top: '86px' }}>
               <div style={{ color: 'var(--navy)', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '2.2rem', marginBottom: '0.25rem' }}>
                 {listing.price === 0 ? 'FREE' : '$' + Number(listing.price).toFixed(2)}
               </div>
@@ -407,6 +411,15 @@ export default function ListingDetail() {
                   >
                     {purchasing ? 'Redirecting...' : 'Purchase $' + Number(listing.price).toFixed(2)}
                   </button>
+
+                  {!user && (
+                    <p className="muted" style={{ fontSize: '.75rem', textAlign: 'center', marginTop: '10px', lineHeight: 1.5 }}>
+                      Buying as a guest — we'll email your download link.{' '}
+                      <a href="/auth" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline' }}>
+                        Log in
+                      </a> to save it to a library instead.
+                    </p>
+                  )}
                 </>
               )}
 
