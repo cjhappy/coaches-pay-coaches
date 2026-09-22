@@ -7,6 +7,7 @@ const MESSAGES = {
   review: (n) => `${n.actor_name || 'A coach'} reviewed "${n.content_title || 'your listing'}"`,
   sale: (n) => `${n.actor_name || 'A coach'} purchased "${n.content_title || 'your listing'}"`,
   comment: (n) => `${n.actor_name || 'A coach'} commented on "${n.content_title || 'your listing'}"`,
+  dispute: (n) => `A payment for "${n.content_title || 'your listing'}" was disputed`,
 }
 
 function timeAgo(dateStr) {
@@ -36,7 +37,7 @@ export default function NotificationBell() {
     setOpen(false)
     if (n.type === 'follow') navigate('/coach/' + n.actor_id)
     else if (n.type === 'review' || n.type === 'comment') navigate('/listing/' + n.content_id)
-    else if (n.type === 'sale') navigate('/seller')
+    else if (n.type === 'sale' || n.type === 'dispute') navigate('/seller')
   }
 
   return (

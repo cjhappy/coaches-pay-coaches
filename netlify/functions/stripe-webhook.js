@@ -81,6 +81,10 @@ exports.handler = async (event) => {
         amount_seller: parseFloat(amount_seller),
         amount_platform: parseFloat(amount_platform),
         stripe_session_id: session.id,
+        // Disputes/chargebacks reference the payment_intent, not the
+        // checkout session, so this is what lets the dispute handler below
+        // find its way back to the right purchase row.
+        stripe_payment_intent_id: session.payment_intent || null,
         status: 'completed',
         // Snapshot of listing at time of purchase
         listing_title: listing?.title || null,
@@ -171,6 +175,69 @@ exports.handler = async (event) => {
           stripe_payouts_enabled: account.payouts_enabled,
         })
         .eq('stripe_account_id', account.id)
+    }
+
+    // A dispute/chargeback previously went completely unhandled here — the
+    // purchase record never reflected it and nobody was told. This finds
+    // the purchase by payment_intent, flags it, and emails both the buyer's
+    // seller (whose payout may get clawed back) and the platform admin.
+    if (stripeEvent.type === 'charge.dispute.created') {
+      const dispute = stripeEvent.data.object
+
+      const { data: purchase } = await supabase
+        .from('purchases')
+        .select('id, listing_title, amount_total, seller_id')
+        .eq('stripe_payment_intent_id', dispute.payment_intent)
+        .maybeSingle()
+
+      if (purchase) {
+        await supabase
+          .from('purchases')
+          .update({ status: 'disputed', dispute_status: dispute.status, dispute_reason: dispute.reason })
+          .eq('id', purchase.id)
+
+        const { data: seller } = await supabase
+          .from('profiles')
+          .select('full_name, email')
+          .eq('id', purchase.seller_id)
+          .single()
+
+        if (seller) {
+          await supabase.from('notifications').insert({
+            user_id: purchase.seller_id,
+            type: 'dispute',
+            content_id: purchase.id,
+            content_title: purchase.listing_title,
+          })
+        }
+
+        const disputeAmount = (dispute.amount / 100).toFixed(2)
+        const recipients = [process.env.ADMIN_EMAIL, seller?.email].filter(Boolean)
+
+        for (const to of recipients) {
+          await fetch(`${process.env.SITE_URL}/.netlify/functions/send-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal-secret': process.env.INTERNAL_FUNCTION_SECRET
+            },
+            body: JSON.stringify({
+              type: 'dispute',
+              data: {
+                to,
+                isAdmin: to === process.env.ADMIN_EMAIL,
+                sellerName: seller?.full_name || 'Seller',
+                listingTitle: purchase.listing_title || 'a listing',
+                amount: disputeAmount,
+                reason: dispute.reason,
+                purchaseId: purchase.id,
+              }
+            })
+          })
+        }
+      } else {
+        console.error(`Dispute ${dispute.id} received for unknown payment_intent ${dispute.payment_intent}`)
+      }
     }
 
   } catch (err) {

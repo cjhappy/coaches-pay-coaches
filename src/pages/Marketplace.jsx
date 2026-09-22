@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -9,93 +9,122 @@ import SaveButton from '../components/SaveButton'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['All', 'Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
+const PAGE_SIZE = 24
+
 export default function Marketplace() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [listings, setListings] = useState([])
-  const [filtered, setFiltered] = useState([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [page, setPage] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [sport, setSport] = useState('All')
   const [category, setCategory] = useState('All')
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('newest')
   const [showFollowing, setShowFollowing] = useState(false)
-  const [followingIds, setFollowingIds] = useState([])
-  const [visibleCount, setVisibleCount] = useState(24)
+  const [followingIds, setFollowingIds] = useState(null) // null = not loaded yet
   const [fetchError, setFetchError] = useState(false)
+  const requestIdRef = useRef(0)
 
-  useEffect(() => { fetchListings() }, [])
-  useEffect(() => { applyFilters(); setVisibleCount(24) }, [listings, sport, category, search, sort, showFollowing, followingIds])
+  // Debounce the search box so we're not firing a query on every keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(searchInput), 350)
+    return () => clearTimeout(t)
+  }, [searchInput])
 
- async function fetchListings() {
-  setFetchError(false)
-  const { data: listingsData, error } = await supabase
-    .from('listings')
-    .select('*')
-    .order('created_at', { ascending: false })
-
-  if (error || !listingsData) { setLoading(false); setFetchError(true); return }
-
-  const sellerIds = [...new Set(listingsData.map(l => l.seller_id))]
-  const listingIds = listingsData.map(l => l.id)
-
-  const { data: profilesData } = await supabase
-    .from('profiles')
-    .select('id, full_name, avatar_url')
-    .in('id', sellerIds)
-
-  const { data: reviewsData } = await supabase
-    .from('reviews')
-    .select('listing_id, rating')
-    .in('listing_id', listingIds)
-
-  const profileMap = {}
-  profilesData?.forEach(p => { profileMap[p.id] = p })
-
-  const reviewMap = {}
-  reviewsData?.forEach(r => {
-    if (!reviewMap[r.listing_id]) reviewMap[r.listing_id] = []
-    reviewMap[r.listing_id].push(r.rating)
-  })
-
-  const combined = listingsData.map(l => {
-    const ratings = reviewMap[l.id] || []
-    const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
-    return {
-      ...l,
-      profiles: profileMap[l.seller_id] || null,
-      avgRating,
-      reviewCount: ratings.length
+  useEffect(() => {
+    if (user) {
+      supabase.from('followers').select('following_id').eq('follower_id', user.id)
+        .then(({ data }) => setFollowingIds((data || []).map(f => f.following_id)))
+    } else {
+      setFollowingIds([])
     }
-  })
+  }, [user])
 
-  setListings(combined)
+  // Any filter/sort change starts over from page 0. followingIds loading
+  // (null) is excluded so we don't fire a throwaway query before it's ready.
+  useEffect(() => {
+    if (followingIds === null) return
+    setPage(0)
+    fetchListings(0, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sport, category, search, sort, showFollowing, followingIds])
 
-  if (user) {
-    const { data: followingData } = await supabase
-      .from('followers')
-      .select('following_id')
-      .eq('follower_id', user.id)
-    setFollowingIds((followingData || []).map(f => f.following_id))
+  async function fetchListings(pageToLoad, replace) {
+    if (showFollowing && followingIds.length === 0) {
+      setListings([])
+      setTotalCount(0)
+      setLoading(false)
+      setLoadingMore(false)
+      return
+    }
+
+    replace ? setLoading(true) : setLoadingMore(true)
+    setFetchError(false)
+    const requestId = ++requestIdRef.current
+
+    let query = supabase
+      .from('listings')
+      .select('*, profiles(full_name, avatar_url)', { count: 'exact' })
+
+    if (sport !== 'All') query = query.eq('sport', sport)
+    if (category !== 'All') query = query.eq('category', category)
+    if (search.trim()) {
+      const term = search.trim().replace(/[%_]/g, '')
+      query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%`)
+    }
+    if (showFollowing) query = query.in('seller_id', followingIds)
+
+    if (sort === 'newest') query = query.order('created_at', { ascending: false })
+    else if (sort === 'oldest') query = query.order('created_at', { ascending: true })
+    else if (sort === 'price-low') query = query.order('price', { ascending: true })
+    else if (sort === 'price-high') query = query.order('price', { ascending: false })
+
+    query = query.range(pageToLoad * PAGE_SIZE, pageToLoad * PAGE_SIZE + PAGE_SIZE - 1)
+
+    const { data, error, count } = await query
+
+    // A slower request that resolves after a newer one shouldn't clobber
+    // its results — only the most recent fetch is allowed to write state.
+    if (requestId !== requestIdRef.current) return
+
+    if (error || !data) {
+      setLoading(false)
+      setLoadingMore(false)
+      setFetchError(true)
+      return
+    }
+
+    const listingIds = data.map(l => l.id)
+    const { data: reviewsData } = listingIds.length
+      ? await supabase.from('reviews').select('listing_id, rating').in('listing_id', listingIds)
+      : { data: [] }
+
+    const reviewMap = {}
+    reviewsData?.forEach(r => {
+      if (!reviewMap[r.listing_id]) reviewMap[r.listing_id] = []
+      reviewMap[r.listing_id].push(r.rating)
+    })
+
+    const combined = data.map(l => {
+      const ratings = reviewMap[l.id] || []
+      const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0
+      return { ...l, avgRating, reviewCount: ratings.length }
+    })
+
+    setListings(prev => replace ? combined : [...prev, ...combined])
+    setTotalCount(count || 0)
+    setLoading(false)
+    setLoadingMore(false)
   }
 
-  setLoading(false)
-}
-
-  function applyFilters() {
-    let result = [...listings]
-    if (showFollowing && followingIds.length > 0) result = result.filter(l => followingIds.includes(l.seller_id))
-    if (sport !== 'All') result = result.filter(l => l.sport === sport)
-    if (category !== 'All') result = result.filter(l => l.category === category)
-    if (search) result = result.filter(l =>
-      l.title.toLowerCase().includes(search.toLowerCase()) ||
-      l.description.toLowerCase().includes(search.toLowerCase())
-    )
-    if (sort === 'newest') result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    if (sort === 'oldest') result.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-    if (sort === 'price-low') result.sort((a, b) => a.price - b.price)
-    if (sort === 'price-high') result.sort((a, b) => b.price - a.price)
-    setFiltered(result)
+  function handleLoadMore() {
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchListings(nextPage, false)
   }
 
   return (
@@ -120,8 +149,8 @@ export default function Marketplace() {
             className="form-input"
             style={{ paddingLeft: '2.5rem', background: 'var(--navy-light)', borderColor: 'var(--border)', color: 'var(--white)' }}
             placeholder="Search resources..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
           />
         </div>
       </div>
@@ -168,7 +197,7 @@ export default function Marketplace() {
             </button>
           )}
           <div className="muted" style={{ fontSize: '.85rem', paddingBottom: '0.1rem' }}>
-            {filtered.length} result{filtered.length !== 1 ? 's' : ''}
+            {totalCount} result{totalCount !== 1 ? 's' : ''}
           </div>
         </div>
 
@@ -194,8 +223,8 @@ export default function Marketplace() {
         {loading ? (
           <p className="muted">Loading...</p>
         ) : fetchError ? (
-          <ErrorState message="We couldn't load the marketplace right now." onRetry={fetchListings} />
-        ) : filtered.length === 0 ? (
+          <ErrorState message="We couldn't load the marketplace right now." onRetry={() => fetchListings(0, true)} />
+        ) : listings.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
             {showFollowing ? (
               <>
@@ -213,14 +242,14 @@ export default function Marketplace() {
         ) : (
           <>
             <div className="dash-grid">
-              {filtered.slice(0, visibleCount).map(listing => (
+              {listings.map(listing => (
                 <ListingCard key={listing.id} listing={listing} navigate={navigate} />
               ))}
             </div>
-            {filtered.length > visibleCount && (
+            {listings.length < totalCount && (
               <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                <button className="btn btn-ghost-dark" onClick={() => setVisibleCount(c => c + 24)}>
-                  Load More ({filtered.length - visibleCount} more)
+                <button className="btn btn-ghost-dark" onClick={handleLoadMore} disabled={loadingMore}>
+                  {loadingMore ? 'Loading...' : `Load More (${totalCount - listings.length} more)`}
                 </button>
               </div>
             )}

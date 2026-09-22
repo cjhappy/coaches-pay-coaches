@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import ListingForm from '../components/ListingForm'
 import Avatar from '../components/Avatar'
 import SellerCompleteness from '../components/SellerCompleteness'
+import RevenueChart from '../components/RevenueChart'
 import SiteNav from '../components/SiteNav'
 import { compressImage } from '../lib/imageCompress'
 
@@ -443,6 +444,7 @@ export default function SellerDashboard() {
 
         {activeTab === 'sales' && (
           <>
+            <RevenueChart sales={sales} />
             <div className="section-label" style={{ marginBottom: '1rem' }}>Recent Sales</div>
             {sales.length === 0 ? (
               <div className="cpc-card" style={{ padding: '2.5rem', textAlign: 'center' }}>

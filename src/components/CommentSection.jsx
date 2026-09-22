@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { notify } from '../lib/notify'
+import ReportButton from './ReportButton'
 
 const COMMENT_LIMIT = 500
 
@@ -140,6 +141,14 @@ export default function CommentSection({ listing }) {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <span className="muted" style={{ fontSize: '.75rem' }}>{new Date(comment.created_at).toLocaleDateString()}</span>
+                  {user?.id !== comment.user_id && (
+                    <ReportButton
+                      contentType="comment"
+                      contentId={comment.id}
+                      reportedUserId={comment.user_id}
+                      contentSnapshot={comment.comment}
+                    />
+                  )}
                   {(user?.id === comment.user_id || canModerate) && (
                     <button
                       onClick={() => handleDelete(comment.id)}

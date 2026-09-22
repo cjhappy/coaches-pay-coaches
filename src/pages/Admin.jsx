@@ -29,10 +29,14 @@ export default function Admin() {
   async function fetchAll() {
     setFetchError(false)
     const [usersRes, listingsRes, purchasesRes, reportsRes] = await Promise.all([
-      supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-      supabase.from('listings').select('*, profiles(full_name)').order('created_at', { ascending: false }),
-      supabase.from('purchases').select('*, listings(title, price), profiles!purchases_buyer_id_fkey(full_name)').order('created_at', { ascending: false }),
-      supabase.from('reports').select('*, reporter:profiles!reports_reporter_id_fkey(full_name), reported:profiles!reports_reported_user_id_fkey(full_name)').order('created_at', { ascending: false })
+      // Admin is internal-only, so full pagination UI is overkill — but the
+      // queries were unbounded, which would get slow (and eventually hit
+      // Supabase's default row cap) as the platform grows. Bounding each to
+      // the most recent 1000 rows keeps this fast without adding UI.
+      supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('listings').select('*, profiles(full_name)').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('purchases').select('*, listings(title, price), profiles!purchases_buyer_id_fkey(full_name)').order('created_at', { ascending: false }).limit(1000),
+      supabase.from('reports').select('*, reporter:profiles!reports_reporter_id_fkey(full_name), reported:profiles!reports_reported_user_id_fkey(full_name)').order('created_at', { ascending: false }).limit(1000)
     ])
 
     if (usersRes.error || listingsRes.error || purchasesRes.error || reportsRes.error) {
