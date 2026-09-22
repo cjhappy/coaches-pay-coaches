@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import ListingForm from '../components/ListingForm'
 import Avatar from '../components/Avatar'
 import SellerCompleteness from '../components/SellerCompleteness'
+import StorefrontEditor from '../components/StorefrontEditor'
 import RevenueChart from '../components/RevenueChart'
 import SiteNav from '../components/SiteNav'
 import EmptyState from '../components/EmptyState'
@@ -369,6 +370,7 @@ export default function SellerDashboard() {
 
         <SellerCompleteness profile={profile} listings={listings} onConnectStripe={handleConnectStripe} />
         <BioEditor profile={profile} setProfile={setProfile} />
+        <StorefrontEditor profile={profile} listings={listings} setProfile={setProfile} />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
           <div className="cpc-card" style={{ padding: '1.25rem' }}>

@@ -201,7 +201,18 @@ export default function CoachProfile() {
   const shareUrl = 'https://coachespaycoaches.org/coach/' + coach.id
   const isOwnProfile = user?.id === coach.id
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
-  const visibleListings = sportFilter === 'all' ? listings : listings.filter(l => l.sport === sportFilter)
+  const featuredIds = coach.featured_listing_ids || []
+  const sortedListings = featuredIds.length > 0
+    ? [...listings].sort((a, b) => {
+        const aIdx = featuredIds.indexOf(a.id)
+        const bIdx = featuredIds.indexOf(b.id)
+        if (aIdx === -1 && bIdx === -1) return 0
+        if (aIdx === -1) return 1
+        if (bIdx === -1) return -1
+        return aIdx - bIdx
+      })
+    : listings
+  const visibleListings = sportFilter === 'all' ? sortedListings : sortedListings.filter(l => l.sport === sportFilter)
 
   return (
     <div className="page-body cream-page">
@@ -218,11 +229,13 @@ export default function CoachProfile() {
       <div style={{
         position: 'relative',
         padding: '3rem 5%',
-        background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 55%, var(--navy-light) 100%)',
+        background: coach.banner_url
+          ? `linear-gradient(rgba(13,50,71,0.55), rgba(13,50,71,0.55)), url(${coach.banner_url}) center/cover no-repeat`
+          : `linear-gradient(135deg, ${coach.banner_color || 'var(--navy)'} 0%, var(--navy-mid) 55%, var(--navy-light) 100%)`,
         overflow: 'hidden'
       }}>
-        {/* Decorative brand accent — a diagonal yellow stripe, not a real
-            uploaded banner image (no schema change needed for this). */}
+        {/* Decorative brand accent — a diagonal yellow stripe over the
+            banner (color, image, or default gradient). */}
         <div style={{
           position: 'absolute', top: 0, right: '-10%', width: '55%', height: '140%',
           background: 'var(--yellow)', opacity: 0.06, transform: 'rotate(-12deg)', pointerEvents: 'none'
@@ -247,6 +260,26 @@ export default function CoachProfile() {
                 </span>
               )}
             </div>
+
+            {coach.tagline && (
+              <p style={{ color: 'var(--yellow)', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '.95rem', marginBottom: '10px' }}>
+                {coach.tagline}
+              </p>
+            )}
+
+            {(coach.instagram_url || coach.twitter_url || coach.website_url) && (
+              <div style={{ display: 'flex', gap: '14px', marginBottom: '10px' }}>
+                {coach.instagram_url && (
+                  <a href={coach.instagram_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--off)', fontSize: '.8rem', fontWeight: 700, textDecoration: 'none', opacity: .85 }}>Instagram</a>
+                )}
+                {coach.twitter_url && (
+                  <a href={coach.twitter_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--off)', fontSize: '.8rem', fontWeight: 700, textDecoration: 'none', opacity: .85 }}>X / Twitter</a>
+                )}
+                {coach.website_url && (
+                  <a href={coach.website_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--off)', fontSize: '.8rem', fontWeight: 700, textDecoration: 'none', opacity: .85 }}>Website</a>
+                )}
+              </div>
+            )}
 
             <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '16px', flexWrap: 'wrap' }}>
               <div>
@@ -340,7 +373,12 @@ export default function CoachProfile() {
         ) : (
           <div className="dash-grid">
             {visibleListings.map(listing => (
-              <div key={listing.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
+              <div key={listing.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                {featuredIds.includes(listing.id) && (
+                  <span style={{ position: 'absolute', top: '1rem', left: '1rem', zIndex: 2, background: 'var(--yellow)', border: '1px solid var(--navy)', color: 'var(--navy)', fontSize: '9px', fontWeight: 800, padding: '2px 8px', borderRadius: '100px', letterSpacing: '.05em' }}>
+                    ★ FEATURED
+                  </span>
+                )}
                 {listing.thumbnail_url ? (
                   <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} loading="lazy" decoding="async" />
                 ) : (
