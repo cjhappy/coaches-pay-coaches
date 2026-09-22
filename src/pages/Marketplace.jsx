@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
 import ErrorState from '../components/ErrorState'
 import SaveButton from '../components/SaveButton'
+import Avatar from '../components/Avatar'
 
 const SPORTS = ['All', 'Basketball', 'Soccer', 'Football', 'Baseball', 'Softball', 'Hockey', 'Volleyball', 'Lacrosse', 'Tennis', 'Track & Field', 'Swimming', 'Wrestling', 'Golf', 'Gymnastics', 'Cheerleading', 'Dance', 'Cross Country', 'Rugby', 'Field Hockey', 'Water Polo', 'Bowling', 'Cycling', 'Rowing', 'Fencing', 'Skiing', 'Snowboarding', 'Martial Arts', 'Boxing', 'Multi-Sport', 'Other']
 const CATEGORIES = ['All', 'Practice Plans', 'Drills & Workouts', 'Playbooks', 'Season Plans', 'Scouting Reports', 'Film Breakdown', 'Nutrition Plans', 'Meal Prep Guides', 'Mental Performance', 'Injury Prevention', 'Recovery Protocols', 'Speed & Agility Programs', 'Strength Programs', 'Recruiting Guides', 'Academic Resources', 'Parent Resources', 'Leadership Development', 'Other']
@@ -300,9 +301,7 @@ function ListingCard({ listing, navigate }) {
             style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', cursor: 'pointer' }}
             onClick={(e) => { e.stopPropagation(); navigate('/coach/' + listing.seller_id) }}
           >
-            <div style={{ width: '24px', height: '24px', borderRadius: '6px', background: 'var(--navy)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '9px', color: 'var(--yellow)', flexShrink: 0 }}>
-              {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-            </div>
+            <Avatar url={listing.profiles.avatar_url} name={listing.profiles.full_name} size={24} radius={6} />
             <span style={{ color: 'var(--navy)', fontSize: '.8rem', fontWeight: 700, textDecoration: 'underline' }}>
               {listing.profiles.full_name}
             </span>

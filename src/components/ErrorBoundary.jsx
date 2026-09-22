@@ -28,8 +28,8 @@ export default class ErrorBoundary extends Component {
           </h1>
           <p style={{ color: '#5B6B74', fontSize: '.95rem', maxWidth: '420px', marginBottom: '1.5rem', lineHeight: 1.6 }}>
             We hit an unexpected error. Try reloading the page — if it keeps happening, let us know at{' '}
-            <a href="mailto:christopherhappy05@gmail.com" style={{ color: '#0D3247', fontWeight: 700 }}>
-              christopherhappy05@gmail.com
+            <a href="mailto:cjhappy@coachespaycoaches.org,cgiordano@coachespaycoaches.org" style={{ color: '#0D3247', fontWeight: 700 }}>
+              cjhappy@coachespaycoaches.org
             </a>.
           </p>
           <button

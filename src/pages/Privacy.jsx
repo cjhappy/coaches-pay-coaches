@@ -41,7 +41,7 @@ export default function Privacy() {
           },
           {
             title: '7. Your Rights',
-            body: 'You have the right to access, correct, or delete your personal information at any time. You can update your profile information from your dashboard. To request deletion of your account and data, contact us at christopherhappy05@gmail.com. If you are in the EU or California, you may have additional rights under GDPR or CCPA.'
+            body: 'You have the right to access, correct, or delete your personal information at any time. You can update your profile information from your dashboard. To request deletion of your account and data, contact us at cjhappy@coachespaycoaches.org or cgiordano@coachespaycoaches.org. If you are in the EU or California, you may have additional rights under GDPR or CCPA.'
           },
           {
             title: '8. Children\'s Privacy',
@@ -53,7 +53,7 @@ export default function Privacy() {
           },
           {
             title: '10. Contact',
-            body: 'For questions about this Privacy Policy or to exercise your rights, please contact us at christopherhappy05@gmail.com.'
+            body: 'For questions about this Privacy Policy or to exercise your rights, please contact us at cjhappy@coachespaycoaches.org or cgiordano@coachespaycoaches.org.'
           }
         ].map(section => (
           <div key={section.title} style={{ marginBottom: '2rem' }}>

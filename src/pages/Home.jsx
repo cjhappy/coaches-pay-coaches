@@ -280,7 +280,7 @@ export default function Home() {
               <li><a onClick={() => navigate('/terms')}>Terms of Service</a></li>
               <li><a onClick={() => navigate('/privacy')}>Privacy Policy</a></li>
               <li><a onClick={() => navigate('/refunds')}>Refund Policy</a></li>
-              <li><a href="mailto:christopherhappy05@gmail.com">Contact</a></li>
+              <li><a href="mailto:cjhappy@coachespaycoaches.org,cgiordano@coachespaycoaches.org">Contact</a></li>
             </ul>
           </div>
         </div>
@@ -291,7 +291,7 @@ export default function Home() {
             <a style={{ color: 'var(--off)', opacity: .7, fontSize: '.82rem', cursor: 'pointer', textDecoration: 'none' }} onClick={() => navigate('/terms')}>Terms</a>
             <a style={{ color: 'var(--off)', opacity: .7, fontSize: '.82rem', cursor: 'pointer', textDecoration: 'none' }} onClick={() => navigate('/privacy')}>Privacy</a>
             <a style={{ color: 'var(--off)', opacity: .7, fontSize: '.82rem', cursor: 'pointer', textDecoration: 'none' }} onClick={() => navigate('/refunds')}>Refunds</a>
-            <a style={{ color: 'var(--off)', opacity: .7, fontSize: '.82rem', textDecoration: 'none' }} href="mailto:christopherhappy05@gmail.com">Contact</a>
+            <a style={{ color: 'var(--off)', opacity: .7, fontSize: '.82rem', textDecoration: 'none' }} href="mailto:cjhappy@coachespaycoaches.org,cgiordano@coachespaycoaches.org">Contact</a>
           </div>
         </div>
       </footer>

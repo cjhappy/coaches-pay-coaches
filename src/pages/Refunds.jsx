@@ -69,7 +69,7 @@ export default function RefundPolicy() {
             ))}
           </div>
           <p style={{ color: 'var(--muted-on-cream)', fontSize: '.85rem', lineHeight: 1.6, marginTop: '1rem', marginBottom: 0 }}>
-            To request a review under these exceptions, contact us at <a href="mailto:christopherhappy05@gmail.com" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline' }}>christopherhappy05@gmail.com</a> within 7 days of purchase with your order details and a description of the issue. We do not guarantee a refund will be issued.
+            To request a review under these exceptions, contact us at <a href="mailto:cjhappy@coachespaycoaches.org" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline' }}>cjhappy@coachespaycoaches.org</a> or <a href="mailto:cgiordano@coachespaycoaches.org" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline' }}>cgiordano@coachespaycoaches.org</a> within 7 days of purchase with your order details and a description of the issue. We do not guarantee a refund will be issued.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function RefundPolicy() {
         <div className="cpc-card" style={{ padding: '1.75rem', marginBottom: '1.5rem' }}>
           <div style={{ color: 'var(--navy)', fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1rem', textTransform: 'uppercase', marginBottom: '12px' }}>Contact</div>
           <p style={{ color: 'var(--navy)', fontSize: '.92rem', lineHeight: 1.7, margin: 0 }}>
-            If you have questions about this policy before making a purchase, reach out at <a href="mailto:christopherhappy05@gmail.com" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline' }}>christopherhappy05@gmail.com</a>. We're happy to help you make an informed decision before you buy.
+            If you have questions about this policy before making a purchase, reach out at <a href="mailto:cjhappy@coachespaycoaches.org" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline' }}>cjhappy@coachespaycoaches.org</a> or <a href="mailto:cgiordano@coachespaycoaches.org" style={{ color: 'var(--navy)', fontWeight: 700, textDecoration: 'underline' }}>cgiordano@coachespaycoaches.org</a>. We're happy to help you make an informed decision before you buy.
           </p>
         </div>
 

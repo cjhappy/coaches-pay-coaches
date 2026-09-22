@@ -65,7 +65,7 @@ export default function Terms() {
           },
           {
             title: '13. Contact',
-            body: 'For questions about these Terms of Service, please contact us at christopherhappy05@gmail.com.'
+            body: 'For questions about these Terms of Service, please contact us at cjhappy@coachespaycoaches.org or cgiordano@coachespaycoaches.org.'
           }
         ].map(section => (
           <div key={section.title} style={{ marginBottom: '2rem' }}>

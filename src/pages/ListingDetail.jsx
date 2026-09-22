@@ -8,6 +8,7 @@ import MessageButton from '../components/MessageButton'
 import { Helmet } from 'react-helmet-async'
 import SiteNav from '../components/SiteNav'
 import ReportButton from '../components/ReportButton'
+import Avatar from '../components/Avatar'
 import SaveButton from '../components/SaveButton'
 import CommentSection from '../components/CommentSection'
 import EmptyState from '../components/EmptyState'
@@ -278,9 +279,7 @@ export default function ListingDetail() {
 
             {listing.profiles?.full_name && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1.5rem', cursor: 'pointer', flexWrap: 'wrap' }} onClick={() => navigate('/coach/' + listing.seller_id)}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'var(--green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '11px', color: 'var(--navy)', flexShrink: 0 }}>
-                  {listing.profiles.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                </div>
+                <Avatar url={listing.profiles.avatar_url} name={listing.profiles.full_name} size={32} radius={8} />
                 <div>
                   <div className="muted" style={{ fontSize: '.75rem' }}>Posted by</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

@@ -268,7 +268,7 @@ export default function CoachProfile() {
             )}
 
             {(coach.instagram_url || coach.twitter_url || coach.website_url) && (
-              <div style={{ display: 'flex', gap: '14px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', gap: '14px', marginBottom: '10px', flexWrap: 'wrap' }}>
                 {coach.instagram_url && (
                   <a href={coach.instagram_url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--off)', fontSize: '.8rem', fontWeight: 700, textDecoration: 'none', opacity: .85 }}>Instagram</a>
                 )}
