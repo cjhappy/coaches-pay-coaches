@@ -225,7 +225,8 @@ export default function Marketplace() {
         ) : fetchError ? (
           <ErrorState message="We couldn't load the marketplace right now." onRetry={() => fetchListings(0, true)} />
         ) : listings.length === 0 ? (
-          <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
+          <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+            <img src="/cpc-badge.svg" alt="" style={{ position: 'absolute', top: '50%', left: '50%', width: '140px', height: '140px', transform: 'translate(-50%, -50%)', opacity: 0.05, pointerEvents: 'none' }} />
             {showFollowing ? (
               <>
                 <p className="muted" style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>

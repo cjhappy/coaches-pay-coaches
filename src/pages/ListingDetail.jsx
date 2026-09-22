@@ -10,6 +10,7 @@ import SiteNav from '../components/SiteNav'
 import ReportButton from '../components/ReportButton'
 import SaveButton from '../components/SaveButton'
 import CommentSection from '../components/CommentSection'
+import EmptyState from '../components/EmptyState'
 
 function CopyLinkButton({ url }) {
   const [copied, setCopied] = useState(false)
@@ -312,7 +313,7 @@ export default function ListingDetail() {
               )}
 
               {reviews.length === 0 ? (
-                <p className="muted" style={{ fontSize: '.9rem' }}>No reviews yet. Be the first to review this resource.</p>
+                <EmptyState message="No reviews yet. Be the first to review this resource." />
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                   {reviews.map(review => (

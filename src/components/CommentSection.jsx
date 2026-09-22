@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { notify } from '../lib/notify'
 import ReportButton from './ReportButton'
+import EmptyState from './EmptyState'
 
 const COMMENT_LIMIT = 500
 
@@ -124,7 +125,7 @@ export default function CommentSection({ listing }) {
       {loading ? (
         <p className="muted" style={{ fontSize: '.9rem' }}>Loading comments...</p>
       ) : comments.length === 0 ? (
-        <p className="muted" style={{ fontSize: '.9rem' }}>No comments yet. Be the first to ask a question.</p>
+        <EmptyState message="No comments yet. Be the first to ask a question." />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {comments.map(comment => (

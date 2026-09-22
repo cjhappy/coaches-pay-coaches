@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet-async'
 import MessageButton from '../components/MessageButton'
 import SiteNav from '../components/SiteNav'
 import ErrorState from '../components/ErrorState'
+import EmptyState from '../components/EmptyState'
 import { notify } from '../lib/notify'
 
 function CopyLinkButton({ url }) {
@@ -67,7 +68,7 @@ function CoachReviews({ sellerId, reviews, loading }) {
         )}
       </div>
       {reviews.length === 0 ? (
-        <p className="muted" style={{ fontSize: '.9rem' }}>No reviews yet.</p>
+        <EmptyState message="No reviews yet." />
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {reviews.map(review => (
@@ -335,9 +336,7 @@ export default function CoachProfile() {
           )}
         </div>
         {listings.length === 0 ? (
-          <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
-            <p className="muted">This coach has not uploaded any resources yet.</p>
-          </div>
+          <EmptyState message="This coach has not uploaded any resources yet." />
         ) : (
           <div className="dash-grid">
             {visibleListings.map(listing => (

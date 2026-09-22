@@ -107,7 +107,7 @@ export default function Home() {
         </div>
 
         <h1 className="hero-h1" style={{ position: 'relative', zIndex: 2, marginBottom: '10px' }}>
-          <img src="/cpc-logo-primary.svg" alt="Coaches Pay Coaches" style={{ width: 'min(720px, 92vw)', height: 'auto' }} />
+          <img src="/cpc-logo-primary.svg" alt="Coaches Pay Coaches" style={{ width: 'min(880px, 95vw)', height: 'auto' }} />
         </h1>
 
         <p className="hero-sub-el" style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: 'clamp(16px,2.2vw,22px)', letterSpacing: '3px', textTransform: 'uppercase', color: 'var(--yellow)', margin: '22px 0 18px', position: 'relative', zIndex: 2 }}>

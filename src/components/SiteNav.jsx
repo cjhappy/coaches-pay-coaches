@@ -38,7 +38,7 @@ export default function SiteNav({ active }) {
   return (
     <nav className="cpc-nav">
       <a className="cpc-logo" onClick={() => go('/')}>
-        <img src="/cpc-logo-primary.svg" alt="Coaches Pay Coaches" style={{ height: 44, width: 'auto', display: 'block' }} />
+        <img src="/cpc-logo-primary.svg" alt="Coaches Pay Coaches" style={{ height: 52, width: 'auto', display: 'block' }} />
       </a>
 
       {/* Desktop: primary content links, always visible */}

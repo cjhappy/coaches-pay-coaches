@@ -7,6 +7,7 @@ import Avatar from '../components/Avatar'
 import SellerCompleteness from '../components/SellerCompleteness'
 import RevenueChart from '../components/RevenueChart'
 import SiteNav from '../components/SiteNav'
+import EmptyState from '../components/EmptyState'
 import { compressImage } from '../lib/imageCompress'
 
 function AvatarUploader({ profile, onUpdate }) {
@@ -412,10 +413,7 @@ export default function SellerDashboard() {
             {loading ? (
               <p className="muted">Loading...</p>
             ) : listings.length === 0 ? (
-              <div className="cpc-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
-                <p className="muted" style={{ marginBottom: '1rem' }}>No listings yet.</p>
-                <button className="btn btn-green" onClick={() => setShowForm(true)}>Upload a Resource</button>
-              </div>
+              <EmptyState message="No listings yet." cta="Upload a Resource" onAction={() => setShowForm(true)} />
             ) : (
               <div className="dash-grid">
                 {listings.map(listing => (
@@ -447,9 +445,7 @@ export default function SellerDashboard() {
             <RevenueChart sales={sales} />
             <div className="section-label" style={{ marginBottom: '1rem' }}>Recent Sales</div>
             {sales.length === 0 ? (
-              <div className="cpc-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
-                <p className="muted">No sales yet. Share your listings to start earning!</p>
-              </div>
+              <EmptyState message="No sales yet. Share your listings to start earning!" />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {sales.map(sale => (

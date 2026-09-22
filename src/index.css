@@ -391,7 +391,7 @@ body {
 .cream-page .section-label { color: var(--muted-on-cream); }
 .cream-page .section-label::before { background: var(--navy); }
 .cream-page .muted { color: var(--muted-on-cream) !important; }
-.cream-page .tag { background: var(--cream-card); border: 1px solid var(--border-on-cream); color: var(--navy); }
+.cream-page .tag { background: rgba(253,251,84,0.35); border: 1.5px solid var(--navy); color: var(--navy); font-weight: 700; }
 .cream-page .form-label { color: var(--muted-on-cream); }
 .cream-page .form-input {
   background: var(--white);
@@ -586,7 +586,7 @@ body {
 }
 .site-footer-copy { color: var(--muted); font-size: .78rem; }
 .site-footer-brand { display: flex; align-items: center; gap: 10px; }
-.site-footer-badge { height: 26px; width: 26px; flex-shrink: 0; }
+.site-footer-badge { height: 34px; width: 34px; flex-shrink: 0; }
 .site-footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
 .site-footer-links a {
   color: var(--muted);
