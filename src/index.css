@@ -1,4 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Condensed:wght@600;700;800&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+/* Font <link> moved to index.html (with preconnect) instead of @import
+   here — an @import inside CSS forces the browser to fetch and parse this
+   stylesheet first before it even discovers the font request, adding a
+   fully sequential round trip before any text can render in the final
+   font. A <link> in the HTML is discovered immediately alongside the CSS
+   itself. */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }

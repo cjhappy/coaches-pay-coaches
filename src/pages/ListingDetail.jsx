@@ -450,7 +450,7 @@ export default function ListingDetail() {
               {related.map(r => (
                 <div key={r.id} className="cpc-card" style={{ padding: '1.25rem', cursor: 'pointer' }} onClick={() => navigate('/listing/' + r.id)}>
                   {r.thumbnail_url ? (
-                    <img src={r.thumbnail_url} alt={r.title} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
+                    <img src={r.thumbnail_url} alt={r.title} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} loading="lazy" decoding="async" />
                   ) : (
                     <div style={{ width: '100%', height: '120px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', marginBottom: '1rem' }}>📋</div>
                   )}

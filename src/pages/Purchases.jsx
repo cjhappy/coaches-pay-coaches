@@ -89,7 +89,7 @@ export default function Purchases() {
               <div key={purchase.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
 
                 {getThumbnail(purchase) ? (
-                  <img src={getThumbnail(purchase)} alt={getTitle(purchase)} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
+                  <img src={getThumbnail(purchase)} alt={getTitle(purchase)} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} loading="lazy" decoding="async" />
                 ) : (
                   <div style={{ width: '80px', height: '80px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', flexShrink: 0 }}>📋</div>
                 )}

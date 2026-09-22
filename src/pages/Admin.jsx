@@ -299,7 +299,7 @@ export default function Admin() {
             {filteredListings.map(listing => (
               <div key={listing.id} className="cpc-card" style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                 {listing.thumbnail_url ? (
-                  <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
+                  <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} loading="lazy" decoding="async" />
                 ) : (
                   <div style={{ width: '50px', height: '50px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', flexShrink: 0 }}>📋</div>
                 )}

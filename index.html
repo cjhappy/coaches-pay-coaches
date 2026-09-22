@@ -8,6 +8,15 @@
     <meta name="keywords" content="coaching materials, youth sports, practice plans, drills, playbooks, basketball coaching, soccer coaching, football coaching" />
     <meta name="theme-color" content="#2ecc71" />
     <meta name="google-site-verification" content="4K-IpVLM1qL4_oU23DXZXbhkv-XbF3FN-YJfNkZNi_E" />
+
+    <!-- Opens the connection to Supabase and Google Fonts as early as
+         possible, in parallel with everything else, instead of waiting
+         until the JS bundle (Supabase) or the stylesheet (fonts) is
+         parsed to even start the DNS/TLS handshake. -->
+    <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Condensed:wght@600;700;800&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://coachespaycoaches.org/" />
     <meta property="og:title" content="Coaches Pay Coaches — The Marketplace for Youth Sports Coaches" />

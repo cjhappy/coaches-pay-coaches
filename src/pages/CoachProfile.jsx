@@ -343,7 +343,7 @@ export default function CoachProfile() {
             {visibleListings.map(listing => (
               <div key={listing.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
                 {listing.thumbnail_url ? (
-                  <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
+                  <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} loading="lazy" decoding="async" />
                 ) : (
                   <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', marginBottom: '1rem' }}>📋</div>
                 )}

@@ -78,7 +78,7 @@ function PostCard({ post, currentUser, onDelete }) {
           </p>
 
           {post.image_url && (
-            <img src={post.image_url} alt="post" style={{ width: '100%', borderRadius: '10px', marginBottom: '1rem', maxHeight: '400px', objectFit: 'cover' }} />
+            <img src={post.image_url} alt="post" style={{ width: '100%', borderRadius: '10px', marginBottom: '1rem', maxHeight: '400px', objectFit: 'cover' }} loading="lazy" decoding="async" />
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-on-cream)' }}>

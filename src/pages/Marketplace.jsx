@@ -267,7 +267,7 @@ function ListingCard({ listing, navigate }) {
         <SaveButton listingId={listing.id} size="small" />
       </div>
       {listing.thumbnail_url ? (
-        <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
+        <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} loading="lazy" decoding="async" />
       ) : (
         <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', fontSize: '2.5rem' }}>📋</div>
       )}

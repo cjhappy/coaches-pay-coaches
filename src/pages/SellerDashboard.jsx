@@ -421,7 +421,7 @@ export default function SellerDashboard() {
                 {listings.map(listing => (
                   <div key={listing.id} className="cpc-card" style={{ padding: '1.25rem' }}>
                     {listing.thumbnail_url && (
-                      <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
+                      <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} loading="lazy" decoding="async" />
                     )}
                     <div style={{ fontFamily: 'var(--font-sub)', fontWeight: 700, fontSize: '1.05rem', textTransform: 'uppercase', marginBottom: '4px', color: 'var(--navy)' }}>{listing.title}</div>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
@@ -455,7 +455,7 @@ export default function SellerDashboard() {
                 {sales.map(sale => (
                   <div key={sale.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
                     {sale.listings?.thumbnail_url ? (
-                      <img src={sale.listings.thumbnail_url} alt={sale.listings.title} style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} />
+                      <img src={sale.listings.thumbnail_url} alt={sale.listings.title} style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px', flexShrink: 0 }} loading="lazy" decoding="async" />
                     ) : (
                       <div style={{ width: '70px', height: '70px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.75rem', flexShrink: 0 }}>📋</div>
                     )}

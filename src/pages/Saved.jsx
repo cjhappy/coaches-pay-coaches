@@ -68,7 +68,7 @@ export default function Saved() {
               return (
                 <div key={item.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
                   {listing.thumbnail_url ? (
-                    <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem', cursor: 'pointer' }} onClick={() => navigate('/listing/' + listing.id)} />
+                    <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem', cursor: 'pointer' }} onClick={() => navigate('/listing/' + listing.id)} loading="lazy" decoding="async" />
                   ) : (
                     <div style={{ width: '100%', height: '140px', borderRadius: '8px', background: 'var(--cream-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', fontSize: '2.5rem', cursor: 'pointer' }} onClick={() => navigate('/listing/' + listing.id)}>📋</div>
                   )}
