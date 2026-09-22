@@ -18,6 +18,7 @@ exports.handler = async (event) => {
       process.env.STRIPE_WEBHOOK_SECRET
     )
   } catch (err) {
+    console.error('Webhook signature verification failed:', err.message)
     return { statusCode: 400, body: 'Webhook Error: ' + err.message }
   }
 

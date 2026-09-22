@@ -51,6 +51,7 @@ exports.handler = async (event) => {
 
     return { statusCode: 200, headers, body: JSON.stringify({ attributed: (data || []).length > 0 }) }
   } catch (err) {
+    console.error('attribute-referral failed:', err.message)
     return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) }
   }
 }

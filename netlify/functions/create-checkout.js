@@ -127,6 +127,7 @@ exports.handler = async (event) => {
 
     return { statusCode: 200, headers, body: JSON.stringify({ url: session.url }) }
   } catch (err) {
+    console.error('create-checkout failed:', err.message)
     return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) }
   }
 }

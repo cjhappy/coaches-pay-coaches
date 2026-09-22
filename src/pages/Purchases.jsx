@@ -42,7 +42,7 @@ export default function Purchases() {
     setError(null)
     const { data, error } = await supabase.storage
       .from('listings-files')
-      .createSignedUrl(fileUrl, 60)
+      .createSignedUrl(fileUrl, 300)
     if (error) {
       setError('Could not generate download link.')
     } else {

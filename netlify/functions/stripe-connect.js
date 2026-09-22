@@ -64,6 +64,7 @@ exports.handler = async (event) => {
 
     return { statusCode: 200, headers, body: JSON.stringify({ url: accountLink.url }) }
   } catch (err) {
+    console.error('stripe-connect failed:', err.message)
     return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) }
   }
 }

@@ -200,7 +200,7 @@ export default function ListingDetail() {
   async function handleDownload() {
     const { data, error } = await supabase.storage
       .from('listings-files')
-      .createSignedUrl(listing.file_url, 60)
+      .createSignedUrl(listing.file_url, 300)
     if (error) setError('Could not generate download link.')
     else window.open(data.signedUrl, '_blank')
   }

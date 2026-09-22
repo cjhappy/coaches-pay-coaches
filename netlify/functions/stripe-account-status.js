@@ -72,6 +72,7 @@ exports.handler = async (event) => {
       })
     }
   } catch (err) {
+    console.error('stripe-account-status failed:', err.message)
     return { statusCode: 500, headers, body: JSON.stringify({ error: err.message }) }
   }
 }
