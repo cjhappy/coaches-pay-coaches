@@ -48,23 +48,10 @@ function ShareCard({ url, name }) {
   )
 }
 
-function CoachReviews({ sellerId }) {
-  const [reviews, setReviews] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    async function fetchReviews() {
-      const { data } = await supabase
-        .from('reviews')
-        .select('*, profiles(full_name), listings(title)')
-        .eq('seller_id', sellerId)
-        .order('created_at', { ascending: false })
-      setReviews(data || [])
-      setLoading(false)
-    }
-    fetchReviews()
-  }, [sellerId])
-
+// Lifted out of the component so the header stats (follower count, avg
+// rating) and the reviews section below can share one fetch instead of
+// each running their own query.
+function CoachReviews({ sellerId, reviews, loading }) {
   const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
   if (loading) return null
 
@@ -119,8 +106,25 @@ export default function CoachProfile() {
   const [isFollowing, setIsFollowing] = useState(false)
   const [followLoading, setFollowLoading] = useState(false)
   const [fetchError, setFetchError] = useState(false)
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
+  const [sportFilter, setSportFilter] = useState('all')
 
   useEffect(() => { fetchCoach() }, [id])
+
+  useEffect(() => {
+    async function fetchReviews() {
+      setReviewsLoading(true)
+      const { data } = await supabase
+        .from('reviews')
+        .select('*, profiles(full_name), listings(title)')
+        .eq('seller_id', id)
+        .order('created_at', { ascending: false })
+      setReviews(data || [])
+      setReviewsLoading(false)
+    }
+    fetchReviews()
+  }, [id])
 
   async function fetchCoach() {
     setFetchError(false)
@@ -195,6 +199,8 @@ export default function CoachProfile() {
   const sports = [...new Set(listings.map(l => l.sport))]
   const shareUrl = 'https://coachespaycoaches.org/coach/' + coach.id
   const isOwnProfile = user?.id === coach.id
+  const avgRating = reviews.length > 0 ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length : 0
+  const visibleListings = sportFilter === 'all' ? listings : listings.filter(l => l.sport === sportFilter)
 
   return (
     <div className="page-body cream-page">
@@ -208,21 +214,40 @@ export default function CoachProfile() {
 
       <SiteNav active="coaches" />
 
-      <div style={{ background: 'var(--navy)', padding: '3rem 5%' }}>
-        <button className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '13px', marginBottom: '2rem' }} onClick={() => navigate(-1)}>
+      <div style={{
+        position: 'relative',
+        padding: '3rem 5%',
+        background: 'linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 55%, var(--navy-light) 100%)',
+        overflow: 'hidden'
+      }}>
+        {/* Decorative brand accent — a diagonal yellow stripe, not a real
+            uploaded banner image (no schema change needed for this). */}
+        <div style={{
+          position: 'absolute', top: 0, right: '-10%', width: '55%', height: '140%',
+          background: 'var(--yellow)', opacity: 0.06, transform: 'rotate(-12deg)', pointerEvents: 'none'
+        }} />
+
+        <button className="btn btn-ghost" style={{ padding: '8px 16px', fontSize: '13px', marginBottom: '2rem', position: 'relative' }} onClick={() => navigate(-1)}>
           Back
         </button>
 
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '2rem', flexWrap: 'wrap', position: 'relative' }}>
           <Avatar url={coach.avatar_url} name={coach.full_name} size={100} radius={20} />
 
           <div style={{ flex: 1, minWidth: '200px' }}>
             <div className="section-label" style={{ marginBottom: '8px' }}>Coach Profile</div>
-            <h1 style={{ fontFamily: 'var(--font-header)', fontWeight: 400, fontSize: 'clamp(28px, 4vw, 48px)', textTransform: 'uppercase', lineHeight: 1, marginBottom: '12px', color: 'var(--white)' }}>
-              {coach.full_name}
-            </h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '12px' }}>
+              <h1 style={{ fontFamily: 'var(--font-header)', fontWeight: 400, fontSize: 'clamp(28px, 4vw, 48px)', textTransform: 'uppercase', lineHeight: 1, margin: 0, color: 'var(--white)' }}>
+                {coach.full_name}
+              </h1>
+              {coach.verified && (
+                <span style={{ background: 'var(--yellow)', border: '1px solid var(--navy)', color: 'var(--navy)', fontSize: '10px', fontWeight: 800, padding: '3px 9px', borderRadius: '100px', letterSpacing: '.06em', textTransform: 'uppercase' }}>
+                  ✓ Verified
+                </span>
+              )}
+            </div>
 
-            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '16px', flexWrap: 'wrap' }}>
               <div>
                 <span style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.2rem', color: 'var(--white)' }}>{followerCount}</span>
                 <span style={{ color: 'var(--muted)', fontSize: '.8rem', marginLeft: '4px' }}>Followers</span>
@@ -235,6 +260,12 @@ export default function CoachProfile() {
                 <span style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.2rem', color: 'var(--white)' }}>{listings.length}</span>
                 <span style={{ color: 'var(--muted)', fontSize: '.8rem', marginLeft: '4px' }}>Resources</span>
               </div>
+              {reviews.length > 0 && (
+                <div>
+                  <span style={{ fontFamily: 'var(--font-sub)', fontWeight: 900, fontSize: '1.2rem', color: 'var(--white)' }}>★ {avgRating.toFixed(1)}</span>
+                  <span style={{ color: 'var(--muted)', fontSize: '.8rem', marginLeft: '4px' }}>({reviews.length} review{reviews.length === 1 ? '' : 's'})</span>
+                </div>
+              )}
             </div>
 
             {sports.length > 0 && (
@@ -274,9 +305,34 @@ export default function CoachProfile() {
         </div>
       </div>
 
+      <CoachReviews sellerId={id} reviews={reviews} loading={reviewsLoading} />
+
       <div className="dash-body">
-        <div className="section-label" style={{ marginBottom: '1.5rem' }}>
-          Resources by {coach.full_name?.split(' ')[0]}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+          <div className="section-label" style={{ margin: 0 }}>
+            Resources by {coach.full_name?.split(' ')[0]}
+          </div>
+          {sports.length > 1 && (
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setSportFilter('all')}
+                className="tag"
+                style={{ cursor: 'pointer', border: 'none', background: sportFilter === 'all' ? 'var(--navy)' : 'var(--cream-card)', color: sportFilter === 'all' ? 'var(--yellow)' : 'var(--navy)' }}
+              >
+                All
+              </button>
+              {sports.map(s => (
+                <button
+                  key={s}
+                  onClick={() => setSportFilter(s)}
+                  className="tag"
+                  style={{ cursor: 'pointer', border: 'none', background: sportFilter === s ? 'var(--navy)' : 'var(--cream-card)', color: sportFilter === s ? 'var(--yellow)' : 'var(--navy)' }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         {listings.length === 0 ? (
           <div className="cpc-card" style={{ padding: '3rem', textAlign: 'center' }}>
@@ -284,7 +340,7 @@ export default function CoachProfile() {
           </div>
         ) : (
           <div className="dash-grid">
-            {listings.map(listing => (
+            {visibleListings.map(listing => (
               <div key={listing.id} className="cpc-card" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column' }}>
                 {listing.thumbnail_url ? (
                   <img src={listing.thumbnail_url} alt={listing.title} style={{ width: '100%', height: '140px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }} />
@@ -310,8 +366,6 @@ export default function CoachProfile() {
           </div>
         )}
       </div>
-
-      <CoachReviews sellerId={id} />
     </div>
   )
 }

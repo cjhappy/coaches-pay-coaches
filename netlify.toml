@@ -1,4 +1,13 @@
 [build]
+
+[[edge_functions]]
+  path = "/listing/*"
+  function = "social-meta"
+
+[[edge_functions]]
+  path = "/coach/*"
+  function = "social-meta"
+
 [[headers]]
   for = "/*"
   [headers.values]
