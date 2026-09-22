@@ -16,10 +16,6 @@ export default function Admin() {
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState(false)
   const [search, setSearch] = useState('')
-  const [stats, setStats] = useState({
-    totalUsers: 0, totalListings: 0, totalRevenue: 0, totalSales: 0,
-    totalSellers: 0, totalBuyers: 0, verifiedSellers: 0, avgOrderValue: 0
-  })
 
   useEffect(() => {
     if (profile && !profile.is_admin) navigate('/dashboard')
@@ -55,24 +51,6 @@ export default function Admin() {
     setPurchases(purchasesData)
     setReports(reportsData)
 
-    const completed = purchasesData.filter(p => p.status === 'completed')
-    const totalRevenue = completed.reduce((sum, p) => sum + Number(p.amount_platform), 0)
-    const totalSales = completed.length
-    const sellers = usersData.filter(u => u.role === 'seller' || u.role === 'both')
-    const buyers = usersData.filter(u => u.role === 'buyer' || u.role === 'both')
-    const verified = usersData.filter(u => u.verified)
-
-    setStats({
-      totalUsers: usersData.length,
-      totalListings: listingsData.length,
-      totalRevenue,
-      totalSales,
-      totalSellers: sellers.length,
-      totalBuyers: buyers.length,
-      verifiedSellers: verified.length,
-      avgOrderValue: totalSales > 0 ? completed.reduce((sum, p) => sum + Number(p.amount_total), 0) / totalSales : 0
-    })
-
     setLoading(false)
   }
 
@@ -98,6 +76,34 @@ export default function Admin() {
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, verified: !currentValue } : u))
   }
 
+  const [disconnectingId, setDisconnectingId] = useState(null)
+
+  // Reuses the same stripe-disconnect function sellers use on themselves
+  // (SellerDashboard's handleDisconnectStripe) — it now also accepts an
+  // admin caller acting on someone else's account, so there's no separate
+  // Stripe integration to maintain here.
+  async function disconnectSellerStripe(userId, name) {
+    if (!confirm(`Disconnect ${name || 'this seller'}'s Stripe account? They won't be able to receive payouts until they reconnect.`)) return
+    setDisconnectingId(userId)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/.netlify/functions/stripe-disconnect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
+        },
+        body: JSON.stringify({ userId })
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Disconnect failed')
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, stripe_account_id: null, stripe_charges_enabled: false, stripe_payouts_enabled: false } : u))
+    } catch (err) {
+      alert('Failed to disconnect Stripe: ' + err.message)
+    }
+    setDisconnectingId(null)
+  }
+
   async function dismissReport(reportId) {
     await supabase.from('reports').update({ status: 'dismissed' }).eq('id', reportId)
     setReports(prev => prev.map(r => r.id === reportId ? { ...r, status: 'dismissed' } : r))
@@ -106,7 +112,7 @@ export default function Admin() {
   async function deleteReportedContent(report) {
     if (!confirm(`Delete this ${report.content_type} and mark the report resolved? This cannot be undone.`)) return
 
-    const tableByType = { post: 'posts', listing: 'listings', message: 'messages' }
+    const tableByType = { post: 'posts', listing: 'listings', message: 'messages', comment: 'listing_comments' }
     const table = tableByType[report.content_type]
     if (table) {
       await supabase.from(table).delete().eq('id', report.content_id)
@@ -141,6 +147,27 @@ export default function Admin() {
 
   const completedPurchases = purchases.filter(p => p.status === 'completed')
   const pendingReports = reports.filter(r => r.status === 'pending')
+
+  // Derived directly from the live users/listings/purchases state on every
+  // render, instead of a separate `stats` state that was only ever
+  // computed once in fetchAll() — deleting a listing/user or toggling
+  // verified previously left these numbers stale until a full page
+  // reload, since none of those actions recomputed them.
+  const sellers = users.filter(u => u.role === 'seller' || u.role === 'both')
+  const buyers = users.filter(u => u.role === 'buyer' || u.role === 'both')
+  const verifiedSellers = users.filter(u => u.verified)
+  const totalRevenue = completedPurchases.reduce((sum, p) => sum + Number(p.amount_platform), 0)
+  const totalSales = completedPurchases.length
+  const stats = {
+    totalUsers: users.length,
+    totalListings: listings.length,
+    totalRevenue,
+    totalSales,
+    totalSellers: sellers.length,
+    totalBuyers: buyers.length,
+    verifiedSellers: verifiedSellers.length,
+    avgOrderValue: totalSales > 0 ? completedPurchases.reduce((sum, p) => sum + Number(p.amount_total), 0) / totalSales : 0
+  }
 
   const filteredUsers = users.filter(u =>
     !search || u.full_name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase())
@@ -278,6 +305,16 @@ export default function Admin() {
                   >
                     {u.is_admin ? 'Remove Admin' : 'Make Admin'}
                   </button>
+                  {u.stripe_account_id && (
+                    <button
+                      className="btn"
+                      style={{ padding: '5px 12px', fontSize: '12px', background: '#fff', color: '#b91c1c', border: '1.5px solid #b91c1c' }}
+                      disabled={disconnectingId === u.id}
+                      onClick={() => disconnectSellerStripe(u.id, u.full_name)}
+                    >
+                      {disconnectingId === u.id ? 'Disconnecting...' : 'Disconnect Stripe'}
+                    </button>
+                  )}
                   {u.id !== user.id && (
                     <button
                       className="btn"

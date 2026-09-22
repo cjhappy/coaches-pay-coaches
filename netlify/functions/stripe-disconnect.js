@@ -31,7 +31,19 @@ exports.handler = async (event) => {
     if (authError || !user) throw new Error('Not authenticated')
 
     const { userId } = JSON.parse(event.body)
-    if (userId !== user.id) throw new Error('You can only disconnect your own account')
+
+    if (userId !== user.id) {
+      // Not disconnecting your own account — only allowed if the caller is
+      // an admin (e.g. removing a fraudulent or abusive seller's payout
+      // access). Look up the caller's own profile to check, rather than
+      // trusting anything the client claims about itself.
+      const { data: callerProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single()
+      if (!callerProfile?.is_admin) throw new Error('You can only disconnect your own account')
+    }
 
     const { data: profile } = await supabaseAdmin
       .from('profiles')
