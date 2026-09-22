@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import MobileNav from './components/MobileNav'
 import SiteFooter from './components/SiteFooter'
 import Analytics from './components/Analytics'
+import LoadingScreen from './components/LoadingScreen'
 
 // Everything below Home/AuthForm is lazy-loaded — those two are the pages
 // most people hit first (landing page, sign up/log in), so they stay in
@@ -31,10 +32,6 @@ const RefundPolicy = lazy(() => import('./pages/Refunds'))
 const AccountSettings = lazy(() => import('./pages/AccountSettings'))
 const Saved = lazy(() => import('./pages/Saved'))
 
-function RouteLoading() {
-  return <div className="page-body cream-page" style={{ padding: '4rem 5%' }}><span className="muted">Loading...</span></div>
-}
-
 function AppFooter() {
   const location = useLocation()
   if (location.pathname === '/') return null
@@ -43,11 +40,11 @@ function AppFooter() {
 
 function App() {
   const { user, loading } = useAuth()
-  if (loading) return <div>Loading...</div>
+  if (loading) return <LoadingScreen />
 
   return (
     <BrowserRouter>
-      <Suspense fallback={<RouteLoading />}>
+      <Suspense fallback={<LoadingScreen />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <AuthForm onSuccess={() => window.location.href = '/dashboard'} />} />

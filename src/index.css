@@ -9,6 +9,63 @@ body {
   overflow-x: hidden;
 }
 
+/* ── BRANDED LOADING SCREEN ──
+   Used for route transitions (lazy-loaded pages) and the session/profile
+   check on protected pages — replaces the old plain "Loading..." text. */
+.cpc-loading-page {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cream);
+}
+.cpc-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+}
+.cpc-loading-ring {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cpc-loading-ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid var(--border-on-cream);
+  border-top-color: var(--navy);
+  animation: cpc-spin .9s linear infinite;
+}
+.cpc-loading-badge {
+  width: 38px;
+  height: 38px;
+  animation: cpc-pulse 1.6s ease-in-out infinite;
+}
+.cpc-loading-label {
+  font-family: var(--font-sub);
+  font-weight: 700;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: var(--muted-on-cream);
+}
+@keyframes cpc-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes cpc-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: .85; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cpc-loading-ring::before, .cpc-loading-badge { animation: none; }
+}
+
 /* ── COACHES PAY COACHES BRAND TOKENS ──
    NOTE: "Industry Inc." (the brand guide's header face) is a paid, non-Google
    font. Until it's licensed + self-hosted, headers use Anton as a free
